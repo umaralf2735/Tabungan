@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     description: 'Catat keuangan harian dan capai target tabunganmu dengan fitur AI canggih dari FinanceFlow Pro.',
     type: 'website',
   },
+  verification: {
+    google: 'pGRIr8dxnh_eP78K4ztKMPZaFxnyRNMEhKW573z4TrE',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
