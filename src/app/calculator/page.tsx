@@ -21,107 +21,108 @@ export default function CalculatorPage() {
 
   return (
     <div className="animate-fade-in">
-      <header style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Kalkulator AI & Dana Darurat</h2>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Hitung rasio keuangan ideal dan target dana daruratmu.</p>
+      <header className="mb-4">
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Kalkulator Finansial</h2>
+        <p className="text-xs text-muted">Hitung rasio ideal & dana darurat</p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         
         {/* Kolom Input */}
-        <section className="card">
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Masukkan Data Bulanan</h3>
+        <section className="card-glass" style={{ padding: '1.25rem' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Data Bulanan</h3>
           
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Total Pemasukan (Gaji, Bisnis, dll)</label>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pemasukan (Gaji, Bisnis, dll)</label>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>Rp</span>
+              <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Rp</span>
               <input 
                 type="number" 
                 value={income} 
                 onChange={e => setIncome(e.target.value)} 
                 placeholder="0"
-                style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
+                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', fontSize: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
               />
             </div>
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Pengeluaran Tetap/Wajib (Kosan, Listrik, Cicilan)</label>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pengeluaran Wajib (Kosan, Cicilan)</label>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>Rp</span>
+              <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Rp</span>
               <input 
                 type="number" 
                 value={fixedExpense} 
                 onChange={e => setFixedExpense(e.target.value)} 
                 placeholder="0"
-                style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
+                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', fontSize: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
               />
             </div>
           </div>
           
           {sisa < 0 && (
-            <div style={{ padding: '1rem', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--color-danger)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
+            <div style={{ padding: '0.75rem', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(244, 63, 94, 0.3)', fontSize: '0.75rem' }}>
               ⚠️ Pengeluaran wajibmu lebih besar dari pendapatan!
             </div>
           )}
         </section>
 
-        {/* Kolom Output */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Target Dana Darurat */}
+        <section className="card-glass" style={{ border: '1px solid rgba(139, 92, 246, 0.3)', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-secondary)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-secondary)' }}>Target Dana Darurat</h3>
+          </div>
+          <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+            Tabungan proteksi minimal 3x - 6x pengeluaran wajib bulanan.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)' }}>
+            <div>
+              <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Min (3x)</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700 }}>Rp {(emergencyMin/1000).toLocaleString('id-ID')}k</p>
+            </div>
+            <div style={{ color: 'var(--color-text-muted)' }}>—</div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Ideal (6x)</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rp {(emergencyMax/1000).toLocaleString('id-ID')}k</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Rule 50/30/20 */}
+        <section className="card-glass" style={{ border: '1px solid rgba(37, 99, 235, 0.3)', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rekomendasi 50/30/20</h3>
+          </div>
           
-          <section className="card" style={{ border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-secondary)', marginBottom: '1rem' }}>Target Dana Darurat (Emergency Fund)</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-              Dana yang harus tersedia (cash/tabungan cair) untuk berjaga-jaga jika terjadi musibah atau kehilangan pekerjaan. Minimal 3-6 kali pengeluaran bulanan.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div className="flex-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
               <div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Minimal (3 Bulan)</p>
-                <p style={{ fontSize: '1.25rem', fontWeight: 700 }}>Rp {emergencyMin.toLocaleString('id-ID')}</p>
+                <div style={{ fontSize: '0.8rem', fontWeight: 600 }}>Pokok (50%)</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Sewa, Makan, Listrik</div>
               </div>
-              <div style={{ color: 'var(--color-text-muted)' }}>—</div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Ideal (6 Bulan)</p>
-                <p style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rp {emergencyMax.toLocaleString('id-ID')}</p>
-              </div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Rp {needs.toLocaleString('id-ID')}</div>
             </div>
-          </section>
-
-          <section className="card" style={{ border: '1px solid rgba(37, 99, 235, 0.3)' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '1rem' }}>Rekomendasi Budget (Rule 50/30/20)</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-              Metode penganggaran ideal untuk membagi gajimu berdasarkan persentase.
-            </p>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Kebutuhan Pokok (50%)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Sewa, Makan, Listrik, Transport</div>
-                </div>
-                <div style={{ fontWeight: 700 }}>Rp {needs.toLocaleString('id-ID')}</div>
+            <div className="flex-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 600 }}>Keinginan (30%)</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Hiburan, Jajan, Hobi</div>
               </div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Keinginan (30%)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Hiburan, Jajan, Hobi, Nongkrong</div>
-                </div>
-                <div style={{ fontWeight: 700 }}>Rp {wants.toLocaleString('id-ID')}</div>
-              </div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--color-success)' }}>Tabungan / Investasi (20%)</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Dana Darurat, Saham, Emas</div>
-                </div>
-                <div style={{ fontWeight: 700, color: 'var(--color-success)' }}>Rp {savings.toLocaleString('id-ID')}</div>
-              </div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Rp {wants.toLocaleString('id-ID')}</div>
             </div>
-          </section>
+            
+            <div className="flex-between">
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-success)' }}>Tabungan (20%)</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Investasi, Dana Darurat</div>
+              </div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-success)' }}>Rp {savings.toLocaleString('id-ID')}</div>
+            </div>
+          </div>
+        </section>
 
-        </div>
       </div>
     </div>
   );
