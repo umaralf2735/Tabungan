@@ -69,7 +69,7 @@ export default function WalletsPage() {
 
   return (
     <div className="animate-fade-in">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Multi Wallet</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Pisahkan saldo kas, bank, dan e-wallet Anda.</p>

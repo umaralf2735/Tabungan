@@ -103,7 +103,7 @@ export default function Home() {
 
   return (
     <div className="animate-fade-in">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Dashboard</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Selamat datang kembali, {user.name}!</p>
