@@ -6,250 +6,188 @@ export default function TransactionsPage() {
   const [wallets, setWallets] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isTransferMode, setIsTransferMode] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   
-  const [formData, setFormData] = useState({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: '' });
-  const [transferData, setTransferData] = useState({ description: 'Transfer antar dompet', amount: '', fromWalletId: '', toWalletId: '' });
+  const [search, setSearch] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+
+  const [formData, setFormData] = useState({ amount: '', type: 'EXPENSE', category: '', description: '', date: '', walletId: '' });
+  const [transferData, setTransferData] = useState({ fromWalletId: '', toWalletId: '', amount: '', description: 'Transfer antar dompet' });
 
   useEffect(() => {
-    fetchTransactions();
-    fetchWallets();
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    if (userData.id) {
+      setUser(userData);
+      fetchData(userData.id);
+    }
   }, []);
 
-  const fetchWallets = async () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user.id) return;
-    const res = await fetch(`/api/wallets?userId=${user.id}`);
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      setWallets(data);
-      if (data.length > 0) {
-        setFormData(prev => ({ ...prev, walletId: data[0].id }));
-        setTransferData(prev => ({ 
-          ...prev, 
-          fromWalletId: data[0].id, 
-          toWalletId: data.length > 1 ? data[1].id : data[0].id 
-        }));
+  const fetchData = async (userId: string) => {
+    try {
+      const [txRes, walletRes] = await Promise.all([
+        fetch('/api/transactions'),
+        fetch(`/api/wallets?userId=${userId}`)
+      ]);
+      const txData = await txRes.json();
+      const walletData = await walletRes.json();
+      if(Array.isArray(txData)) setTransactions(txData);
+      if(Array.isArray(walletData)) {
+        setWallets(walletData);
+        if (walletData.length > 0) {
+          setFormData(prev => ({ ...prev, walletId: walletData[0].id }));
+          setTransferData(prev => ({ ...prev, fromWalletId: walletData[0].id, toWalletId: walletData.length > 1 ? walletData[1].id : '' }));
+        }
       }
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const fetchTransactions = async () => {
-    const res = await fetch('/api/transactions');
-    const data = await res.json();
-    if (Array.isArray(data)) setTransactions(data);
-  };
-
-  const handleEdit = (tx: any) => {
-    if(tx.category.startsWith('Transfer')) {
-      alert("Transaksi transfer tidak dapat diedit langsung. Silakan hapus dan buat ulang.");
-      return;
-    }
-    setEditingId(tx.id);
-    setIsTransferMode(false);
-    setFormData({ description: tx.description, amount: tx.amount.toString(), type: tx.type, category: tx.category, paymentMethod: tx.paymentMethod, walletId: tx.walletId || '' });
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm('Yakin ingin menghapus transaksi ini? (Jika ini adalah transaksi transfer, saldo dompet akan dikembalikan)')) {
-      await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-      fetchTransactions();
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    if (isTransferMode) {
-      if (transferData.fromWalletId === transferData.toWalletId) {
-        alert("Dompet asal dan tujuan tidak boleh sama!");
-        return;
-      }
-      
+    if(isTransferMode) {
       await fetch('/api/transactions/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...transferData, amount: parseFloat(transferData.amount), userId: user.id })
       });
-      
     } else {
-      if (editingId) {
-        await fetch(`/api/transactions/${editingId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount) })
-        });
-      } else {
-        await fetch('/api/transactions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id })
-        });
-      }
+      await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id, date: formData.date ? new Date(formData.date).toISOString() : undefined })
+      });
     }
-    
     setShowForm(false);
-    setEditingId(null);
-    setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' });
-    setTransferData({ description: 'Transfer antar dompet', amount: '', fromWalletId: wallets.length > 0 ? wallets[0].id : '', toWalletId: wallets.length > 1 ? wallets[1].id : '' });
-    fetchTransactions();
+    fetchData(user.id);
   };
+
+  const handleDelete = async (id: string) => {
+    if(!confirm('Hapus transaksi?')) return;
+    await fetch(`/api/transactions?id=${id}`, { method: 'DELETE' });
+    fetchData(user.id);
+  };
+
+  const filteredTransactions = transactions.filter(t => {
+    if(filterType !== 'ALL' && t.type !== filterType && !(filterType === 'TRANSFER' && t.category.startsWith('Transfer'))) return false;
+    if(search && !t.description?.toLowerCase().includes(search.toLowerCase()) && !t.category?.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <div className="animate-fade-in">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      {/* Compact Header */}
+      <div className="flex-between mb-4">
         <div>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Transaksi</h2>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Kelola semua riwayat pemasukan dan pengeluaran kamu.</p>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Transaksi</h2>
+          <p className="text-xs text-muted">Kelola transaksi keuangan Anda</p>
         </div>
-        <button onClick={() => { 
-          setShowForm(!showForm); 
-          setEditingId(null); 
-          setIsTransferMode(false);
-          setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' }); 
-        }} className="btn-primary">
-          {showForm ? 'Batal' : '+ Tambah Transaksi'}
+        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
+          {showForm ? 'Batal' : '+ Tambah'}
         </button>
-      </header>
+      </div>
 
+      {/* Form (Compact) */}
       {showForm && (
-        <section className="card animate-fade-in" style={{ marginBottom: '2rem', padding: '2rem' }}>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem' }}>
-            <button 
-              type="button" 
-              onClick={() => { setIsTransferMode(false); setEditingId(null); }} 
-              style={{ fontWeight: 600, padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', background: !isTransferMode ? 'var(--color-primary)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)' }}
-            >
-              Catat Transaksi
-            </button>
-            {!editingId && (
-              <button 
-                type="button" 
-                onClick={() => setIsTransferMode(true)} 
-                style={{ fontWeight: 600, padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', background: isTransferMode ? 'var(--color-secondary)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)' }}
-              >
-                Transfer Antar Dompet
-              </button>
-            )}
+        <form onSubmit={handleSave} className="card mb-4">
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <button type="button" onClick={() => setIsTransferMode(false)} style={{ flex: 1, padding: '0.5rem', background: !isTransferMode ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: 'white', borderRadius: 'var(--radius-sm)', border: 'none', fontSize: '0.8rem', fontWeight: 600 }}>Biasa</button>
+            <button type="button" onClick={() => setIsTransferMode(true)} style={{ flex: 1, padding: '0.5rem', background: isTransferMode ? 'var(--color-secondary)' : 'rgba(255,255,255,0.05)', color: 'white', borderRadius: 'var(--radius-sm)', border: 'none', fontSize: '0.8rem', fontWeight: 600 }}>Transfer Dompet</button>
           </div>
           
-          <h3 style={{ marginBottom: '1.5rem', fontWeight: 700, fontSize: '1.25rem' }}>
-            {isTransferMode ? 'Pindah Saldo (Transfer)' : editingId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'}
-          </h3>
-          
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
-            
-            {isTransferMode ? (
-              /* FORM TRANSFER */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {!isTransferMode ? (
               <>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Deskripsi (Catatan)</label>
-                  <input type="text" required value={transferData.description} onChange={e => setTransferData({...transferData, description: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah Transfer (Rp)</label>
-                  <input type="number" required value={transferData.amount} onChange={e => setTransferData({...transferData, amount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Dari Dompet</label>
-                  <select required value={transferData.fromWalletId} onChange={e => setTransferData({...transferData, fromWalletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                    {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Ke Dompet Tujuan</label>
-                  <select required value={transferData.toWalletId} onChange={e => setTransferData({...transferData, toWalletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                    {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
-                  </select>
-                </div>
+                <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
+                  <option value="EXPENSE">Pengeluaran</option>
+                  <option value="INCOME">Pemasukan</option>
+                </select>
+                <input type="number" placeholder="Nominal (Rp)" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
+                <input type="text" placeholder="Deskripsi" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
+                <input type="text" placeholder="Kategori" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
+                <select value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
+                  {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
+                </select>
+                <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', colorScheme: 'dark' }} />
               </>
             ) : (
-              /* FORM TRANSAKSI BIASA */
               <>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Deskripsi</label>
-                  <input type="text" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah (Rp)</label>
-                  <input type="number" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Tipe</label>
-                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                    <option value="EXPENSE">Pengeluaran</option>
-                    <option value="INCOME">Pemasukan</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Kategori</label>
-                  <input type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Pilih Dompet (Wallet)</label>
-                  <select required value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                    <option value="" disabled>-- Pilih Dompet --</option>
-                    {wallets.map(w => (
-                      <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>
-                    ))}
-                  </select>
-                </div>
+                <select value={transferData.fromWalletId} onChange={e => setTransferData({...transferData, fromWalletId: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
+                  <option value="">Dari Dompet...</option>
+                  {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                </select>
+                <select value={transferData.toWalletId} onChange={e => setTransferData({...transferData, toWalletId: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
+                  <option value="">Ke Dompet...</option>
+                  {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                </select>
+                <input type="number" placeholder="Nominal (Rp)" value={transferData.amount} onChange={e => setTransferData({...transferData, amount: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
               </>
             )}
-            
-            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <button type="submit" className="btn-primary" style={isTransferMode ? { background: 'var(--color-secondary)' } : {}}>
-                {isTransferMode ? 'Proses Transfer' : editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}
-              </button>
-            </div>
-          </form>
-        </section>
+            <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem', width: '100%' }}>Simpan</button>
+          </div>
+        </form>
       )}
 
-      <section className="card">
-        <div className="table-responsive">
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
-            <thead>
-            <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
-              <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)' }}>Tanggal</th>
-              <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)' }}>Deskripsi</th>
-              <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)' }}>Kategori</th>
-              <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)', textAlign: 'right' }}>Jumlah</th>
-              <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)', textAlign: 'center' }}>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(tx => {
-              const isTransfer = tx.category.startsWith('Transfer');
-              return (
-              <tr key={tx.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                <td style={{ padding: '1rem 0' }}>{new Date(tx.date).toLocaleDateString('id-ID')}</td>
-                <td style={{ padding: '1rem 0', fontWeight: 500 }}>{tx.description}</td>
-                <td style={{ padding: '1rem 0' }}>
-                  <span style={{ backgroundColor: isTransfer ? 'rgba(139, 92, 246, 0.2)' : 'var(--color-bg-base)', color: isTransfer ? 'var(--color-secondary)' : 'var(--color-text)', padding: '0.35rem 0.85rem', borderRadius: '999px', fontSize: '0.875rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
-                    {tx.category}
-                  </span>
-                </td>
-                <td style={{ padding: '1rem 0', textAlign: 'right', fontWeight: 700, color: tx.type === 'INCOME' ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                  {tx.type === 'INCOME' ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
-                </td>
-                <td style={{ padding: '1rem 0', textAlign: 'center' }}>
-                  <button onClick={() => handleEdit(tx)} className="btn-icon" title="Edit" style={{ marginRight: '0.5rem', opacity: isTransfer ? 0.5 : 1 }}>✏️</button>
-                  <button onClick={() => handleDelete(tx.id)} className="btn-icon" title="Hapus">🗑️</button>
-                </td>
-              </tr>
-            )})}
-            {transactions.length === 0 && (
-              <tr>
-                <td colSpan={5} style={{ padding: '3rem 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>Belum ada data transaksi.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        </div>
-      </section>
+      {/* Search & Filter */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+        <input 
+          type="text" 
+          placeholder="Cari transaksi..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, padding: '0.6rem 1rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'white', borderRadius: '99px', fontSize: '0.8rem' }}
+        />
+        <select 
+          value={filterType} 
+          onChange={e => setFilterType(e.target.value)}
+          style={{ padding: '0.6rem 1rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'white', borderRadius: '99px', fontSize: '0.8rem' }}
+        >
+          <option value="ALL">Semua</option>
+          <option value="INCOME">Masuk</option>
+          <option value="EXPENSE">Keluar</option>
+          <option value="TRANSFER">Transfer</option>
+        </select>
+      </div>
+
+      {/* Transaction List Cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        {filteredTransactions.length === 0 ? (
+          <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ marginBottom: '1rem', opacity: 0.5 }}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <p className="text-sm">Belum ada transaksi</p>
+          </div>
+        ) : (
+          filteredTransactions.map(tx => {
+            const isIncome = tx.type === 'INCOME';
+            const isTransfer = tx.category.startsWith('Transfer');
+            const walletName = wallets.find(w => w.id === tx.walletId)?.name || '';
+            
+            return (
+              <div key={tx.id} className="card" style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative' }}>
+                <div style={{ background: isIncome ? 'rgba(34, 197, 94, 0.1)' : isTransfer ? 'rgba(139, 92, 246, 0.1)' : 'rgba(244, 63, 94, 0.1)', color: isIncome ? 'var(--color-success)' : isTransfer ? 'var(--color-secondary)' : 'var(--color-danger)', padding: '0.5rem', borderRadius: '50%' }}>
+                  {isIncome ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600 }}>{tx.description}</h4>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('id-ID')} {walletName && `• ${walletName}`}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isIncome ? 'var(--color-success)' : 'var(--color-text)' }}>
+                    {isIncome ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
+                  </div>
+                  <button onClick={() => handleDelete(tx.id)} style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.7rem', cursor: 'pointer', marginTop: '0.2rem' }}>
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }
