@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
   const router = useRouter();
@@ -38,12 +38,10 @@ export default function Home() {
     }
   };
 
-  if (!user) return <div style={{ padding: '2rem' }}>Memuat Sistem...</div>;
+  if (!user) return <div style={{ padding: '2rem', textAlign: 'center' }}>Memuat Sistem...</div>;
 
-  // Kalkulasi Saldo
   const totalWalletBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
   
-  // Filter transaksi bulan ini, abaikan kategori "Transfer Keluar" / "Transfer Masuk"
   const currentMonthTransactions = transactions.filter(t => 
     new Date(t.date).getMonth() === new Date().getMonth() && 
     new Date(t.date).getFullYear() === new Date().getFullYear() &&
@@ -53,8 +51,8 @@ export default function Home() {
   const totalIncome = currentMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
 
-  // Analisis Insight Otomatis
-  let insightMessage = "Belum cukup data transaksi bulan ini untuk dianalisis.";
+  // AI Insight
+  let insightMessage = "Anda masih bisa menabung bulan ini. Pertahankan!";
   let insightColor = "var(--color-primary)";
   
   if (currentMonthTransactions.length > 0) {
@@ -66,164 +64,126 @@ export default function Home() {
     const maxCategory = Object.keys(expensesByCategory).reduce((a, b) => expensesByCategory[a] > expensesByCategory[b] ? a : b, "");
     
     if (totalExpense > totalIncome && totalIncome > 0) {
-      insightMessage = `⚠️ Peringatan: Pengeluaranmu bulan ini (Rp ${totalExpense.toLocaleString('id-ID')}) melebihi pemasukan (Rp ${totalIncome.toLocaleString('id-ID')})! Kategori paling boros adalah "${maxCategory}". Kurangi pengeluaran di sektor ini.`;
+      insightMessage = `Pengeluaran "${maxCategory}" cukup tinggi minggu ini.`;
       insightColor = "var(--color-danger)";
     } else if (maxCategory) {
-      insightMessage = `💡 Insight: Pengeluaran terbesarmu bulan ini ada di kategori "${maxCategory}" (Rp ${expensesByCategory[maxCategory].toLocaleString('id-ID')}). Tetap kontrol pengeluaran agar uangmu bisa ditabung!`;
-      insightColor = "var(--color-secondary)";
-    } else if (totalIncome > 0 && totalExpense === 0) {
-      insightMessage = `🌟 Luar biasa! Bulan ini semua pemasukan utuh dan belum ada pengeluaran. Sempurna untuk ditabung!`;
-      insightColor = "var(--color-success)";
+      insightMessage = `Pengeluaran terbesar di "${maxCategory}". Tetap kontrol ya.`;
+      insightColor = "var(--color-primary)";
     }
   }
 
-  // Siapkan data untuk Pie Chart (Hanya Pengeluaran per Kategori, Abaikan Transfer)
-  const allExpensesByCategory = transactions.filter(t => t.type === 'EXPENSE' && !t.category.startsWith('Transfer')).reduce((acc, t) => {
-    acc[t.category] = (acc[t.category] || 0) + t.amount;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const pieData = Object.keys(allExpensesByCategory).map(key => ({
-    name: key,
-    value: allExpensesByCategory[key]
-  }));
-
-  // Data Bar Chart (Bulan per Bulan untuk Pemasukan vs Pengeluaran, Abaikan Transfer)
-  const monthlyDataMap: Record<string, { name: string, Pemasukan: number, Pengeluaran: number }> = {};
+  // Bar Chart Data (3 Bulan Terakhir agar compact)
+  const monthlyDataMap: Record<string, { name: string, Masuk: number, Keluar: number }> = {};
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   
   transactions.forEach(t => {
     if (t.category.startsWith('Transfer')) return;
-    
     const d = new Date(t.date);
     const key = `${d.getFullYear()}-${d.getMonth()}`;
-    if (!monthlyDataMap[key]) {
-      monthlyDataMap[key] = { name: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substring(2)}`, Pemasukan: 0, Pengeluaran: 0 };
-    }
-    if (t.type === 'INCOME') monthlyDataMap[key].Pemasukan += t.amount;
-    if (t.type === 'EXPENSE') monthlyDataMap[key].Pengeluaran += t.amount;
+    if (!monthlyDataMap[key]) monthlyDataMap[key] = { name: monthNames[d.getMonth()], Masuk: 0, Keluar: 0 };
+    if (t.type === 'INCOME') monthlyDataMap[key].Masuk += t.amount;
+    if (t.type === 'EXPENSE') monthlyDataMap[key].Keluar += t.amount;
   });
-  
-  // Ambil 6 bulan terakhir
-  const barData = Object.values(monthlyDataMap).reverse().slice(0, 6).reverse();
+  const barData = Object.values(monthlyDataMap).reverse().slice(0, 3).reverse();
 
-  // Warna Neon untuk grafik
-  const COLORS = ['#2563EB', '#8B5CF6', '#ec4899', '#06b6d4', '#10b981', '#f59e0b'];
+  // Recent 3 Transactions
+  const recentTransactions = transactions.slice(0, 3);
 
   return (
-    <div className="animate-fade-in">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="animate-fade-in" style={{ paddingBottom: '1rem' }}>
+      
+      {/* Header & Quick Action */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Dashboard</h2>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Selamat datang kembali, {user.name}!</p>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Selamat datang,</h2>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{user.name} 👋</h1>
         </div>
-        <button onClick={() => router.push('/transactions')} className="btn-primary">+ Tambah Transaksi</button>
+        <button onClick={() => router.push('/transactions')} className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
+          + Transaksi
+        </button>
       </header>
 
-      {/* AI Insight Box */}
-      <div className="card animate-fade-in" style={{ 
-          marginBottom: '2rem', 
-          padding: '1.5rem', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '1rem',
-          border: `1px solid ${insightColor}`,
-          boxShadow: `0 0 20px ${insightColor}22`
-        }}>
-        <div style={{ fontSize: '2rem', padding: '1rem', backgroundColor: `${insightColor}22`, borderRadius: '50%' }}>
-          🤖
+      {/* Summary Cards Grid */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <div className="card-glass" style={{ gridColumn: '1 / -1', padding: '1.25rem', background: 'linear-gradient(135deg, rgba(37,99,235,0.1), rgba(15,23,42,0.9))' }}>
+          <p className="text-xs text-muted" style={{ marginBottom: '0.25rem' }}>Total Saldo Tersedia</p>
+          <h3 style={{ fontSize: '2rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h3>
         </div>
-        <div>
-          <h4 style={{ color: insightColor, fontWeight: 700, marginBottom: '0.25rem' }}>AI Insight Otomatis</h4>
-          <p style={{ color: 'var(--color-text)' }}>{insightMessage}</p>
+        <div className="card-glass" style={{ padding: '1rem' }}>
+          <p className="text-xs text-muted" style={{ marginBottom: '0.25rem' }}>Pemasukan</p>
+          <h4 className="font-bold text-success" style={{ fontSize: '1.1rem' }}>+Rp {(totalIncome/1000).toFixed(0)}k</h4>
         </div>
-      </div>
-
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="card" style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(37,99,235,0.3)' }}>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 500 }}>Total Kekayaan (Dari Dompet)</p>
-          <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h3>
-        </div>
-        <div className="card">
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 500 }}>Pemasukan (Bulan Ini)</p>
-          <h3 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-success)' }}>+Rp {totalIncome.toLocaleString('id-ID')}</h3>
-        </div>
-        <div className="card">
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 500 }}>Pengeluaran (Bulan Ini)</p>
-          <h3 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-danger)' }}>-Rp {totalExpense.toLocaleString('id-ID')}</h3>
+        <div className="card-glass" style={{ padding: '1rem' }}>
+          <p className="text-xs text-muted" style={{ marginBottom: '0.25rem' }}>Pengeluaran</p>
+          <h4 className="font-bold text-danger" style={{ fontSize: '1.1rem' }}>-Rp {(totalExpense/1000).toFixed(0)}k</h4>
         </div>
       </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        
-        {/* Grafik Bar Pemasukan vs Pengeluaran */}
-        <section className="card">
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>Arus Kas (6 Bulan Terakhir)</h3>
-          {barData.length > 0 ? (
-            <div style={{ width: '100%', height: '300px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--color-text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `Rp ${value / 1000}k`} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', borderColor: 'var(--color-border)', borderRadius: '8px', color: 'white' }}
-                    itemStyle={{ color: 'white' }}
-                    formatter={(value: number) => `Rp ${value.toLocaleString('id-ID')}`}
-                  />
-                  <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                  <Bar dataKey="Pemasukan" fill="var(--color-success)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Pengeluaran" fill="var(--color-danger)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginTop: '3rem' }}>Belum ada data untuk grafik arus kas.</p>
-          )}
-        </section>
-
-        {/* Grafik Pie Alokasi Pengeluaran */}
-        <section className="card">
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>Alokasi Pengeluaran (Total)</h3>
-          {pieData.length > 0 ? (
-            <div style={{ width: '100%', height: '300px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} style={{ filter: `drop-shadow(0px 0px 5px ${COLORS[index % COLORS.length]}88)` }} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', borderColor: 'var(--color-border)', borderRadius: '8px', color: 'white' }}
-                    itemStyle={{ color: 'white' }}
-                    formatter={(value: number) => `Rp ${value.toLocaleString('id-ID')}`} 
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
-                {pieData.map((entry, index) => (
-                  <div key={entry.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: COLORS[index % COLORS.length], boxShadow: `0 0 5px ${COLORS[index % COLORS.length]}` }}></div>
-                    <span>{entry.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginTop: '3rem' }}>Belum ada data pengeluaran.</p>
-          )}
-        </section>
+      {/* AI Insight Compact */}
+      <div className="card-glass animate-fade-in" style={{ marginBottom: '1.5rem', padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', border: `1px solid rgba(37, 99, 235, 0.3)`, boxShadow: `0 0 15px rgba(37, 99, 235, 0.1)` }}>
+        <div style={{ color: 'var(--color-primary)' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        </div>
+        <div>
+          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>AI Insight</h4>
+          <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{insightMessage}</p>
+        </div>
       </div>
+
+      {/* Arus Kas Chart */}
+      <section className="card-glass" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Arus Kas</h3>
+        {barData.length > 0 ? (
+          <div style={{ width: '100%', height: '180px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={barData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
+                <Bar dataKey="Masuk" fill="var(--color-success)" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar dataKey="Keluar" fill="var(--color-danger)" radius={[4, 4, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <p className="text-xs text-muted" style={{ textAlign: 'center', padding: '2rem 0' }}>Belum ada data grafik.</p>
+        )}
+      </section>
+
+      {/* Recent Transactions */}
+      <section>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Transaksi Terakhir</h3>
+          <button onClick={() => router.push('/transactions')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>Lihat Semua</button>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {recentTransactions.map(tx => {
+            const isIncome = tx.type === 'INCOME';
+            const isTransfer = tx.category.startsWith('Transfer');
+            return (
+              <div key={tx.id} className="card-glass" style={{ padding: '0.85rem 1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: isIncome ? 'rgba(34, 197, 94, 0.1)' : isTransfer ? 'rgba(139, 92, 246, 0.1)' : 'rgba(244, 63, 94, 0.1)', color: isIncome ? 'var(--color-success)' : isTransfer ? 'var(--color-secondary)' : 'var(--color-danger)', padding: '0.5rem', borderRadius: '50%' }}>
+                  {isIncome ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600 }}>{tx.description}</h4>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('id-ID')}</p>
+                </div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: isIncome ? 'var(--color-success)' : 'var(--color-text)' }}>
+                  {isIncome ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
+                </div>
+              </div>
+            );
+          })}
+          {recentTransactions.length === 0 && (
+            <p className="text-xs text-muted" style={{ textAlign: 'center', padding: '1rem 0' }}>Belum ada riwayat.</p>
+          )}
+        </div>
+      </section>
 
     </div>
   );
