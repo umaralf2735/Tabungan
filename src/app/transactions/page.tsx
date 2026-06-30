@@ -101,8 +101,9 @@ export default function TransactionsPage() {
       )}
 
       <section className="card">
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
+        <div className="table-responsive">
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+            <thead>
             <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
               <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)' }}>Tanggal</th>
               <th style={{ padding: '1rem 0', color: 'var(--color-text-muted)' }}>Deskripsi</th>
@@ -137,6 +138,7 @@ export default function TransactionsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );
