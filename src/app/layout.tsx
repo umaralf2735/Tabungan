@@ -32,7 +32,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <a href="/wallets" className="nav-link">Dompet (Wallet)</a>
               <a href="/budgets" className="nav-link">Anggaran (Budget)</a>
               <a href="/transactions" className="nav-link">Transaksi</a>
-              <a href="/goals" className="nav-link">Target Tabungan</a>
+              <a href="/reports" className="nav-link">Laporan (Export)</a>
+              <a href="/calculator" className="nav-link">Kalkulator AI</a>
               <a href="/auth/login" className="nav-link logout-link">Keluar</a>
             </nav>
           </aside>

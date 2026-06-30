@@ -158,7 +158,7 @@ export default function Home() {
         
         {/* Grafik Bar Pemasukan vs Pengeluaran */}
         <section className="card">
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Arus Kas (6 Bulan Terakhir)</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>Arus Kas (6 Bulan Terakhir)</h3>
           {barData.length > 0 ? (
             <div style={{ width: '100%', height: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -184,7 +184,7 @@ export default function Home() {
 
         {/* Grafik Pie Alokasi Pengeluaran */}
         <section className="card">
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Alokasi Pengeluaran (Total)</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>Alokasi Pengeluaran (Total)</h3>
           {pieData.length > 0 ? (
             <div style={{ width: '100%', height: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
