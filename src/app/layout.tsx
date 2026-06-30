@@ -25,16 +25,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <div className="app-container">
+          {/* Mobile Header (Hanya muncul di HP) */}
+          <header className="mobile-header">
+            <h1 className="logo-text" style={{ marginBottom: 0 }}>FinanceFlow</h1>
+          </header>
+
           <aside className="sidebar">
-            <h1 className="logo-text">FinanceFlow</h1>
+            <h1 className="logo-text desktop-logo">FinanceFlow</h1>
             <nav className="nav-menu">
-              <a href="/" className="nav-link">Dashboard</a>
-              <a href="/wallets" className="nav-link">Dompet (Wallet)</a>
-              <a href="/budgets" className="nav-link">Anggaran (Budget)</a>
-              <a href="/transactions" className="nav-link">Transaksi</a>
-              <a href="/reports" className="nav-link">Laporan (Export)</a>
-              <a href="/calculator" className="nav-link">Kalkulator AI</a>
-              <a href="/auth/login" className="nav-link logout-link">Keluar</a>
+              <a href="/" className="nav-link">
+                <span className="nav-icon">🏠</span>
+                <span className="nav-text">Dashboard</span>
+              </a>
+              <a href="/wallets" className="nav-link">
+                <span className="nav-icon">💳</span>
+                <span className="nav-text">Dompet</span>
+              </a>
+              <a href="/budgets" className="nav-link">
+                <span className="nav-icon">🎯</span>
+                <span className="nav-text">Anggaran</span>
+              </a>
+              <a href="/transactions" className="nav-link">
+                <span className="nav-icon">💸</span>
+                <span className="nav-text">Transaksi</span>
+              </a>
+              <a href="/reports" className="nav-link">
+                <span className="nav-icon">📊</span>
+                <span className="nav-text">Laporan</span>
+              </a>
+              <a href="/calculator" className="nav-link">
+                <span className="nav-icon">🧮</span>
+                <span className="nav-text">Kalkulator</span>
+              </a>
+              <a href="/auth/login" className="nav-link logout-link">
+                <span className="nav-icon">🚪</span>
+                <span className="nav-text">Keluar</span>
+              </a>
             </nav>
           </aside>
           <main className="main-content animate-fade-in">
