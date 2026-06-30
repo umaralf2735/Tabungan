@@ -42,7 +42,14 @@ export default function Home() {
 
   // Kalkulasi Saldo
   const totalWalletBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
-  const currentMonthTransactions = transactions.filter(t => new Date(t.date).getMonth() === new Date().getMonth() && new Date(t.date).getFullYear() === new Date().getFullYear());
+  
+  // Filter transaksi bulan ini, abaikan kategori "Transfer Keluar" / "Transfer Masuk"
+  const currentMonthTransactions = transactions.filter(t => 
+    new Date(t.date).getMonth() === new Date().getMonth() && 
+    new Date(t.date).getFullYear() === new Date().getFullYear() &&
+    !t.category.startsWith('Transfer')
+  );
+  
   const totalIncome = currentMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
 
@@ -70,8 +77,8 @@ export default function Home() {
     }
   }
 
-  // Siapkan data untuk Pie Chart (Hanya Pengeluaran per Kategori)
-  const allExpensesByCategory = transactions.filter(t => t.type === 'EXPENSE').reduce((acc, t) => {
+  // Siapkan data untuk Pie Chart (Hanya Pengeluaran per Kategori, Abaikan Transfer)
+  const allExpensesByCategory = transactions.filter(t => t.type === 'EXPENSE' && !t.category.startsWith('Transfer')).reduce((acc, t) => {
     acc[t.category] = (acc[t.category] || 0) + t.amount;
     return acc;
   }, {} as Record<string, number>);
@@ -81,11 +88,13 @@ export default function Home() {
     value: allExpensesByCategory[key]
   }));
 
-  // Data Bar Chart (Bulan per Bulan untuk Pemasukan vs Pengeluaran)
+  // Data Bar Chart (Bulan per Bulan untuk Pemasukan vs Pengeluaran, Abaikan Transfer)
   const monthlyDataMap: Record<string, { name: string, Pemasukan: number, Pengeluaran: number }> = {};
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   
   transactions.forEach(t => {
+    if (t.category.startsWith('Transfer')) return;
+    
     const d = new Date(t.date);
     const key = `${d.getFullYear()}-${d.getMonth()}`;
     if (!monthlyDataMap[key]) {

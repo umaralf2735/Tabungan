@@ -5,8 +5,11 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [wallets, setWallets] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [isTransferMode, setIsTransferMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: '' });
+  const [transferData, setTransferData] = useState({ description: 'Transfer antar dompet', amount: '', fromWalletId: '', toWalletId: '' });
 
   useEffect(() => {
     fetchTransactions();
@@ -20,7 +23,14 @@ export default function TransactionsPage() {
     const data = await res.json();
     if (Array.isArray(data)) {
       setWallets(data);
-      if (data.length > 0) setFormData(prev => ({ ...prev, walletId: data[0].id }));
+      if (data.length > 0) {
+        setFormData(prev => ({ ...prev, walletId: data[0].id }));
+        setTransferData(prev => ({ 
+          ...prev, 
+          fromWalletId: data[0].id, 
+          toWalletId: data.length > 1 ? data[1].id : data[0].id 
+        }));
+      }
     }
   };
 
@@ -31,13 +41,18 @@ export default function TransactionsPage() {
   };
 
   const handleEdit = (tx: any) => {
+    if(tx.category.startsWith('Transfer')) {
+      alert("Transaksi transfer tidak dapat diedit langsung. Silakan hapus dan buat ulang.");
+      return;
+    }
     setEditingId(tx.id);
+    setIsTransferMode(false);
     setFormData({ description: tx.description, amount: tx.amount.toString(), type: tx.type, category: tx.category, paymentMethod: tx.paymentMethod, walletId: tx.walletId || '' });
     setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Yakin ingin menghapus transaksi ini?')) {
+    if (confirm('Yakin ingin menghapus transaksi ini? (Jika ini adalah transaksi transfer, saldo dompet akan dikembalikan)')) {
       await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
       fetchTransactions();
     }
@@ -47,23 +62,38 @@ export default function TransactionsPage() {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
-    if (editingId) {
-      await fetch(`/api/transactions/${editingId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount) })
-      });
-    } else {
-      await fetch('/api/transactions', {
+    if (isTransferMode) {
+      if (transferData.fromWalletId === transferData.toWalletId) {
+        alert("Dompet asal dan tujuan tidak boleh sama!");
+        return;
+      }
+      
+      await fetch('/api/transactions/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id })
+        body: JSON.stringify({ ...transferData, amount: parseFloat(transferData.amount), userId: user.id })
       });
+      
+    } else {
+      if (editingId) {
+        await fetch(`/api/transactions/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount) })
+        });
+      } else {
+        await fetch('/api/transactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id })
+        });
+      }
     }
     
     setShowForm(false);
     setEditingId(null);
     setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' });
+    setTransferData({ description: 'Transfer antar dompet', amount: '', fromWalletId: wallets.length > 0 ? wallets[0].id : '', toWalletId: wallets.length > 1 ? wallets[1].id : '' });
     fetchTransactions();
   };
 
@@ -74,45 +104,105 @@ export default function TransactionsPage() {
           <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Transaksi</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Kelola semua riwayat pemasukan dan pengeluaran kamu.</p>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' }); }} className="btn-primary">
+        <button onClick={() => { 
+          setShowForm(!showForm); 
+          setEditingId(null); 
+          setIsTransferMode(false);
+          setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' }); 
+        }} className="btn-primary">
           {showForm ? 'Batal' : '+ Tambah Transaksi'}
         </button>
       </header>
 
       {showForm && (
         <section className="card animate-fade-in" style={{ marginBottom: '2rem', padding: '2rem' }}>
-          <h3 style={{ marginBottom: '1.5rem', fontWeight: 700, fontSize: '1.25rem' }}>{editingId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'}</h3>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem' }}>
+            <button 
+              type="button" 
+              onClick={() => { setIsTransferMode(false); setEditingId(null); }} 
+              style={{ fontWeight: 600, padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', background: !isTransferMode ? 'var(--color-primary)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)' }}
+            >
+              Catat Transaksi
+            </button>
+            {!editingId && (
+              <button 
+                type="button" 
+                onClick={() => setIsTransferMode(true)} 
+                style={{ fontWeight: 600, padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', background: isTransferMode ? 'var(--color-secondary)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)' }}
+              >
+                Transfer Antar Dompet
+              </button>
+            )}
+          </div>
+          
+          <h3 style={{ marginBottom: '1.5rem', fontWeight: 700, fontSize: '1.25rem' }}>
+            {isTransferMode ? 'Pindah Saldo (Transfer)' : editingId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'}
+          </h3>
+          
           <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Deskripsi</label>
-              <input type="text" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah (Rp)</label>
-              <input type="number" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Tipe</label>
-              <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                <option value="EXPENSE">Pengeluaran</option>
-                <option value="INCOME">Pemasukan</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Kategori</label>
-              <input type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Pilih Dompet (Wallet)</label>
-              <select required value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
-                <option value="" disabled>-- Pilih Dompet --</option>
-                {wallets.map(w => (
-                  <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>
-                ))}
-              </select>
-            </div>
+            
+            {isTransferMode ? (
+              /* FORM TRANSFER */
+              <>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Deskripsi (Catatan)</label>
+                  <input type="text" required value={transferData.description} onChange={e => setTransferData({...transferData, description: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah Transfer (Rp)</label>
+                  <input type="number" required value={transferData.amount} onChange={e => setTransferData({...transferData, amount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Dari Dompet</label>
+                  <select required value={transferData.fromWalletId} onChange={e => setTransferData({...transferData, fromWalletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
+                    {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Ke Dompet Tujuan</label>
+                  <select required value={transferData.toWalletId} onChange={e => setTransferData({...transferData, toWalletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
+                    {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
+                  </select>
+                </div>
+              </>
+            ) : (
+              /* FORM TRANSAKSI BIASA */
+              <>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Deskripsi</label>
+                  <input type="text" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah (Rp)</label>
+                  <input type="number" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Tipe</label>
+                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
+                    <option value="EXPENSE">Pengeluaran</option>
+                    <option value="INCOME">Pemasukan</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Kategori</label>
+                  <input type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Pilih Dompet (Wallet)</label>
+                  <select required value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
+                    <option value="" disabled>-- Pilih Dompet --</option>
+                    {wallets.map(w => (
+                      <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+            
             <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <button type="submit" className="btn-primary">{editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}</button>
+              <button type="submit" className="btn-primary" style={isTransferMode ? { background: 'var(--color-secondary)' } : {}}>
+                {isTransferMode ? 'Proses Transfer' : editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}
+              </button>
             </div>
           </form>
         </section>
@@ -131,12 +221,14 @@ export default function TransactionsPage() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(tx => (
+            {transactions.map(tx => {
+              const isTransfer = tx.category.startsWith('Transfer');
+              return (
               <tr key={tx.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                 <td style={{ padding: '1rem 0' }}>{new Date(tx.date).toLocaleDateString('id-ID')}</td>
                 <td style={{ padding: '1rem 0', fontWeight: 500 }}>{tx.description}</td>
                 <td style={{ padding: '1rem 0' }}>
-                  <span style={{ backgroundColor: 'var(--color-bg-base)', padding: '0.35rem 0.85rem', borderRadius: '999px', fontSize: '0.875rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
+                  <span style={{ backgroundColor: isTransfer ? 'rgba(139, 92, 246, 0.2)' : 'var(--color-bg-base)', color: isTransfer ? 'var(--color-secondary)' : 'var(--color-text)', padding: '0.35rem 0.85rem', borderRadius: '999px', fontSize: '0.875rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
                     {tx.category}
                   </span>
                 </td>
@@ -144,11 +236,11 @@ export default function TransactionsPage() {
                   {tx.type === 'INCOME' ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
                 </td>
                 <td style={{ padding: '1rem 0', textAlign: 'center' }}>
-                  <button onClick={() => handleEdit(tx)} className="btn-icon" title="Edit" style={{ marginRight: '0.5rem' }}>✏️</button>
+                  <button onClick={() => handleEdit(tx)} className="btn-icon" title="Edit" style={{ marginRight: '0.5rem', opacity: isTransfer ? 0.5 : 1 }}>✏️</button>
                   <button onClick={() => handleDelete(tx.id)} className="btn-icon" title="Hapus">🗑️</button>
                 </td>
               </tr>
-            ))}
+            )})}
             {transactions.length === 0 && (
               <tr>
                 <td colSpan={5} style={{ padding: '3rem 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>Belum ada data transaksi.</td>
