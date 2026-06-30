@@ -41,7 +41,7 @@ export default function ReportsPage() {
     // 2. Loop data transaksi
     transactions.forEach(tx => {
       const date = new Date(tx.date).toLocaleDateString('id-ID');
-      const desc = `"${tx.description.replace(/"/g, '""')}"`; // Handle commas in description
+      const desc = `"${(tx.description || '').replace(/"/g, '""')}"`; // Handle commas in description
       const cat = `"${tx.category}"`;
       const type = tx.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran';
       const amount = tx.amount;
