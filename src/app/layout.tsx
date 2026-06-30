@@ -1,9 +1,17 @@
 import './globals.css';
 import { ReactNode } from 'react';
 
-export const metadata = {
-  title: 'Personal Finance Tracker',
-  description: 'Manage your daily finances with a clean, minimal, professional interface.',
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'FinanceFlow Pro - Aplikasi Pengelola Keuangan Pribadi Terbaik',
+  description: 'Catat pemasukan, pengeluaran, kelola multi-wallet, dan atur anggaran bulananmu dengan mudah menggunakan FinanceFlow Pro. Dilengkapi dengan AI Insight untuk menganalisis keuanganmu secara otomatis.',
+  keywords: ['pengelola keuangan', 'catat keuangan', 'budgeting', 'finance tracker', 'aplikasi keuangan pribadi', 'AI insight keuangan', 'finance flow'],
+  openGraph: {
+    title: 'FinanceFlow Pro - Kelola Keuangan dengan Cerdas',
+    description: 'Catat keuangan harian dan capai target tabunganmu dengan fitur AI canggih dari FinanceFlow Pro.',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
