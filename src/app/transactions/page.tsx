@@ -3,13 +3,26 @@ import { useEffect, useState } from 'react';
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [wallets, setWallets] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash' });
+  const [formData, setFormData] = useState({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: '' });
 
   useEffect(() => {
     fetchTransactions();
+    fetchWallets();
   }, []);
+
+  const fetchWallets = async () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.id) return;
+    const res = await fetch(`/api/wallets?userId=${user.id}`);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      setWallets(data);
+      if (data.length > 0) setFormData(prev => ({ ...prev, walletId: data[0].id }));
+    }
+  };
 
   const fetchTransactions = async () => {
     const res = await fetch('/api/transactions');
@@ -19,7 +32,7 @@ export default function TransactionsPage() {
 
   const handleEdit = (tx: any) => {
     setEditingId(tx.id);
-    setFormData({ description: tx.description, amount: tx.amount.toString(), type: tx.type, category: tx.category, paymentMethod: tx.paymentMethod });
+    setFormData({ description: tx.description, amount: tx.amount.toString(), type: tx.type, category: tx.category, paymentMethod: tx.paymentMethod, walletId: tx.walletId || '' });
     setShowForm(true);
   };
 
@@ -50,7 +63,7 @@ export default function TransactionsPage() {
     
     setShowForm(false);
     setEditingId(null);
-    setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash' });
+    setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' });
     fetchTransactions();
   };
 
@@ -61,7 +74,7 @@ export default function TransactionsPage() {
           <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Transaksi</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Kelola semua riwayat pemasukan dan pengeluaran kamu.</p>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash' }); }} className="btn-primary">
+        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ description: '', amount: '', type: 'EXPENSE', category: 'Food', paymentMethod: 'Cash', walletId: wallets.length > 0 ? wallets[0].id : '' }); }} className="btn-primary">
           {showForm ? 'Batal' : '+ Tambah Transaksi'}
         </button>
       </header>
@@ -90,8 +103,13 @@ export default function TransactionsPage() {
               <input type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Metode Pembayaran</label>
-              <input type="text" required value={formData.paymentMethod} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Pilih Dompet (Wallet)</label>
+              <select required value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }}>
+                <option value="" disabled>-- Pilih Dompet --</option>
+                {wallets.map(w => (
+                  <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>
+                ))}
+              </select>
             </div>
             <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
               <button type="submit" className="btn-primary">{editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}</button>

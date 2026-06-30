@@ -1,35 +1,24 @@
 :root {
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-secondary: #8b5cf6;
+  --color-primary: #2563EB;       /* Electric Blue */
+  --color-primary-hover: #3b82f6;
+  --color-secondary: #8B5CF6;     /* Purple Neon */
   
-  --color-bg-base: #f1f5f9;
-  --color-surface: rgba(255, 255, 255, 0.7);
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-border: rgba(255, 255, 255, 0.5);
+  --color-bg-base: #020617;       /* Navy Black */
+  --color-surface: rgba(15, 23, 42, 0.6); /* Glassmorphism Card */
+  --color-text: #ffffff;          /* Putih terang */
+  --color-text-muted: #94a3b8;
+  --color-border: rgba(255, 255, 255, 0.05); /* Transparan blur */
   
-  --color-success: #10b981;
-  --color-danger: #ef4444;
+  --color-success: #22C55E;       /* Bright Green */
+  --color-danger: #F43F5E;        /* Bright Red */
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --shadow-lg: 0 15px 35px 0 rgba(31, 38, 135, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 30px -5px rgba(37, 99, 235, 0.15); /* Glowing effect */
+  --shadow-lg: 0 20px 40px -10px rgba(139, 92, 246, 0.2);
   
-  --radius-md: 0.75rem;
-  --radius-lg: 1.25rem;
-  --radius-xl: 2rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg-base: #0f172a;
-    --color-surface: rgba(30, 41, 59, 0.6);
-    --color-text: #f8fafc;
-    --color-text-muted: #94a3b8;
-    --color-border: rgba(255, 255, 255, 0.1);
-    --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  }
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2.5rem;
 }
 
 * {
@@ -43,21 +32,13 @@ body {
   color: var(--color-text);
   line-height: 1.5;
   background-color: var(--color-bg-base);
+  /* Futuristic Glowing Background */
   background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.1) 0, transparent 50%);
+    radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
   background-attachment: fixed;
   transition: background-color 0.3s ease, color 0.3s ease;
   min-height: 100vh;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(253,100%,20%,0.1) 0, transparent 50%), 
-      radial-gradient(at 100% 100%, hsla(225,100%,30%,0.15) 0, transparent 50%);
-  }
 }
 
 a {
@@ -91,13 +72,8 @@ button {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-@media (prefers-color-scheme: dark) {
-  .card:hover {
-    background: rgba(30, 41, 59, 0.8);
-  }
+  background: rgba(30, 41, 59, 0.8); /* Semi transparan glowing */
+  border: 1px solid rgba(139, 92, 246, 0.3); /* Border ungu saat hover */
 }
 
 .btn-primary {
@@ -106,13 +82,13 @@ button {
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); /* Glow effect */
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); /* Purple glow */
 }
 
 .btn-danger {
@@ -121,12 +97,12 @@ button {
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
   transition: all 0.3s ease;
 }
 .btn-danger:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6);
 }
 
 .btn-icon {
@@ -137,8 +113,8 @@ button {
   transition: all 0.2s ease;
 }
 .btn-icon:hover {
-  background: var(--color-bg-base);
-  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.1); /* Efek terang saat disorot */
+  color: #ffffff;
 }
 
 /* Responsive Layout */
@@ -149,11 +125,11 @@ button {
 }
 
 .sidebar {
-  background: var(--color-surface);
+  background: #0F172A; /* Dark Blue */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid var(--color-border);
-  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  box-shadow: 2px 0 20px rgba(0,0,0,0.5);
   padding: 1rem;
   width: 100%;
   z-index: 10;
@@ -162,7 +138,7 @@ button {
 .logo-text {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-text);
   margin-bottom: 1rem;
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
@@ -180,14 +156,22 @@ button {
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  color: var(--color-text-muted);
 }
 .nav-link:hover {
-  background: rgba(100,100,100,0.1);
+  background: rgba(37, 99, 235, 0.2); /* Hover biru neon terang */
+  color: #ffffff; /* Teks putih menyala */
+  box-shadow: inset 0 0 10px rgba(37, 99, 235, 0.3);
 }
 .logout-link {
   color: var(--color-danger);
+}
+.logout-link:hover {
+  background: rgba(244, 63, 94, 0.2);
+  color: #ffffff;
+  box-shadow: inset 0 0 10px rgba(244, 63, 94, 0.3);
 }
 
 .main-content {

@@ -18,6 +18,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <h1 className="logo-text">FinanceFlow</h1>
             <nav className="nav-menu">
               <a href="/" className="nav-link">Dashboard</a>
+              <a href="/wallets" className="nav-link">Dompet (Wallet)</a>
+              <a href="/budgets" className="nav-link">Anggaran (Budget)</a>
               <a href="/transactions" className="nav-link">Transaksi</a>
               <a href="/goals" className="nav-link">Target Tabungan</a>
               <a href="/auth/login" className="nav-link logout-link">Keluar</a>

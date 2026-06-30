@@ -16,17 +16,52 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const transaction = await prisma.transaction.create({
-      data: {
-        amount: data.amount,
-        type: data.type,
-        category: data.category,
-        paymentMethod: data.paymentMethod,
-        description: data.description,
-        userId: data.userId, // Pastikan user sudah login
-      },
+    
+    // Jika tidak ada walletId, buat transaksi biasa
+    if (!data.walletId) {
+      const transaction = await prisma.transaction.create({
+        data: {
+          amount: data.amount,
+          type: data.type,
+          category: data.category,
+          paymentMethod: data.paymentMethod,
+          description: data.description,
+          userId: data.userId,
+        },
+      });
+      return NextResponse.json(transaction);
+    }
+
+    // Jika ada walletId, update saldo dompet sekaligus
+    const result = await prisma.$transaction(async (prisma) => {
+      const transaction = await prisma.transaction.create({
+        data: {
+          amount: data.amount,
+          type: data.type,
+          category: data.category,
+          paymentMethod: data.paymentMethod,
+          description: data.description,
+          userId: data.userId,
+          walletId: data.walletId,
+        },
+      });
+
+      const wallet = await prisma.wallet.findUnique({ where: { id: data.walletId } });
+      if (wallet) {
+        const newBalance = data.type === 'INCOME' 
+          ? wallet.balance + data.amount 
+          : wallet.balance - data.amount;
+        
+        await prisma.wallet.update({
+          where: { id: data.walletId },
+          data: { balance: newBalance }
+        });
+      }
+
+      return transaction;
     });
-    return NextResponse.json(transaction);
+
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: 'Gagal membuat transaksi' }, { status: 500 });
   }

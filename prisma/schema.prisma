@@ -14,8 +14,21 @@ model User {
   passwordHash String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  wallets      Wallet[]
   transactions Transaction[]
   goals        Goal[]
+  budgets      Budget[]
+}
+
+model Wallet {
+  id        String        @id @default(uuid())
+  name      String        // e.g., "Cash", "BCA", "GoPay"
+  balance   Float         @default(0)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  transactions Transaction[]
 }
 
 model Transaction {
@@ -28,6 +41,8 @@ model Transaction {
   description   String?
   userId        String
   user          User     @relation(fields: [userId], references: [id])
+  walletId      String?
+  wallet        Wallet?  @relation(fields: [walletId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -42,4 +57,16 @@ model Goal {
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  category  String   // e.g., "Food", "Transport"
+  amount    Float    // Batas pengeluaran (limit)
+  month     Int      // 1 - 12
+  year      Int
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
