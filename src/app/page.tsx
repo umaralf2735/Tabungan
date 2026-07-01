@@ -134,7 +134,7 @@ export default function Home() {
 
       {/* 5. Financial Chart Section */}
       <section className="card-glass" style={{ padding: '1rem', marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.75rem' }}>Pengeluaran Bulan Ini</h3>
+        <h3 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.75rem' }}>Arus Kas (Masuk & Keluar)</h3>
         {barData.length > 0 ? (
           <div style={{ width: '100%', height: '140px' }}>
             <ResponsiveContainer width="100%" height="100%">
