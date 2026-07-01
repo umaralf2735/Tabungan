@@ -73,15 +73,15 @@ export default function ReportsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
         <div className="card-glass" style={{ padding: '1rem' }}>
           <p className="text-xs text-muted mb-1">Total Pemasukan</p>
-          <h3 className="text-success" style={{ fontSize: '1.1rem', fontWeight: 700 }}>+Rp {(totalIncome/1000).toFixed(0)}k</h3>
+          <h3 className="text-success" style={{ fontSize: '1.1rem', fontWeight: 700 }}>+Rp {totalIncome.toLocaleString('id-ID')}</h3>
         </div>
         <div className="card-glass" style={{ padding: '1rem' }}>
           <p className="text-xs text-muted mb-1">Total Pengeluaran</p>
-          <h3 className="text-danger" style={{ fontSize: '1.1rem', fontWeight: 700 }}>-Rp {(totalExpense/1000).toFixed(0)}k</h3>
+          <h3 className="text-danger" style={{ fontSize: '1.1rem', fontWeight: 700 }}>-Rp {totalExpense.toLocaleString('id-ID')}</h3>
         </div>
         <div className="card-glass" style={{ padding: '1rem' }}>
           <p className="text-xs text-muted mb-1">Terselamatkan</p>
-          <h3 className="text-primary" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Rp {(savings/1000).toFixed(0)}k</h3>
+          <h3 className="text-primary" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Rp {savings.toLocaleString('id-ID')}</h3>
         </div>
         <button onClick={handleExportCSV} className="card-glass" style={{ padding: '1rem', border: '1px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(37,99,235,0.1)' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-primary)', marginBottom: '0.25rem' }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>

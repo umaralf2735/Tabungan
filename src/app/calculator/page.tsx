@@ -79,12 +79,12 @@ export default function CalculatorPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)' }}>
             <div>
               <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Min (3x)</p>
-              <p style={{ fontSize: '1rem', fontWeight: 700 }}>Rp {(emergencyMin/1000).toLocaleString('id-ID')}k</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700 }}>Rp {emergencyMin.toLocaleString('id-ID')}</p>
             </div>
             <div style={{ color: 'var(--color-text-muted)' }}>—</div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Ideal (6x)</p>
-              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rp {(emergencyMax/1000).toLocaleString('id-ID')}k</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rp {emergencyMax.toLocaleString('id-ID')}</p>
             </div>
           </div>
         </section>

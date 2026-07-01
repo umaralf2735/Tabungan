@@ -110,11 +110,11 @@ export default function Home() {
         </div>
         <div className="card-glass" style={{ padding: '0.85rem' }}>
           <p className="text-xs text-muted mb-1">Pemasukan</p>
-          <h4 className="font-bold text-success" style={{ fontSize: '1rem' }}>+Rp {(totalIncome/1000).toFixed(0)}k</h4>
+          <h4 className="font-bold text-success" style={{ fontSize: '1rem' }}>+Rp {totalIncome.toLocaleString('id-ID')}</h4>
         </div>
         <div className="card-glass" style={{ padding: '0.85rem' }}>
           <p className="text-xs text-muted mb-1">Pengeluaran</p>
-          <h4 className="font-bold text-danger" style={{ fontSize: '1rem' }}>-Rp {(totalExpense/1000).toFixed(0)}k</h4>
+          <h4 className="font-bold text-danger" style={{ fontSize: '1rem' }}>-Rp {totalExpense.toLocaleString('id-ID')}</h4>
         </div>
         
         {/* Progress Target Tabungan */}
