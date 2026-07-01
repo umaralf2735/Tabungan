@@ -51,6 +51,14 @@ export default function Home() {
   const totalIncome = currentMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
 
+  // Kalkulasi Target Tabungan (20% dari Pemasukan sesuai Rule 50/30/20)
+  const savings = totalIncome - totalExpense;
+  const savingsTarget = totalIncome * 0.20;
+  let savingsProgress = 0;
+  if (savingsTarget > 0 && savings > 0) {
+    savingsProgress = Math.min((savings / savingsTarget) * 100, 100);
+  }
+
   // AI Insight
   let insightMessage = "Anda masih bisa menabung Rp300.000 bulan ini.";
   
@@ -112,11 +120,11 @@ export default function Home() {
         {/* Progress Target Tabungan */}
         <div className="card-glass" style={{ gridColumn: '1 / -1', padding: '1rem' }}>
           <div className="flex-between mb-2">
-            <h4 style={{ fontSize: '0.8rem', fontWeight: 600 }}>Progress Dana Darurat</h4>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)' }}>65%</span>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: 600 }}>Target Tabungan (20% Pemasukan)</h4>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)' }}>{savingsProgress.toFixed(0)}%</span>
           </div>
           <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden' }}>
-            <div style={{ width: '65%', height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '99px' }}></div>
+            <div style={{ width: `${savingsProgress}%`, height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '99px', transition: 'width 0.5s ease' }}></div>
           </div>
         </div>
       </section>
