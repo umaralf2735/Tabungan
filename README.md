@@ -72,7 +72,7 @@ Buka `http://localhost:3000` di *browser* Anda untuk melihat aplikasinya.
 ---
 
 ## 📸 Panduan Install PWA di Android
-1. Akses *link* *deploy* aplikasi (misal via Vercel) dari **Google Chrome** di HP Anda.
+1. Akses *link* *deploy* aplikasi https://finance-nu-black.vercel.app/ dari **Google Chrome** di HP Anda.
 2. Klik tombol **Titik Tiga (⋮)** di pojok kanan atas.
 3. Pilih **"Tambahkan ke Layar Utama" (Add to Homescreen)** atau **"Instal Aplikasi"**.
 4. Selesai! FinanceFlow Pro kini terpasang di HP Anda layaknya aplikasi *Native*.
