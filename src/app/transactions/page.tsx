@@ -55,7 +55,7 @@ export default function TransactionsPage() {
       await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id, date: formData.date ? new Date(formData.date).toISOString() : undefined })
+        body: JSON.stringify({ ...formData, description: formData.category, amount: parseFloat(formData.amount), userId: user.id, date: formData.date ? new Date(formData.date).toISOString() : undefined })
       });
     }
     setShowForm(false);
@@ -103,8 +103,7 @@ export default function TransactionsPage() {
                   <option value="INCOME">Pemasukan</option>
                 </select>
                 <input type="number" placeholder="Nominal (Rp)" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
-                <input type="text" placeholder="Deskripsi" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
-                <input type="text" placeholder="Kategori" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
+                <input type="text" placeholder="Kategori (Misal: Makanan, Bensin)" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }} />
                 <select value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} required style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
                   {wallets.map(w => <option key={w.id} value={w.id}>{w.name} (Rp {w.balance.toLocaleString('id-ID')})</option>)}
                 </select>
@@ -172,8 +171,8 @@ export default function TransactionsPage() {
                   )}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600 }}>{tx.description}</h4>
-                  <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('id-ID')} {walletName && `• ${walletName}`}</p>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600 }}>{tx.description || tx.category}</h4>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{tx.description !== tx.category ? `${tx.category} • ` : ''}{new Date(tx.date).toLocaleDateString('id-ID')} {walletName && `• ${walletName}`}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isIncome ? 'var(--color-success)' : 'var(--color-text)' }}>
