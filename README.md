@@ -1,84 +1,97 @@
 <div align="center">
-  <img src="public/FinanceFlow.png" alt="FinanceFlow Logo" width="120" />
-  <h1>💎 FinanceFlow Pro</h1>
-  <p><strong>Aplikasi Pencatat Keuangan Pribadi (PWA) Sekelas Fintech Digital</strong></p>
-
+  <img src="https://img.icons8.com/fluent/96/000000/wallet.png" alt="FinanceFlow Logo" width="80"/>
+  <h1>FinanceFlow Pro</h1>
+  <p><strong>Premium Personal Finance Dashboard</strong></p>
+  
   <p>
-    <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/Prisma-ORM-1B222D?style=for-the-badge&logo=prisma" alt="Prisma" />
-    <img src="https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite" alt="SQLite" />
-    <img src="https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge&logo=pwa" alt="PWA" />
+    <a href="#fitur-utama">Fitur</a> •
+    <a href="#teknologi">Teknologi</a> •
+    <a href="#instalasi">Instalasi</a>
   </p>
 </div>
 
 ---
 
-## 🌟 Tentang Proyek Ini
+## 📖 Tentang Aplikasi
+**FinanceFlow Pro** adalah aplikasi manajemen keuangan pribadi (*Personal Finance*) yang dirancang dengan **Titanium Design System**—menawarkan antarmuka modern, elegan (berbasis *glassmorphism*), dan pengalaman pengguna kelas atas ala *startup fintech*. 
 
-**FinanceFlow Pro** adalah aplikasi manajemen keuangan pribadi berkonsep *Progressive Web App (PWA)* yang didesain khusus mengutamakan tampilan antarmuka *Mobile-First*. Terinspirasi dari estetika aplikasi perbankan digital premium (seperti Jago, Blu, atau DANA), aplikasi ini tidak hanya mencatat transaksi, tetapi memberikan nuansa *fintech* kelas atas di genggaman Anda.
+Aplikasi ini tidak hanya fokus pada pencatatan keuangan, tetapi juga analisis kas bulanan, target tabungan, dan keamanan akun yang ketat (menggunakan validasi OTP via Email).
 
-## ✨ Fitur Unggulan
+---
 
-- 📱 **Progressive Web App (PWA)**: Dapat di-*install* langsung ke layar utama Android/iOS tanpa lewat App Store.
-- 💳 **Multi-Dompet (Wallets)**: Kelola banyak sumber dana sekaligus (Cash, Rekening BCA, GoPay, dll).
-- 📊 **Dashboard & Statistik Interaktif**: Visualisasi arus kas 6 bulan terakhir menggunakan grafik dinamis.
-- 🧮 **Kalkulator 50/30/20 & Dana Darurat**: Sistem AI pintar untuk mengatur porsi anggaran ideal dan menghitung target tabungan Anda.
-- 🧾 **Cetak Laporan Eksklusif**: Unduh laporan keuangan Anda dalam format file **CSV (Excel)** atau cetak **Struk PDF Premium** layaknya struk belanja sungguhan.
-- 🎨 **Desain Glassmorphism**: UI yang elegan, rapi, dan nyaman di mata (mendukung *Dark Mode*).
+## ✨ Fitur Utama
+
+- 🔐 **Autentikasi Bank-Grade**: 
+  - Login dan Registrasi aman dengan enkripsi `Bcrypt`.
+  - Pemulihan kata sandi (Lupa Sandi) menggunakan **Kode OTP via Email** (Integrasi *Nodemailer*).
+- 💰 **Manajemen Multi-Dompet**: Buat dan pantau saldo dari berbagai dompet (Rekening, E-Wallet, Uang Tunai) secara terpisah.
+- 📊 **Analitik & AI Insight**:
+  - Grafik Area dinamis (6 bulan terakhir) menggunakan `Recharts`.
+  - Peringatan pintar (FinanceFlow AI) jika pengeluaran kategori tertentu melebihi batas wajar.
+- 🖨️ **Ekspor Laporan Keuangan**:
+  - Unduh data riwayat transaksi dalam format **Excel (CSV)**.
+  - Cetak otomatis dalam format **Struk PDF Thermal** elegan (menggunakan `jsPDF`).
+- 🎨 **Titanium UI (Premium UX)**: Tema gelap (*Dark Mode*), animasi transisi mulus, dan kartu melayang bergaya *Glassmorphism*.
 
 ---
 
 ## 🚀 Teknologi yang Digunakan
 
-| Kategori | Teknologi |
-| --- | --- |
-| **Framework** | Next.js (App Router) / React |
-| **Database & ORM** | SQLite & Prisma ORM |
-| **Styling** | Vanilla CSS (CSS Variables & Glassmorphism) |
-| **Icons & Charts** | Lucide React & Recharts |
-| **PDF Engine** | jsPDF |
+Aplikasi ini dibangun menggunakan arsitektur modern (*Fullstack*):
+
+- **Frontend:** Next.js 15 (App Router), React, TypeScript.
+- **Styling:** Vanilla CSS (Titanium Design System).
+- **Backend/API:** Next.js Route Handlers.
+- **Database:** PostgreSQL (Cloud Database by Neon DB).
+- **ORM:** Prisma.
+- **Lainnya:** Nodemailer (SMTP), jsPDF (PDF Generator), Recharts (Data Visualization).
+- **Deployment:** Vercel.
 
 ---
 
-## 💻 Cara Menjalankan Secara Lokal (Local Development)
+## 🛠️ Instalasi (Menjalankan secara Lokal)
 
-Ikuti langkah-langkah di bawah ini untuk menjalankan **FinanceFlow Pro** di komputer Anda sendiri:
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini di komputer Anda:
 
-### 1. Kloning Repositori
-```bash
-git clone https://github.com/username/FinanceFlow.git
-cd FinanceFlow
-```
+1. **Clone repository ini**
+   ```bash
+   git clone https://github.com/USERNAME_ANDA/financeflow.git
+   cd financeflow
+   ```
 
-### 2. Install Dependensi
-Pastikan Anda sudah menginstal Node.js, lalu jalankan:
-```bash
-npm install
-```
+2. **Install dependensi**
+   ```bash
+   npm install
+   ```
 
-### 3. Setup Database (Prisma)
-Aplikasi ini menggunakan SQLite secara bawaan agar mudah dijalankan tanpa *setup* server *database*.
-```bash
-npx prisma generate
-npx prisma db push
-```
+3. **Konfigurasi Environment Variables**
+   Buat file `.env` di folder utama (root) dan masukkan konfigurasi berikut:
+   ```env
+   # Koneksi ke PostgreSQL Database (Bisa pakai Neon DB / Supabase)
+   DATABASE_URL="postgresql://username:password@host:port/database"
+   
+   # JWT Secret untuk Autentikasi
+   JWT_SECRET="isi_dengan_kunci_rahasia_bebas_yang_panjang"
+   
+   # Konfigurasi SMTP Nodemailer (Gmail disarankan)
+   EMAIL_USER="email.anda@gmail.com"
+   EMAIL_PASS="app_password_google_anda"
+   ```
 
-### 4. Jalankan Server Development
-```bash
-npm run dev
-```
-Buka `http://localhost:3000` di *browser* Anda untuk melihat aplikasinya.
+4. **Sinkronisasi Database (Prisma)**
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
 
----
-
-## 📸 Panduan Install PWA di Android
-1. Akses *link* *deploy* aplikasi https://finance-nu-black.vercel.app/ dari **Google Chrome** di HP Anda.
-2. Klik tombol **Titik Tiga (⋮)** di pojok kanan atas.
-3. Pilih **"Tambahkan ke Layar Utama" (Add to Homescreen)** atau **"Instal Aplikasi"**.
-4. Selesai! FinanceFlow Pro kini terpasang di HP Anda layaknya aplikasi *Native*.
+5. **Jalankan Aplikasi**
+   ```bash
+   npm run dev
+   ```
+   Buka `http://localhost:3000` di browser Anda.
 
 ---
 
 <div align="center">
-  <p>Dibuat dengan ❤️ untuk pengelolaan keuangan yang lebih cerdas.</p>
+  <i>Dibuat dengan ❤️ untuk Portofolio Profesional</i>
 </div>
