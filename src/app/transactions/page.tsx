@@ -25,7 +25,7 @@ export default function TransactionsPage() {
   const fetchData = async (userId: string) => {
     try {
       const [txRes, walletRes] = await Promise.all([
-        fetch('/api/transactions'),
+        fetch(`/api/transactions?userId=${userId}`),
         fetch(`/api/wallets?userId=${userId}`)
       ]);
       const txData = await txRes.json();

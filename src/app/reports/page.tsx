@@ -22,7 +22,7 @@ export default function ReportsPage() {
   }, []);
 
   const fetchTransactions = async () => {
-    const res = await fetch('/api/transactions');
+    const res = await fetch(`/api/transactions?userId=${user.id}`);
     const data = await res.json();
     if (Array.isArray(data)) setTransactions(data);
   };
