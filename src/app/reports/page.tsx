@@ -17,12 +17,12 @@ export default function ReportsPage() {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     if (userData.id) {
       setUser(userData);
-      fetchTransactions();
+      fetchTransactions(userData.id);
     }
   }, []);
 
-  const fetchTransactions = async () => {
-    const res = await fetch(`/api/transactions?userId=${user.id}`);
+  const fetchTransactions = async (userId: string) => {
+    const res = await fetch(`/api/transactions?userId=${userId}`);
     const data = await res.json();
     if (Array.isArray(data)) setTransactions(data);
   };
