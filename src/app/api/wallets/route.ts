@@ -42,3 +42,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Missing wallet ID' }, { status: 400 });
+    }
+
+    await prisma.transaction.deleteMany({
+      where: { walletId: id }
+    });
+
+    await prisma.wallet.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ message: 'Wallet deleted successfully' });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  }
+}
