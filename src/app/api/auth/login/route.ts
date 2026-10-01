@@ -18,6 +18,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email tidak ditemukan' }, { status: 400 });
     }
 
+    if (!user.isVerified) {
+      return NextResponse.json({ error: 'Akun belum diverifikasi. Silakan cek email Anda atau daftar ulang.' }, { status: 403 });
+    }
+
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return NextResponse.json({ error: 'Password salah' }, { status: 400 });

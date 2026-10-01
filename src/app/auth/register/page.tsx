@@ -5,11 +5,13 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -24,7 +26,34 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      router.push('/auth/login');
+      setStep(2); // Pindah ke form verifikasi OTP
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    
+    try {
+      const res = await fetch('/api/auth/verify-register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, otp })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      
+      // Simpan data login
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      router.push('/');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -44,7 +73,9 @@ export default function RegisterPage() {
             <h1 className="font-extrabold text-3xl mb-2" style={{ letterSpacing: '-0.04em', background: 'linear-gradient(135deg, #FFFFFF, #94A3B8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               FinanceFlow
             </h1>
-            <p className="text-muted text-sm font-bold">Mulai perjalanan finansial Anda</p>
+            <p className="text-muted text-sm font-bold">
+              {step === 1 ? 'Mulai perjalanan finansial Anda' : 'Verifikasi email Anda'}
+            </p>
           </div>
           
           {error && (
@@ -53,45 +84,70 @@ export default function RegisterPage() {
             </div>
           )}
           
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
-              <input 
-                type="text" 
-                placeholder="Steve Jobs" 
-                value={formData.name} 
-                onChange={e => setFormData({...formData, name: e.target.value})} 
-                required 
-                style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
-              <input 
-                type="email" 
-                placeholder="nama@email.com" 
-                value={formData.email} 
-                onChange={e => setFormData({...formData, email: e.target.value})} 
-                required 
-                style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
-              <input 
-                type="password" 
-                placeholder="••••••••" 
-                value={formData.password} 
-                onChange={e => setFormData({...formData, password: e.target.value})} 
-                required 
-                style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
-              />
-            </div>
-            
-            <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '16px', marginTop: '0.5rem', borderRadius: '16px', fontSize: '0.95rem' }}>
-              {loading ? 'Memproses...' : 'Buat Akun'}
-            </button>
-          </form>
+          {step === 1 ? (
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <label className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
+                <input 
+                  type="text" 
+                  placeholder="Steve Jobs" 
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})} 
+                  required 
+                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
+                <input 
+                  type="email" 
+                  placeholder="nama@email.com" 
+                  value={formData.email} 
+                  onChange={e => setFormData({...formData, email: e.target.value})} 
+                  required 
+                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={formData.password} 
+                  onChange={e => setFormData({...formData, password: e.target.value})} 
+                  required 
+                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                />
+              </div>
+              
+              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '16px', marginTop: '0.5rem', borderRadius: '16px', fontSize: '0.95rem' }}>
+                {loading ? 'Memproses...' : 'Buat Akun'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                <p className="text-sm text-muted">Kode OTP 6-digit telah dikirim ke:</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--color-primary)' }}>{formData.email}</p>
+              </div>
+              
+              <div>
+                <input 
+                  type="text" 
+                  placeholder="Masukkan 6 Digit OTP" 
+                  value={otp} 
+                  onChange={e => setOtp(e.target.value)} 
+                  required
+                  maxLength={6}
+                  style={{ width: '100%', padding: '16px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '8px', fontWeight: 'bold' }} 
+                />
+              </div>
+              
+              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '16px', marginTop: '0.5rem', borderRadius: '16px', fontSize: '0.95rem' }}>
+                {loading ? 'Memverifikasi...' : 'Verifikasi Akun'}
+              </button>
+            </form>
+          )}
           
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
             <p className="text-sm text-muted">
