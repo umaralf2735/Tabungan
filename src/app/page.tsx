@@ -123,13 +123,15 @@ export default function Home() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Dashboard</h1>
-          <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             {monthNames[new Date().getMonth()]} {new Date().getFullYear()}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
         </div>
         <button className="btn-primary desktop-btn" onClick={() => router.push('/transactions')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          <span className="desktop-only-text">+ Tambah Transaksi</span>
+          <span className="desktop-only-text">Tambah Transaksi</span>
         </button>
       </header>
 
@@ -139,10 +141,10 @@ export default function Home() {
         <div className="card-full card-mobile-sleek" style={{ position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: 'var(--color-primary)', filter: 'blur(50px)', opacity: 0.2 }}></div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: 'rgba(59,130,246,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
+            <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
             </span>
-            TOTAL NET WORTH
+            TOTAL KEKAYAAN
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h2>
@@ -154,10 +156,10 @@ export default function Home() {
         {/* Card 2: Income */}
         <div className="card-half card-mobile-sleek">
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: 'rgba(34,197,94,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-success)' }}>
+            <span style={{ background: 'rgba(52,211,153,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-success)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="19 12 12 19 5 12"></polyline><line x1="12" y1="19" x2="12" y2="5"></line></svg>
             </span>
-            TOTAL INCOME
+            TOTAL PEMASUKAN
           </p>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Rp {totalIncome.toLocaleString('id-ID')}</h2>
           <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendInc)}</p>
@@ -166,10 +168,10 @@ export default function Home() {
         {/* Card 3: Expenses */}
         <div className="card-half card-mobile-sleek">
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: 'rgba(239,68,68,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-danger)' }}>
+            <span style={{ background: 'rgba(251,113,133,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-danger)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="5 12 12 5 19 12"></polyline><line x1="12" y1="5" x2="12" y2="19"></line></svg>
             </span>
-            TOTAL EXPENSES
+            TOTAL PENGELUARAN
           </p>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Rp {totalExpense.toLocaleString('id-ID')}</h2>
           <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendExp)}</p>
@@ -177,12 +179,12 @@ export default function Home() {
 
         {/* Card 4: Net Cash Flow */}
         <div className="card-full card-mobile-sleek" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: '#A855F7', filter: 'blur(50px)', opacity: 0.2 }}></div>
+          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: '#A78BFA', filter: 'blur(50px)', opacity: 0.2 }}></div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: 'rgba(168,85,247,0.2)', padding: '6px', borderRadius: '8px', color: '#A855F7' }}>
+            <span style={{ background: 'rgba(167,139,250,0.2)', padding: '6px', borderRadius: '8px', color: '#A78BFA' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             </span>
-            NET CASH FLOW
+            ARUS KAS BERSIH
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Rp {netCashFlow.toLocaleString('id-ID')}</h2>
@@ -196,34 +198,50 @@ export default function Home() {
       <section className="card-mobile-sleek" style={{ marginBottom: '24px' }}>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          NET WORTH GROWTH (12 MONTHS)
+          PERTUMBUHAN KEKAYAAN (12 BULAN)
         </p>
-        <div style={{ width: '100%', height: '200px' }}>
+        <div style={{ width: '100%', height: '220px' }}>
           {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPro" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                    <stop offset="100%" stopColor="#A855F7" stopOpacity={0.8}/>
+                    <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.8}/>
+                    <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity={0.8}/>
                   </linearGradient>
                   <linearGradient id="colorProBg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} dx={-10} />
+                <YAxis 
+                  domain={['dataMin', 'dataMax']}
+                  stroke="var(--color-text-muted)" 
+                  fontSize={10} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickFormatter={(val) => {
+                    if (val === 0) return '0';
+                    if (val >= 1000000) return (val / 1000000).toFixed(1) + ' jt';
+                    if (val >= 1000) return (val / 1000).toFixed(0) + ' rb';
+                    return val.toString();
+                  }} 
+                  dx={-10} 
+                />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px', color: '#fff', fontSize: '0.75rem' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={3} fillOpacity={1} fill="url(#colorProBg)" />
+                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary)', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-muted text-center" style={{ marginTop: '80px', fontSize: '0.8rem' }}>Belum ada data riwayat.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginBottom: '8px', opacity: 0.5 }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              <p style={{ fontSize: '0.8rem' }}>Belum ada data riwayat.</p>
+            </div>
           )}
         </div>
       </section>
@@ -235,17 +253,17 @@ export default function Home() {
         <div className="card-mobile-sleek">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: 'rgba(59,130,246,0.2)', padding: '6px', borderRadius: '50%', color: 'var(--color-primary)' }}>
+              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '50%', color: 'var(--color-primary)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
               </span>
-              TOP SPENDING CATEGORIES
+              KATEGORI PENGELUARAN
             </p>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
             {topCategories.map((cat: any, index: number) => {
-              const colors = ['#EF4444', '#8B5CF6', '#3B82F6', '#22C55E'];
+              const colors = ['#FB7185', '#A78BFA', '#34D399', '#FBBF24'];
               const color = colors[index % colors.length];
               const amount = cat[1] as number;
               const percentage = totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : 0;
@@ -262,7 +280,12 @@ export default function Home() {
                 </div>
               );
             })}
-            {topCategories.length === 0 && <p className="text-muted text-xs">Belum ada pengeluaran bulan ini.</p>}
+            {topCategories.length === 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 0', color: 'var(--color-text-muted)' }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginBottom: '8px', opacity: 0.5 }}><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <p className="text-xs">Belum ada data pengeluaran bulan ini.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -270,13 +293,13 @@ export default function Home() {
         <div className="card-mobile-sleek">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: 'rgba(59,130,246,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
+              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </span>
-              RECENT TRANSACTIONS
+              TRANSAKSI TERBARU
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', cursor: 'pointer' }} onClick={() => router.push('/transactions')}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>View All</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Lihat Semua</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
           </div>
@@ -287,11 +310,11 @@ export default function Home() {
               return (
                 <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: isIncome ? 'rgba(52,211,153,0.1)' : 'rgba(251,113,133,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {isIncome ? (
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" strokeWidth="2"><path d="M12 5v14"></path></svg>
                       )}
                     </div>
                     <div>
@@ -305,7 +328,15 @@ export default function Home() {
                 </div>
               );
             })}
-            {recentTransactions.length === 0 && <p className="text-muted text-xs">Tidak ada transaksi terbaru.</p>}
+            {recentTransactions.length === 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: '12px' }}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-text-muted)', opacity: 0.5 }}><path d="M3 7h18M3 12h18M3 17h18"></path></svg>
+                <p className="text-muted text-xs">Belum ada transaksi bulan ini.</p>
+                <button onClick={() => router.push('/transactions')} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>
+                  + Tambah Transaksi
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>

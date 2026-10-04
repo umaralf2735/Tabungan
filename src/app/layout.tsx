@@ -45,22 +45,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                 <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: 'var(--color-danger)', borderRadius: '50%' }}></span>
               </button>
-              <a href="/menu" className="top-nav-link" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '50%', padding: '10px' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <a href="/menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', background: 'var(--color-primary)', borderRadius: '50%', color: 'white', overflow: 'hidden' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path></svg>
               </a>
             </div>
           </nav>
-
-          {/* MOBILE HEADER (Mobile Only) */}
-          <header className="mobile-header" style={{ position: 'relative', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 className="logo-text" style={{ fontSize: '1.25rem' }}>
-              <span style={{ color: 'white' }}>Finance</span><span style={{ color: '#3B82F6' }}>Flow</span>
-            </h1>
-            <div className="mobile-header-bell" style={{ display: 'block', position: 'relative' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              <span style={{ position: 'absolute', top: 0, right: 2, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid #0C1222' }}></span>
-            </div>
-          </header>
 
           {/* MAIN CONTENT */}
           <main className="main-content animate-fade-in">
