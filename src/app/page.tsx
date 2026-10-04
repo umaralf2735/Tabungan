@@ -57,7 +57,7 @@ export default function Home() {
     acc[t.category] = (acc[t.category] || 0) + t.amount;
     return acc;
   }, {} as Record<string, number>);
-  const topCategories = Object.entries(expensesByCategory).sort((a, b) => (b[1] as number) - (a[1] as number)).slice(0, 4);
+  const topCategories = Object.entries(expensesByCategory).sort((a: any, b: any) => b[1] - a[1]).slice(0, 4);
 
   // Chart Data (12 Bulan)
   const monthlyDataMap: Record<string, { name: string, Saldo: number }> = {};
