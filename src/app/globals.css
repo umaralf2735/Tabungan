@@ -231,29 +231,33 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-/* Bottom Nav (Mobile) - Floating Blur */
-.sidebar {
+.top-navbar {
+  display: none;
+}
+
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(12, 19, 36, 0.85); /* #0C1324 with opacity */
+  background: rgba(12, 19, 36, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid rgba(255,255,255,0.05);
   box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
   z-index: 50;
-  padding: 8px 16px 24px 16px; /* Extra padding bottom for iPhone home indicator */
+  padding: 8px 16px 24px 16px;
 }
 
 .logo-text {
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-text);
-  background: linear-gradient(135deg, var(--color-text), var(--color-text-muted));
+  background: linear-gradient(135deg, #FFFFFF, #94A3B8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.03em;
+  margin: 0;
 }
 
 .nav-menu {
@@ -272,11 +276,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   padding: 8px;
   border-radius: var(--radius-sm);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   color: var(--color-text-muted);
   font-size: 0.65rem;
   width: 20%;
-  position: relative;
 }
 .nav-link:hover, .nav-link.active {
   color: var(--color-text);
@@ -291,10 +294,9 @@ h1, h2, h3, h4, h5, h6 {
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
 }
 
-/* Animasi Icon Glow untuk yang aktif */
 .nav-link.active .nav-icon {
   stroke: var(--color-primary);
   filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
@@ -307,9 +309,7 @@ h1, h2, h3, h4, h5, h6 {
 .main-content {
   flex: 1;
   padding: 16px;
-  padding-bottom: 120px; /* Sangat longgar untuk bottom nav */
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding-bottom: 120px;
   width: 100%;
 }
 
@@ -343,58 +343,51 @@ input::placeholder {
 /* Desktop styles */
 @media (min-width: 768px) {
   .app-container {
-    flex-direction: row;
+    flex-direction: column;
   }
   .mobile-header {
     display: none;
   }
-  .desktop-logo {
-    display: block;
-    margin-bottom: 40px;
-    font-size: 1.75rem;
+  .bottom-nav {
+    display: none;
   }
-  .sidebar {
+  
+  .top-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 48px;
+    background: rgba(12, 19, 36, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     position: sticky;
     top: 0;
-    width: 280px;
-    padding: 32px;
-    height: 100vh;
-    border-right: 1px solid var(--color-border);
-    border-top: none;
-    box-shadow: none;
-    background: var(--color-surface-secondary);
+    z-index: 50;
   }
-  .nav-menu {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
+  .top-nav-menu {
+    display: flex;
+    gap: 16px;
+  }
+  .top-nav-link {
+    display: flex;
+    align-items: center;
     gap: 8px;
-  }
-  .nav-link {
-    flex-direction: row;
-    justify-content: flex-start;
+    color: var(--color-text-muted);
+    font-weight: 600;
     font-size: 0.95rem;
-    padding: 12px 16px;
-    width: 100%;
-    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    border-radius: 99px;
+    transition: all 0.2s;
   }
-  .nav-link:hover {
-    background: rgba(255,255,255,0.03);
+  .top-nav-link:hover {
+    color: var(--color-text);
+    background: rgba(255,255,255,0.05);
   }
-  .nav-link.active {
-    background: rgba(59, 130, 246, 0.1);
-  }
-  .nav-icon {
-    width: 20px;
-    height: 20px;
-    margin-bottom: 0;
-    margin-right: 16px;
-  }
-  .nav-link.active .nav-icon {
-    transform: none;
-  }
+  
   .main-content {
     padding: 32px 48px;
+    padding-bottom: 48px;
   }
 }
 

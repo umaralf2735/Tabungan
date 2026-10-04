@@ -257,112 +257,119 @@ export default function ReportsPage() {
   const barData = Object.values(monthlyDataMap).slice(-6);
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto' }}>
+    <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
       
       {/* HEADER HERO */}
       <header className="flex-between mb-4 mt-2">
         <div>
-          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em' }}>Laporan</h1>
-          <p className="text-sm text-muted mt-1">Analisis finansial bulanan</p>
+          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Reports</h1>
+          <p className="text-sm text-muted mt-1">Analisis finansial Anda</p>
         </div>
       </header>
 
-      {/* DATE RANGE FILTER */}
-      <div className="card-glass mb-4" style={{ padding: '16px', display: 'flex', gap: '12px', alignItems: 'center', borderRadius: '24px' }}>
-        <div style={{ flex: 1 }}>
-          <label className="text-xs text-muted mb-1 block font-bold">Dari Tanggal</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
-        </div>
-        <div style={{ color: 'var(--color-text-muted)', paddingTop: '20px' }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-        </div>
-        <div style={{ flex: 1 }}>
-          <label className="text-xs text-muted mb-1 block font-bold">Sampai Tanggal</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
-        </div>
-      </div>
-
-      {/* SUMMARY STATS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-        <div className="card" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <div style={{ background: 'rgba(34, 197, 94, 0.15)', color: 'var(--color-success)', padding: '8px', borderRadius: '12px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="19 12 12 19 5 12"></polyline><line x1="12" y1="19" x2="12" y2="5"></line></svg>
-            </div>
-            <p className="text-muted text-xs font-bold">Pemasukan</p>
-          </div>
-          <h4 className="font-extrabold text-success text-lg">Rp {totalIncome.toLocaleString('id-ID')}</h4>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'start' }}>
         
-        <div className="card" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: 'var(--color-danger)', padding: '8px', borderRadius: '12px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="5 12 12 5 19 12"></polyline><line x1="12" y1="5" x2="12" y2="19"></line></svg>
+        {/* LEFT COLUMN: FILTERS, STATS, EXPORT */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* DATE RANGE FILTER */}
+          <div className="card-glass" style={{ padding: '16px', display: 'flex', gap: '12px', alignItems: 'center', borderRadius: '24px' }}>
+            <div style={{ flex: 1 }}>
+              <label className="text-xs text-muted mb-1 block font-bold">Dari Tanggal</label>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
             </div>
-            <p className="text-muted text-xs font-bold">Pengeluaran</p>
+            <div style={{ color: 'var(--color-text-muted)', paddingTop: '20px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="text-xs text-muted mb-1 block font-bold">Sampai Tanggal</label>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
+            </div>
           </div>
-          <h4 className="font-extrabold text-danger text-lg">Rp {totalExpense.toLocaleString('id-ID')}</h4>
+
+          {/* SUMMARY STATS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="card" style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <div style={{ background: 'rgba(34, 197, 94, 0.15)', color: 'var(--color-success)', padding: '8px', borderRadius: '12px' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="19 12 12 19 5 12"></polyline><line x1="12" y1="19" x2="12" y2="5"></line></svg>
+                </div>
+                <p className="text-muted text-xs font-bold">Pemasukan</p>
+              </div>
+              <h4 className="font-extrabold text-success text-lg">Rp {totalIncome.toLocaleString('id-ID')}</h4>
+            </div>
+            
+            <div className="card" style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: 'var(--color-danger)', padding: '8px', borderRadius: '12px' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="5 12 12 5 19 12"></polyline><line x1="12" y1="5" x2="12" y2="19"></line></svg>
+                </div>
+                <p className="text-muted text-xs font-bold">Pengeluaran</p>
+              </div>
+              <h4 className="font-extrabold text-danger text-lg">Rp {totalExpense.toLocaleString('id-ID')}</h4>
+            </div>
+
+            {/* NET BALANCE CARD */}
+            <div className="card-glass" style={{ gridColumn: '1 / -1', padding: '24px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '150px', height: '150px', background: 'var(--color-primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', zIndex: 0 }}></div>
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p className="text-sm text-muted font-bold mb-1">Sisa Bersih (Netto)</p>
+                  <h3 className="font-extrabold text-2xl" style={{ color: savings >= 0 ? 'var(--color-text)' : 'var(--color-danger)' }}>
+                    Rp {savings.toLocaleString('id-ID')}
+                  </h3>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '16px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={savings >= 0 ? 'var(--color-primary)' : 'var(--color-danger)'} strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* EXPORT BUTTONS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <button onClick={handleExportCSV} style={{ padding: '16px', borderRadius: '20px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '50%', marginBottom: '12px' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              </div>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Export CSV</span>
+            </button>
+            <button onClick={handleExportPDF} style={{ padding: '16px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(37,99,235,0.1), rgba(15,23,42,0.5))', border: '1px solid rgba(37,99,235,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
+              <div style={{ background: 'rgba(37,99,235,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
+              </div>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>Export PDF</span>
+            </button>
+          </div>
         </div>
 
-        {/* NET BALANCE CARD */}
-        <div className="card-glass" style={{ gridColumn: '1 / -1', padding: '24px', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '150px', height: '150px', background: 'var(--color-primary)', filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', zIndex: 0 }}></div>
-          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p className="text-sm text-muted font-bold mb-1">Sisa Bersih (Netto)</p>
-              <h3 className="font-extrabold text-2xl" style={{ color: savings >= 0 ? 'var(--color-text)' : 'var(--color-danger)' }}>
-                Rp {savings.toLocaleString('id-ID')}
-              </h3>
+        {/* RIGHT COLUMN: CHART SECTION */}
+        <div className="card-glass" style={{ padding: '24px 16px', height: '100%', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '24px', textAlign: 'center', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>Arus Kas (6 Bulan Terakhir)</h3>
+          {barData.length > 0 ? (
+            <div style={{ flex: 1, width: '100%', minHeight: '300px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
+                  <YAxis stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                    contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '16px', fontSize: '12px', fontWeight: 600, padding: '12px', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Bar dataKey="Masuk" fill="var(--color-success)" radius={[6, 6, 0, 0]} barSize={24} />
+                  <Bar dataKey="Keluar" fill="var(--color-danger)" radius={[6, 6, 0, 0]} barSize={24} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '16px' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={savings >= 0 ? 'var(--color-primary)' : 'var(--color-danger)'} strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto 12px auto', color: 'var(--color-text-muted)', opacity: 0.5 }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              <p className="text-sm font-bold text-muted">Belum ada data grafik</p>
             </div>
-          </div>
+          )}
         </div>
-      </div>
 
-      {/* EXPORT BUTTONS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-        <button onClick={handleExportCSV} style={{ padding: '16px', borderRadius: '20px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
-          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '50%', marginBottom: '12px' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          </div>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Data Excel (CSV)</span>
-        </button>
-        <button onClick={handleExportPDF} style={{ padding: '16px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(37,99,235,0.1), rgba(15,23,42,0.5))', border: '1px solid rgba(37,99,235,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
-          <div style={{ background: 'rgba(37,99,235,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary)' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
-          </div>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>Cetak Laporan PDF</span>
-        </button>
-      </div>
-
-      {/* CHART SECTION */}
-      <div className="card-glass" style={{ padding: '24px 16px' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '24px', textAlign: 'center', letterSpacing: '-0.02em' }}>Arus Kas (6 Bulan Terakhir)</h3>
-        {barData.length > 0 ? (
-          <div style={{ width: '100%', height: '240px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
-                <YAxis stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(255,255,255,0.02)' }}
-                  contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '16px', fontSize: '12px', fontWeight: 600, padding: '12px' }}
-                  itemStyle={{ color: 'var(--color-text)' }}
-                />
-                <Bar dataKey="Masuk" fill="var(--color-success)" radius={[6, 6, 0, 0]} barSize={16} />
-                <Bar dataKey="Keluar" fill="var(--color-danger)" radius={[6, 6, 0, 0]} barSize={16} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div style={{ padding: '40px 0', textAlign: 'center' }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto 12px auto', color: 'var(--color-text-muted)', opacity: 0.5 }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-            <p className="text-sm font-bold text-muted">Belum ada data grafik</p>
-          </div>
-        )}
       </div>
     </div>
   );
