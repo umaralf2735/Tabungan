@@ -429,6 +429,27 @@ input::placeholder {
   color: var(--color-text);
 }
 
+.mobile-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  cursor: pointer;
+}
+.desktop-btn {
+  display: none !important;
+}
+
 @media (min-width: 768px) {
   .dashboard-cards {
     grid-template-columns: repeat(4, 1fr);
@@ -444,6 +465,12 @@ input::placeholder {
   }
   .mobile-header-bell {
     display: none;
+  }
+  .mobile-fab {
+    display: none;
+  }
+  .desktop-btn {
+    display: inline-flex !important;
   }
 }
 

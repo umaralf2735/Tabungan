@@ -59,6 +59,43 @@ export default function Home() {
   }, {} as Record<string, number>);
   const topCategories = Object.entries(expensesByCategory).sort((a: any, b: any) => b[1] - a[1]).slice(0, 4);
 
+  // Kalkulasi Tren (Bulan Lalu)
+  const prevMonthTransactions = transactions.filter(t => {
+    const d = new Date(t.date);
+    const now = new Date();
+    const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    return d.getMonth() === prevMonth && d.getFullYear() === prevYear && !t.category.startsWith('Transfer');
+  });
+
+  const prevTotalIncome = prevMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
+  const prevTotalExpense = prevMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
+  const prevNetCashFlow = prevTotalIncome - prevTotalExpense;
+  const prevTotalWalletBalance = totalWalletBalance - netCashFlow + prevNetCashFlow;
+
+  const calcTrend = (current: number, prev: number, invertColor: boolean = false) => {
+    if (prev === 0) return { pct: 0, dir: 'none', color: 'var(--color-text-muted)' };
+    const pct = ((current - prev) / prev) * 100;
+    const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'none';
+    
+    let color = 'var(--color-text-muted)';
+    if (dir === 'up') color = invertColor ? 'var(--color-danger)' : 'var(--color-success)';
+    if (dir === 'down') color = invertColor ? 'var(--color-success)' : 'var(--color-danger)';
+    
+    return { pct: Math.abs(pct).toFixed(0), dir, color };
+  };
+
+  const trendNW = calcTrend(totalWalletBalance, prevTotalWalletBalance);
+  const trendInc = calcTrend(totalIncome, prevTotalIncome);
+  const trendExp = calcTrend(totalExpense, prevTotalExpense, true); // Expense up is danger
+  const trendCF = calcTrend(netCashFlow, prevNetCashFlow);
+
+  const renderTrend = (trend: any) => {
+    if (trend.dir === 'none') return <span style={{ color: trend.color }}>— 0% vs bulan lalu</span>;
+    if (trend.dir === 'up') return <span style={{ color: trend.color }}>▲ {trend.pct}% vs bulan lalu</span>;
+    return <span style={{ color: trend.color }}>▼ {trend.pct}% vs bulan lalu</span>;
+  };
+
   // Chart Data (12 Bulan)
   const monthlyDataMap: Record<string, { name: string, Saldo: number }> = {};
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -84,10 +121,16 @@ export default function Home() {
       
       {/* HEADER */}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Financial Overview</h1>
-        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
-          {monthNames[new Date().getMonth()]} {new Date().getFullYear()}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Dashboard</h1>
+          <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem' }}>
+            {monthNames[new Date().getMonth()]} {new Date().getFullYear()}
+          </div>
         </div>
+        <button className="btn-primary desktop-btn" onClick={() => router.push('/transactions')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span className="desktop-only-text">+ Tambah Transaksi</span>
+        </button>
       </header>
 
       {/* TOP 4 CARDS (CSS Grid) */}
@@ -105,7 +148,7 @@ export default function Home() {
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h2>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
-          <p style={{ color: 'var(--color-success)', fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>+ Aktif</p>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendNW)}</p>
         </div>
 
         {/* Card 2: Income */}
@@ -117,7 +160,7 @@ export default function Home() {
             TOTAL INCOME
           </p>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Rp {totalIncome.toLocaleString('id-ID')}</h2>
-          <p style={{ color: 'var(--color-success)', fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>Bulan ini</p>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendInc)}</p>
         </div>
 
         {/* Card 3: Expenses */}
@@ -129,7 +172,7 @@ export default function Home() {
             TOTAL EXPENSES
           </p>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Rp {totalExpense.toLocaleString('id-ID')}</h2>
-          <p style={{ color: 'var(--color-danger)', fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>Bulan ini</p>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendExp)}</p>
         </div>
 
         {/* Card 4: Net Cash Flow */}
@@ -145,7 +188,7 @@ export default function Home() {
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Rp {netCashFlow.toLocaleString('id-ID')}</h2>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
-          <p style={{ color: netCashFlow >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{netCashFlow >= 0 ? '+' : ''} Surplus / Defisit</p>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendCF)}</p>
         </div>
       </section>
 
@@ -158,7 +201,7 @@ export default function Home() {
         <div style={{ width: '100%', height: '200px' }}>
           {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={areaData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPro" x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>
@@ -266,6 +309,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* FAB Mobile Only */}
+      <button className="mobile-fab" onClick={() => router.push('/transactions')}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
 
     </div>
   );

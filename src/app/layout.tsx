@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   Home
                 </a>
                 <a href="/transactions" className="top-nav-link">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21h6M9 17h6M9 13h6M5 6h14M5 10h14M5 14h14M5 18h14"></path></svg>
                   Transaksi
                 </a>
                 <a href="/wallets" className="top-nav-link">
@@ -40,9 +40,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             
-            <a href="/menu" className="top-nav-link" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '50%', padding: '10px' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </a>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: 'var(--color-danger)', borderRadius: '50%' }}></span>
+              </button>
+              <a href="/menu" className="top-nav-link" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '50%', padding: '10px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </a>
+            </div>
           </nav>
 
           {/* MOBILE HEADER (Mobile Only) */}
@@ -69,7 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <span className="nav-text">Home</span>
               </a>
               <a href="/transactions" className="nav-link">
-                <svg className="nav-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                <svg className="nav-icon" viewBox="0 0 24 24"><path d="M9 21h6M9 17h6M9 13h6M5 6h14M5 10h14M5 14h14M5 18h14"></path></svg>
                 <span className="nav-text">Transaksi</span>
               </a>
               <a href="/wallets" className="nav-link">
