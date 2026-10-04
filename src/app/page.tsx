@@ -164,10 +164,11 @@ export default function Home() {
           <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '20px', textTransform: 'uppercase' }}>Top Spending Categories</h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {topCategories.map((cat, index) => {
+            {topCategories.map((cat: any, index: number) => {
               const colors = ['#EF4444', '#8B5CF6', '#3B82F6', '#22C55E']; // Red, Purple, Blue, Green
               const color = colors[index % colors.length];
-              const percentage = totalExpense > 0 ? ((cat[1] / totalExpense) * 100).toFixed(1) : 0;
+              const amount = cat[1] as number;
+              const percentage = totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : 0;
               
               return (
                 <div key={cat[0]} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -176,7 +177,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{cat[0]}</p>
-                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>{percentage}% • Rp {cat[1].toLocaleString('id-ID')}</p>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>{percentage}% • Rp {amount.toLocaleString('id-ID')}</p>
                   </div>
                 </div>
               );
@@ -193,7 +194,7 @@ export default function Home() {
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {recentTransactions.map(tx => {
+            {recentTransactions.map((tx: any) => {
               const isIncome = tx.type === 'INCOME';
               return (
                 <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
