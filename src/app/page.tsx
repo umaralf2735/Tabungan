@@ -50,50 +50,26 @@ export default function Home() {
   
   const totalIncome = currentMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
+  const netCashFlow = totalIncome - totalExpense;
 
-  // Kalkulasi Target Tabungan
-  const savings = totalIncome - totalExpense;
-  const savingsTarget = totalIncome * 0.20;
-  let savingsProgress = 0;
-  if (savingsTarget > 0 && savings > 0) {
-    savingsProgress = Math.min((savings / savingsTarget) * 100, 100);
-  }
+  // Kategori Pengeluaran
+  const expensesByCategory = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((acc, t) => {
+    acc[t.category] = (acc[t.category] || 0) + t.amount;
+    return acc;
+  }, {} as Record<string, number>);
+  const topCategories = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1]).slice(0, 4);
 
-  // AI Insight Logic
-  let insightMessage = "Keuangan Anda bulan ini stabil. Pertahankan tren menabung Anda.";
-  let insightType = "success"; // success, warning, danger
-  
-  if (currentMonthTransactions.length > 0) {
-    const expensesByCategory = currentMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + t.amount;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    const maxCategory = Object.keys(expensesByCategory).reduce((a, b) => expensesByCategory[a] > expensesByCategory[b] ? a : b, "");
-    
-    if (totalExpense > totalIncome && totalIncome > 0) {
-      insightMessage = `Peringatan: Pengeluaran bulan ini melebihi batas wajar. Cek kategori ${maxCategory}.`;
-      insightType = "danger";
-    } else if (maxCategory) {
-      insightMessage = `Pengeluaran terbesar ada di kategori ${maxCategory}. Peluang hemat ada di sana.`;
-      insightType = "warning";
-    }
-  }
-
-  // Chart Data (6 Bulan Terakhir)
+  // Chart Data (12 Bulan)
   const monthlyDataMap: Record<string, { name: string, Saldo: number }> = {};
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  
   let runningBalance = totalWalletBalance;
   
-  // Reconstruct simple balance history for area chart
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 12; i++) {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     const key = `${d.getFullYear()}-${d.getMonth()}`;
-    monthlyDataMap[key] = { name: monthNames[d.getMonth()], Saldo: runningBalance };
+    monthlyDataMap[key] = { name: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().slice(2)}`, Saldo: runningBalance };
     
-    // Simulate past balance by subtracting income and adding expense of that month
     const monthTx = transactions.filter(t => new Date(t.date).getMonth() === d.getMonth() && new Date(t.date).getFullYear() === d.getFullYear());
     const mIncome = monthTx.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
     const mExpense = monthTx.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
@@ -101,148 +77,149 @@ export default function Home() {
   }
   
   const areaData = Object.values(monthlyDataMap).reverse();
-  const recentTransactions = transactions.slice(0, 4);
+  const recentTransactions = transactions.slice(0, 6);
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="animate-fade-in" style={{ paddingBottom: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
       
-      {/* HEADER HERO */}
-      <header className="mb-4">
-        <h2 className="text-muted" style={{ fontSize: '0.95rem', fontWeight: 500 }}>Selamat datang,</h2>
-        <h1 className="font-extrabold" style={{ fontSize: '1.5rem', letterSpacing: '-0.03em' }}>{user.name}</h1>
+      {/* HEADER */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Financial Overview</h1>
+        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
+          {monthNames[new Date().getMonth()]} {new Date().getFullYear()}
+        </div>
       </header>
 
-      {/* PREMIUM HERO BALANCE CARD */}
-      <section className="card-glass mb-4" style={{ position: 'relative', overflow: 'hidden', padding: '2rem' }}>
-        {/* Abstract Glow Background */}
-        <div style={{ position: 'absolute', top: '-50%', right: '-20%', width: '200px', height: '200px', background: 'var(--color-primary)', filter: 'blur(100px)', opacity: 0.3, borderRadius: '50%', zIndex: 0 }}></div>
-        <div style={{ position: 'absolute', bottom: '-50%', left: '-20%', width: '200px', height: '200px', background: 'var(--color-secondary)', filter: 'blur(100px)', opacity: 0.2, borderRadius: '50%', zIndex: 0 }}></div>
-        
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <p className="text-muted mb-1" style={{ fontSize: '0.85rem', fontWeight: 500 }}>Total Kekayaan (Net Worth)</p>
-          <h2 className="font-extrabold" style={{ fontSize: '2.5rem', letterSpacing: '-0.04em', background: 'linear-gradient(135deg, #FFFFFF, #94A3B8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Rp {totalWalletBalance.toLocaleString('id-ID')}
-          </h2>
-          
-          <div className="flex-between mt-4">
-            <button className="btn-primary" onClick={() => router.push('/transactions')} style={{ padding: '0.6rem 1.25rem', borderRadius: '16px', fontSize: '0.85rem' }}>
-              + Transaksi Baru
-            </button>
-            <button className="btn-icon" onClick={() => router.push('/wallets')} style={{ borderRadius: '16px', padding: '0.6rem' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-            </button>
-          </div>
+      {/* TOP 4 CARDS (CSS Grid) */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        {/* Card 1: Net Worth */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: 'var(--color-primary)', filter: 'blur(50px)', opacity: 0.2 }}></div>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px' }}>1. TOTAL NET WORTH</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h2>
+          <p style={{ color: 'var(--color-success)', fontSize: '0.8rem', fontWeight: 700, marginTop: '8px' }}>+ Aktif</p>
+        </div>
+
+        {/* Card 2: Income */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px' }}>2. TOTAL INCOME</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>Rp {totalIncome.toLocaleString('id-ID')}</h2>
+          <p style={{ color: 'var(--color-success)', fontSize: '0.8rem', fontWeight: 700, marginTop: '8px' }}>Bulan ini</p>
+        </div>
+
+        {/* Card 3: Expenses */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px' }}>3. TOTAL EXPENSES</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>Rp {totalExpense.toLocaleString('id-ID')}</h2>
+          <p style={{ color: 'var(--color-danger)', fontSize: '0.8rem', fontWeight: 700, marginTop: '8px' }}>Bulan ini</p>
+        </div>
+
+        {/* Card 4: Net Cash Flow */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '1.5rem', border: '1px solid rgba(168, 85, 247, 0.4)', boxShadow: '0 0 20px rgba(168, 85, 247, 0.1)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: '#A855F7', filter: 'blur(50px)', opacity: 0.2 }}></div>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px' }}>4. NET CASH FLOW</p>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>Rp {netCashFlow.toLocaleString('id-ID')}</h2>
+          <p style={{ color: netCashFlow >= 0 ? 'var(--color-success)' : 'var(--color-danger)', fontSize: '0.8rem', fontWeight: 700, marginTop: '8px' }}>{netCashFlow >= 0 ? '+' : ''} Surplus / Defisit</p>
         </div>
       </section>
 
-      {/* SUMMARY STATS (INCOME/EXPENSE) */}
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <div style={{ background: 'rgba(34, 197, 94, 0.15)', color: 'var(--color-success)', padding: '6px', borderRadius: '12px' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="19 12 12 19 5 12"></polyline><line x1="12" y1="19" x2="12" y2="5"></line></svg>
-            </div>
-            <p className="text-muted text-xs font-bold">Pemasukan Bulan Ini</p>
-          </div>
-          <h4 className="font-extrabold text-success text-lg">Rp {totalIncome.toLocaleString('id-ID')}</h4>
-        </div>
-        
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: 'var(--color-danger)', padding: '6px', borderRadius: '12px' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="5 12 12 5 19 12"></polyline><line x1="12" y1="5" x2="12" y2="19"></line></svg>
-            </div>
-            <p className="text-muted text-xs font-bold">Pengeluaran Bulan Ini</p>
-          </div>
-          <h4 className="font-extrabold text-danger text-lg">Rp {totalExpense.toLocaleString('id-ID')}</h4>
-        </div>
-      </section>
-
-      {/* AI INSIGHT */}
-      <div className="card-glass mb-4" style={{ padding: '1.25rem', borderLeft: `4px solid var(--color-${insightType})` }}>
-        <div className="flex-between mb-2">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={`var(--color-${insightType})`} strokeWidth="2"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path><path d="M12 10a4 4 0 0 1 4 4v2H8v-2a4 4 0 0 1 4-4z"></path><path d="M5 16h14"></path><path d="M7 16v4"></path><path d="M17 16v4"></path></svg>
-            <h4 className="font-bold text-sm">FinanceFlow AI</h4>
-          </div>
-        </div>
-        <p className="text-sm" style={{ lineHeight: 1.6 }}>{insightMessage}</p>
-        
-        {/* Progress Bar (Tabungan) */}
-        <div className="mt-3">
-          <div className="flex-between mb-1">
-            <span className="text-xs text-muted font-bold">Target Tabungan 20%</span>
-            <span className="text-xs font-bold text-primary">{savingsProgress.toFixed(0)}%</span>
-          </div>
-          <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '99px', overflow: 'hidden' }}>
-            <div style={{ width: `${savingsProgress}%`, height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '99px', transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }}></div>
-          </div>
-        </div>
-      </div>
-
-      {/* CHART SECTION */}
-      <section className="card mb-4" style={{ padding: '1.5rem 1rem' }}>
-        <h3 className="font-bold text-sm mb-3 px-2">Tren Saldo (6 Bulan)</h3>
-        {areaData.length > 0 ? (
-          <div style={{ width: '100%', height: '180px' }}>
+      {/* MAIN CHART */}
+      <section style={{ background: 'var(--color-surface)', borderRadius: '24px', padding: '1.5rem', border: '1px solid var(--color-border)', marginBottom: '24px' }}>
+        <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '24px', textTransform: 'uppercase' }}>Net Worth Growth (12 Months)</h3>
+        <div style={{ width: '100%', height: '300px' }}>
+          {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={areaData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
+              <AreaChart data={areaData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                  <linearGradient id="colorPro" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                    <stop offset="100%" stopColor="#A855F7" stopOpacity={0.8}/>
+                  </linearGradient>
+                  <linearGradient id="colorProBg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} dx={-10} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', fontSize: '12px' }}
-                  itemStyle={{ color: 'var(--color-text)' }}
+                  contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px', color: '#fff' }}
+                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="Saldo" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorSaldo)" />
+                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={4} fillOpacity={1} fill="url(#colorProBg)" />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        ) : (
-          <p className="text-xs text-muted text-center p-3">Belum ada data grafik.</p>
-        )}
-      </section>
-
-      {/* RECENT TRANSACTIONS */}
-      <section>
-        <div className="flex-between mb-3 px-1">
-          <h3 className="font-bold text-sm">Riwayat Terakhir</h3>
-          <button onClick={() => router.push('/transactions')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>Lihat Semua</button>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {recentTransactions.map(tx => {
-            const isIncome = tx.type === 'INCOME';
-            const isTransfer = tx.category.startsWith('Transfer');
-            return (
-              <div key={tx.id} className="card-glass" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', borderRadius: '20px' }}>
-                <div style={{ background: isIncome ? 'rgba(34, 197, 94, 0.1)' : isTransfer ? 'rgba(139, 92, 246, 0.1)' : 'rgba(244, 63, 94, 0.1)', color: isIncome ? 'var(--color-success)' : isTransfer ? 'var(--color-secondary)' : 'var(--color-danger)', padding: '12px', borderRadius: '16px' }}>
-                  {isIncome ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                  )}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h4 className="font-bold text-sm">{tx.description || tx.category}</h4>
-                  <p className="text-muted text-xs mt-1">{tx.description !== tx.category ? `${tx.category} • ` : ''}{new Date(tx.date).toLocaleDateString('id-ID')}</p>
-                </div>
-                <div className="font-extrabold text-sm" style={{ color: isIncome ? 'var(--color-success)' : 'var(--color-text)' }}>
-                  {isIncome ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
-                </div>
-              </div>
-            );
-          })}
-          {recentTransactions.length === 0 && (
-            <div className="card-glass text-center p-4">
-              <p className="text-sm text-muted">Belum ada riwayat transaksi.</p>
-            </div>
+          ) : (
+            <p className="text-muted text-center" style={{ marginTop: '100px' }}>Belum ada data riwayat.</p>
           )}
         </div>
+      </section>
+
+      {/* BOTTOM PANELS */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+        
+        {/* Left: Top Spending */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '24px', padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+          <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '20px', textTransform: 'uppercase' }}>Top Spending Categories</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            {topCategories.map((cat, index) => {
+              const colors = ['#EF4444', '#8B5CF6', '#3B82F6', '#22C55E']; // Red, Purple, Blue, Green
+              const color = colors[index % colors.length];
+              const percentage = totalExpense > 0 ? ((cat[1] / totalExpense) * 100).toFixed(1) : 0;
+              
+              return (
+                <div key={cat[0]} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: color }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle></svg>
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{cat[0]}</p>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>{percentage}% • Rp {cat[1].toLocaleString('id-ID')}</p>
+                  </div>
+                </div>
+              );
+            })}
+            {topCategories.length === 0 && <p className="text-muted text-sm">Belum ada pengeluaran bulan ini.</p>}
+          </div>
+        </div>
+
+        {/* Right: Recent Transactions */}
+        <div style={{ background: 'var(--color-surface)', borderRadius: '24px', padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Recent Transactions</h3>
+            <button onClick={() => router.push('/transactions')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}>View All</button>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {recentTransactions.map(tx => {
+              const isIncome = tx.type === 'INCOME';
+              return (
+                <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {isIncome ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                      )}
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 600, fontSize: '0.95rem' }}>{tx.description || tx.category}</p>
+                      <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('id-ID')}</p>
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem', color: isIncome ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                    {isIncome ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
+                  </div>
+                </div>
+              );
+            })}
+            {recentTransactions.length === 0 && <p className="text-muted text-sm">Tidak ada transaksi terbaru.</p>}
+          </div>
+        </div>
+
       </section>
 
     </div>
