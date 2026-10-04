@@ -392,6 +392,62 @@ input::placeholder {
 }
 
 /* ==========================================
+   MOBILE & HYBRID RESPONSIVE UTILITIES
+   ========================================== */
+.dashboard-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+.card-full { grid-column: span 2; }
+.card-half { grid-column: span 1; }
+
+.bottom-panels {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+.tx-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Redesign Mobile Cards to match image */
+.card-mobile-sleek {
+  background: #0C1222;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.mobile-header-bell {
+  position: absolute;
+  right: 24px;
+  color: var(--color-text);
+}
+
+@media (min-width: 768px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .card-full, .card-half {
+    grid-column: span 1;
+  }
+  .bottom-panels {
+    grid-template-columns: 1fr 1fr;
+  }
+  .tx-filter-container {
+    flex-direction: row;
+  }
+  .mobile-header-bell {
+    display: none;
+  }
+}
+
+/* ==========================================
    ANIMATIONS
    ========================================== */
 @keyframes fadeIn {

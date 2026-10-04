@@ -155,37 +155,41 @@ export default function TransactionsPage() {
             </form>
           )}
 
-          {/* FILTER & SEARCH */}
-          <div className="card-glass" style={{ display: 'flex', gap: '12px', padding: '16px', borderRadius: '24px' }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input 
-                type="text" 
-                placeholder="Cari transaksi..." 
-                value={search} 
-                onChange={e => setSearch(e.target.value)}
-                style={{ paddingLeft: '40px', borderRadius: '16px', background: 'rgba(0,0,0,0.3)' }}
-              />
-            </div>
-            <select 
-              value={filterType} 
-              onChange={e => setFilterType(e.target.value)}
-              style={{ width: '120px', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', fontSize: '0.85rem' }}
-            >
-              <option value="ALL">Semua</option>
-              <option value="INCOME">Masuk</option>
-              <option value="EXPENSE">Keluar</option>
-              <option value="TRANSFER">Transfer</option>
-            </select>
-          </div>
+      {/* FILTER & SEARCH */}
+      <div className="card-glass tx-filter-container" style={{ padding: '16px', borderRadius: '24px' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input 
+            type="text" 
+            placeholder="Cari transaksi..." 
+            value={search} 
+            onChange={e => setSearch(e.target.value)}
+            style={{ paddingLeft: '40px', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', width: '100%' }}
+          />
+        </div>
+        <select 
+          value={filterType} 
+          onChange={e => setFilterType(e.target.value)}
+          style={{ width: '100%', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', fontSize: '0.85rem' }}
+        >
+          <option value="ALL">Semua</option>
+          <option value="INCOME">Masuk</option>
+          <option value="EXPENSE">Keluar</option>
+          <option value="TRANSFER">Transfer</option>
+        </select>
+      </div>
         </div>
 
         {/* RIGHT COLUMN: TRANSACTION LIST */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filteredTransactions.length === 0 ? (
-            <div className="card-glass text-center p-4" style={{ padding: '60px 20px' }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 16px auto', color: 'var(--color-text-muted)', opacity: 0.5 }}><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-              <p className="text-sm font-bold">Tidak ada transaksi ditemukan.</p>
+            <div className="card-glass text-center p-4" style={{ padding: '80px 20px', borderRadius: '24px' }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 16px auto', color: 'rgba(255,255,255,0.2)' }}>
+                <rect x="8" y="4" width="8" height="16" rx="4" ry="4"></rect>
+                <line x1="12" y1="9" x2="12" y2="15"></line>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+              </svg>
+              <p className="text-sm font-bold" style={{ color: 'var(--color-text-muted)' }}>Tidak ada transaksi ditemukan.</p>
             </div>
           ) : (
             filteredTransactions.map(tx => {

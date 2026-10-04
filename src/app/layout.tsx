@@ -46,8 +46,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </nav>
 
           {/* MOBILE HEADER (Mobile Only) */}
-          <header className="mobile-header">
-            <h1 className="logo-text">FinanceFlow</h1>
+          <header className="mobile-header" style={{ position: 'relative', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h1 className="logo-text" style={{ fontSize: '1.25rem' }}>
+              <span style={{ color: 'white' }}>Finance</span><span style={{ color: '#3B82F6' }}>Flow</span>
+            </h1>
+            <div className="mobile-header-bell" style={{ display: 'block', position: 'relative' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              <span style={{ position: 'absolute', top: 0, right: 2, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid #0C1222' }}></span>
+            </div>
           </header>
 
           {/* MAIN CONTENT */}
