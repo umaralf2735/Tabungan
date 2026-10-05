@@ -412,32 +412,7 @@ input::placeholder {
   color: var(--color-text);
 }
 
-.mobile-fab {
-  position: fixed;
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 48px;
-  padding: 0 24px;
-  border-radius: 24px;
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  z-index: 40;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
-}
-.mobile-fab:active {
-  transform: translateX(-50%) scale(0.95);
-}
+
 .desktop-btn {
   display: none !important;
 }
