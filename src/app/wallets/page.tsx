@@ -57,11 +57,11 @@ export default function WalletsPage() {
           <h3 className="font-bold text-sm mb-2">Dompet Baru</h3>
           <div>
             <label className="text-xs text-muted mb-1" style={{ display: 'block', fontWeight: 600 }}>Nama Dompet / Bank</label>
-            <input type="text" placeholder="mis: BCA, Mandiri, DANA, Tunai" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
           </div>
           <div>
             <label className="text-xs text-muted mb-1" style={{ display: 'block', fontWeight: 600 }}>Saldo Awal (Rp)</label>
-            <input type="number" placeholder="0" value={formData.balance} onChange={e => setFormData({...formData, balance: e.target.value})} required />
+            <input type="number" value={formData.balance} onChange={e => setFormData({...formData, balance: e.target.value})} required />
           </div>
           <button type="submit" className="btn-primary mt-2" style={{ width: '100%', padding: '14px' }}>Simpan Dompet</button>
         </form>

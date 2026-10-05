@@ -90,7 +90,6 @@ export default function RegisterPage() {
                 <label className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
                 <input 
                   type="text" 
-                  placeholder="Steve Jobs" 
                   value={formData.name} 
                   onChange={e => setFormData({...formData, name: e.target.value})} 
                   required 
@@ -101,7 +100,6 @@ export default function RegisterPage() {
                 <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
                 <input 
                   type="email" 
-                  placeholder="nama@email.com" 
                   value={formData.email} 
                   onChange={e => setFormData({...formData, email: e.target.value})} 
                   required 
@@ -112,7 +110,6 @@ export default function RegisterPage() {
                 <label className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
                 <input 
                   type="password" 
-                  placeholder="••••••••" 
                   value={formData.password} 
                   onChange={e => setFormData({...formData, password: e.target.value})} 
                   required 
@@ -134,7 +131,6 @@ export default function RegisterPage() {
               <div>
                 <input 
                   type="text" 
-                  placeholder="Masukkan 6 Digit OTP" 
                   value={otp} 
                   onChange={e => setOtp(e.target.value)} 
                   required

@@ -112,11 +112,11 @@ export default function TransactionsPage() {
                   </div>
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Nominal (Rp)</label>
-                    <input type="number" placeholder="0" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required />
+                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required />
                   </div>
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Kategori</label>
-                    <input type="text" placeholder="Misal: Makanan, Gaji, Bensin" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
+                    <input type="text" placeholder="Ketik kategori" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
                   </div>
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Sumber Dana</label>
@@ -147,7 +147,7 @@ export default function TransactionsPage() {
                   </div>
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Nominal (Rp)</label>
-                    <input type="number" placeholder="0" value={transferData.amount} onChange={e => setTransferData({...transferData, amount: e.target.value})} required />
+                    <input type="number" value={transferData.amount} onChange={e => setTransferData({...transferData, amount: e.target.value})} required />
                   </div>
                 </>
               )}
@@ -161,7 +161,6 @@ export default function TransactionsPage() {
           <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input 
             type="text" 
-            placeholder="Cari transaksi..." 
             value={search} 
             onChange={e => setSearch(e.target.value)}
             style={{ paddingLeft: '40px', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', width: '100%' }}

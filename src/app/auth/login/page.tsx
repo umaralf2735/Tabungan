@@ -60,7 +60,6 @@ export default function LoginPage() {
               <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
               <input 
                 type="email" 
-                placeholder="nama@email.com" 
                 value={formData.email} 
                 onChange={e => setFormData({...formData, email: e.target.value})} 
                 required 
@@ -76,7 +75,6 @@ export default function LoginPage() {
               </div>
               <input 
                 type="password" 
-                placeholder="••••••••" 
                 value={formData.password} 
                 onChange={e => setFormData({...formData, password: e.target.value})} 
                 required 
