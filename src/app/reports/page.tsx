@@ -67,177 +67,158 @@ export default function ReportsPage() {
     
     try {
       const { jsPDF } = await import('jspdf');
+      
+      // Hitung tinggi dinamis berdasarkan jumlah transaksi (maksimal 20 item untuk struk)
+      const maxItems = 20;
+      const txToPrint = currentFilteredTransactions.slice(0, maxItems);
+      const baseHeight = 150;
+      const itemHeight = txToPrint.length * 6;
+      const totalHeight = Math.max(180, baseHeight + itemHeight);
+
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: [80, 230] // Kertas struk panjang
+        format: [80, totalHeight]
       });
       
-      let y = 15;
+      let y = 12;
+      const pageWidth = 80;
+      const margin = 6;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Helper function untuk garis putus-putus
+      const drawDashedLine = (yPos: number) => {
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineDashPattern([1, 1], 0);
+        doc.line(margin, yPos, pageWidth - margin, yPos);
+        doc.setLineDashPattern([], 0); // reset
+      };
 
       // HEADER
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.setTextColor(17, 24, 39);
-      doc.text("FINANCEFLOW", 40, y, { align: "center" });
-      
-      y += 5;
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 116, 139);
-      doc.text("Financial Report", 40, y, { align: "center" });
-      
-      y += 8;
-      doc.setFontSize(8);
-      doc.text("Report Period", 40, y, { align: "center" });
+      doc.setFontSize(14);
+      doc.setTextColor(30, 41, 59);
+      doc.text("FinanceFlow", pageWidth / 2, y, { align: "center" });
       
       y += 4;
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(17, 24, 39);
-      const fmtStart = new Date(startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-      const fmtEnd = new Date(endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-      doc.text(`${fmtStart} - ${fmtEnd}`, 40, y, { align: "center" });
-      
-      y += 8;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(10, y, 70, y);
-      
-      // SUMMARY
-      y += 10;
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
+      doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
-      doc.text("Total Income", 10, y);
-      
-      y += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(34, 197, 94); // Green
-      doc.text(`Rp ${totalIncome.toLocaleString('id-ID')}`, 10, y);
-      
-      y += 8;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 116, 139);
-      doc.text("Total Expense", 10, y);
-      
-      y += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(244, 63, 94); // Red
-      doc.text(`Rp ${totalExpense.toLocaleString('id-ID')}`, 10, y);
-      
-      y += 8;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(10, y, 70, y);
-      
-      // BALANCE
-      y += 10;
-      doc.setDrawColor(226, 232, 240);
-      doc.setFillColor(248, 250, 252);
-      doc.roundedRect(10, y, 60, 30, 3, 3, 'FD');
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(100, 116, 139);
-      doc.text("NET BALANCE", 40, y + 8, { align: "center" });
-      
-      const isNegative = savings < 0;
-      doc.setFontSize(16);
-      doc.setTextColor(isNegative ? 244 : 34, isNegative ? 63 : 197, isNegative ? 94 : 94);
-      doc.text(`Rp ${savings.toLocaleString('id-ID')}`, 40, y + 20, { align: "center" });
-      
-      y += 38;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(10, y, 70, y);
-      
-      // STATISTICS
-      y += 8;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(17, 24, 39);
-      doc.text("Summary", 10, y);
+      doc.text("LAPORAN KEUANGAN PRIBADI", pageWidth / 2, y, { align: "center" });
+      y += 3;
+      doc.text(user?.email || "user@financeflow.com", pageWidth / 2, y, { align: "center" });
       
       y += 6;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(100, 116, 139);
-      doc.text(`• Total Transactions: ${currentFilteredTransactions.length}`, 10, y);
-      y += 5;
-      doc.text(`• Total Income: Rp ${totalIncome.toLocaleString('id-ID')}`, 10, y);
-      y += 5;
-      doc.text(`• Total Expense: Rp ${totalExpense.toLocaleString('id-ID')}`, 10, y);
+      drawDashedLine(y);
+      y += 4;
+
+      // INFO PERIODE
+      const fmtStart = new Date(startDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      const fmtEnd = new Date(endDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
       
-      y += 8;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(10, y, 70, y);
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Periode  : ${fmtStart} - ${fmtEnd}`, margin, y);
+      y += 4;
+      doc.text(`Kasir    : SYSTEM AUTO`, margin, y);
       
-      // RECENT TRANSACTIONS
-      y += 8;
+      y += 4;
+      drawDashedLine(y);
+      y += 6;
+
+      // TRANSACTIONS
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(17, 24, 39);
-      doc.text("Recent Transactions", 10, y);
-      
-      y += 8;
-      const top5 = currentFilteredTransactions.slice(0, 5);
-      
-      top5.forEach((tx) => {
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+      doc.text("RINCIAN TRANSAKSI", margin, y);
+      y += 6;
+
+      doc.setFont('helvetica', 'normal');
+      txToPrint.forEach((tx) => {
         const isInc = tx.type === 'INCOME';
-        doc.setFillColor(isInc ? 220 : 254, isInc ? 252 : 226, isInc ? 231 : 226); 
-        doc.circle(13, y, 3, 'F');
+        const dateStr = new Date(tx.date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' });
         
+        // Baris 1: Nama transaksi
         doc.setFontSize(7);
+        doc.setTextColor(15, 23, 42);
+        const desc = tx.description ? tx.description.substring(0, 20) : tx.category.substring(0, 20);
+        doc.text(desc.toUpperCase(), margin, y);
+        
+        // Nominal di kanan
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(isInc ? 34 : 244, isInc ? 197 : 63, isInc ? 94 : 94);
-        doc.text(isInc ? "+" : "-", 13, y + 1, { align: "center", baseline: "middle" });
+        doc.setTextColor(isInc ? 21 : 220, isInc ? 128 : 38, isInc ? 61 : 38); // Hijau / Merah gelap
+        doc.text(tx.amount.toLocaleString('id-ID'), pageWidth - margin, y, { align: "right" });
         
-        doc.setFontSize(9);
-        doc.setTextColor(17, 24, 39);
-        const desc = tx.description.length > 15 ? tx.description.substring(0, 15) + "..." : tx.description;
-        doc.text(desc, 18, y + 1);
-        
+        // Baris 2: Tanggal & Kategori
+        y += 3.5;
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(148, 163, 184);
-        doc.text(new Date(tx.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }), 18, y + 5);
-        
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(isInc ? 34 : 244, isInc ? 197 : 63, isInc ? 94 : 94);
-        const prefix = isInc ? "+" : "-";
-        doc.text(`${prefix}Rp ${tx.amount.toLocaleString('id-ID')}`, 70, y + 1, { align: "right" });
-        
-        y += 12;
-      });
-      
-      if (currentFilteredTransactions.length > 5) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
+        doc.setFontSize(6);
         doc.setTextColor(100, 116, 139);
-        doc.text(`+ ${currentFilteredTransactions.length - 5} more transactions`, 40, y, { align: "center" });
+        doc.text(`${dateStr} | ${tx.category}`, margin, y);
+        
+        y += 5.5;
+      });
+
+      if (currentFilteredTransactions.length > maxItems) {
+        doc.setFontSize(6);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`+ ${currentFilteredTransactions.length - maxItems} transaksi lainnya...`, pageWidth / 2, y, { align: "center" });
         y += 6;
       }
+
+      drawDashedLine(y);
+      y += 6;
+
+      // SUMMARY
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
       
+      doc.text("Total Pemasukan", margin, y);
+      doc.text(totalIncome.toLocaleString('id-ID'), pageWidth - margin, y, { align: "right" });
       y += 4;
-      doc.setDrawColor(226, 232, 240);
-      doc.line(10, y, 70, y);
       
-      // FOOTER
+      doc.text("Total Pengeluaran", margin, y);
+      doc.text(totalExpense.toLocaleString('id-ID'), pageWidth - margin, y, { align: "right" });
+      y += 4;
+      
+      doc.text("Total Item", margin, y);
+      doc.text(currentFilteredTransactions.length.toString(), pageWidth - margin, y, { align: "right" });
+      y += 6;
+      
+      drawDashedLine(y);
+      y += 6;
+
+      // NET BALANCE
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text("NET BALANCE", margin, y);
+      
+      doc.setFontSize(11);
+      doc.text(`Rp ${savings.toLocaleString('id-ID')}`, pageWidth - margin, y, { align: "right" });
       y += 8;
-      doc.setFontSize(8);
+
+      drawDashedLine(y);
+      y += 6;
+
+      // FOOTER
+      const printDate = new Date().toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6);
       doc.setTextColor(148, 163, 184);
-      doc.text("Generated by FinanceFlow Pro", 40, y, { align: "center" });
+      doc.text(`Tgl Cetak: ${printDate} WIB`, pageWidth / 2, y, { align: "center" });
       
       y += 4;
-      const printDate = new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-      doc.text(`Print Date: ${printDate} WIB`, 40, y, { align: "center" });
+      doc.text(`MEMBER : ${user?.name ? user.name.toUpperCase() : 'GUEST'}`, pageWidth / 2, y, { align: "center" });
       
       y += 6;
       doc.setFont('helvetica', 'italic');
-      doc.text("Thank you for using FinanceFlow", 40, y, { align: "center" });
+      doc.text("Simpan struk ini sebagai bukti laporan sah.", pageWidth / 2, y, { align: "center" });
+      y += 3;
+      doc.text("Terima kasih telah menggunakan FinanceFlow Pro", pageWidth / 2, y, { align: "center" });
       
-      doc.save(`FinanceFlow_Report_${startDate}_to_${endDate}.pdf`);
+      // Save
+      doc.save(`Struk_Laporan_${startDate}_${endDate}.pdf`);
     } catch (error) {
       alert('Gagal membuat PDF. Pastikan module jspdf sudah terinstall.');
       console.error(error);
