@@ -314,11 +314,12 @@ export default function ReportsPage() {
               </div>
               <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Export CSV</span>
             </button>
-            <button onClick={handleExportPDF} style={{ padding: '16px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(37,99,235,0.1), rgba(15,23,42,0.5))', border: '1px solid rgba(37,99,235,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
-              <div style={{ background: 'rgba(37,99,235,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary)' }}>
+            <button onClick={handleExportPDF} style={{ padding: '16px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(15,23,42,0.6))', border: '1px solid rgba(99,102,241,0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
+              <div style={{ background: 'rgba(99,102,241,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
               </div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)' }}>Export PDF</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#F1F5F9' }}>Struk PDF (Kasir)</span>
+              <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Format Nota Termal</span>
             </button>
           </div>
         </div>

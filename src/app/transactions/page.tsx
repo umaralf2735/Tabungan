@@ -117,6 +117,30 @@ export default function TransactionsPage() {
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Kategori</label>
                     <input type="text" placeholder="Ketik kategori" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
+                    
+                    {/* QUICK CATEGORY CHIPS (Recognition over Recall W02 & JTBD 1) */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
+                      {['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Gaji', 'Hiburan'].map(chip => (
+                        <button
+                          key={chip}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, category: chip }))}
+                          style={{
+                            background: formData.category === chip ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)',
+                            color: formData.category === chip ? '#fff' : 'var(--color-text-muted)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            fontSize: '0.72rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="text-xs text-muted mb-1 block font-bold">Sumber Dana</label>

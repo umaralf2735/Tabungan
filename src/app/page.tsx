@@ -135,6 +135,72 @@ export default function Home() {
         </button>
       </header>
 
+      {/* AI INSIGHT / FINANCIAL ASSISTANT (Human-AI Teaming W01) */}
+      <section style={{ marginBottom: '24px' }}>
+        <div className="card-glass" style={{ 
+          padding: '18px 22px', 
+          borderRadius: '20px', 
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.8) 100%)', 
+          border: '1px solid rgba(99, 102, 241, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ 
+              width: '42px', 
+              height: '42px', 
+              borderRadius: '12px', 
+              background: 'linear-gradient(135deg, #6366F1, #A78BFA)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A78BFA' }}>AI Insight • Analis Keuangan</span>
+                <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(52, 211, 153, 0.15)', color: 'var(--color-success)', fontWeight: 700 }}>Aktif</span>
+              </div>
+              <p style={{ fontSize: '0.9rem', color: '#F1F5F9', marginTop: '4px', fontWeight: 500 }}>
+                {netCashFlow < 0 ? (
+                  <span>⚠️ <strong>Defisit Terdeteksi:</strong> Pengeluaran bulan ini melebihi pemasukan sebesar <span style={{ color: 'var(--color-danger)' }}>Rp {Math.abs(netCashFlow).toLocaleString('id-ID')}</span>. Pertimbangkan rem pos jajan non-esensial.</span>
+                ) : topCategories.length > 0 ? (
+                  <span>💡 <strong>Pola Sehat:</strong> Arus kas surplus <span style={{ color: 'var(--color-success)' }}>Rp {netCashFlow.toLocaleString('id-ID')}</span>. Alokasi terbesar di <strong>{topCategories[0][0]}</strong> ({topCategories[0][1].toLocaleString('id-ID')}).</span>
+                ) : (
+                  <span>✨ <strong>Siap Memulai:</strong> Belum ada transaksi bulan ini. Catat transaksi pertama untuk mengaktifkan audit AI otomatis.</span>
+                )}
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => router.push('/reports')} 
+            style={{ 
+              background: 'rgba(255,255,255,0.06)', 
+              border: '1px solid rgba(255,255,255,0.15)', 
+              color: '#F1F5F9', 
+              padding: '8px 14px', 
+              borderRadius: '12px', 
+              fontSize: '0.75rem', 
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            Lihat Laporan Struk
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </section>
+
       {/* TOP 4 CARDS (CSS Grid) */}
       <section className="dashboard-cards" style={{ marginBottom: '24px' }}>
         {/* Card 1: Net Worth */}
