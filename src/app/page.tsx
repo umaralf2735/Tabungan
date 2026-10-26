@@ -57,7 +57,9 @@ export default function Home() {
     acc[t.category] = (acc[t.category] || 0) + t.amount;
     return acc;
   }, {} as Record<string, number>);
-  const topCategories = Object.entries(expensesByCategory).sort((a: any, b: any) => b[1] - a[1]).slice(0, 4);
+  const topCategories: [string, number][] = (Object.entries(expensesByCategory) as [string, number][])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
 
   // Kalkulasi Tren (Bulan Lalu)
   const prevMonthTransactions = transactions.filter(t => {
@@ -172,7 +174,7 @@ export default function Home() {
                 {netCashFlow < 0 ? (
                   <span>⚠️ <strong>Defisit Terdeteksi:</strong> Pengeluaran bulan ini melebihi pemasukan sebesar <span style={{ color: 'var(--color-danger)' }}>Rp {Math.abs(netCashFlow).toLocaleString('id-ID')}</span>. Pertimbangkan rem pos jajan non-esensial.</span>
                 ) : topCategories.length > 0 ? (
-                  <span>💡 <strong>Pola Sehat:</strong> Arus kas surplus <span style={{ color: 'var(--color-success)' }}>Rp {netCashFlow.toLocaleString('id-ID')}</span>. Alokasi terbesar di <strong>{topCategories[0][0]}</strong> ({topCategories[0][1].toLocaleString('id-ID')}).</span>
+                  <span>💡 <strong>Pola Sehat:</strong> Arus kas surplus <span style={{ color: 'var(--color-success)' }}>Rp {netCashFlow.toLocaleString('id-ID')}</span>. Alokasi terbesar di <strong>{topCategories[0][0]}</strong> (Rp {Number(topCategories[0][1]).toLocaleString('id-ID')}).</span>
                 ) : (
                   <span>✨ <strong>Siap Memulai:</strong> Belum ada transaksi bulan ini. Catat transaksi pertama untuk mengaktifkan audit AI otomatis.</span>
                 )}
