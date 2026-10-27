@@ -12,6 +12,12 @@ export default function MenuPage() {
     if (userData) setUser(JSON.parse(userData));
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/auth/login');
+  };
+
   return (
     <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
       <header style={{ marginBottom: '1.5rem' }}>
