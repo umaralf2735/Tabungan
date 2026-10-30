@@ -2,12 +2,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { apiFetch } from '@/lib/api';
+import { buildInsights } from '@/lib/insight';
 
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [wallets, setWallets] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<any[]>([]);
+  const [dismissedInsights, setDismissedInsights] = useState<string[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
@@ -21,14 +25,23 @@ export default function Home() {
     }
     
     setUser(JSON.parse(userData));
-    fetchData(JSON.parse(userData).id);
+    setDismissedInsights(JSON.parse(localStorage.getItem('dismissedInsights') || '[]'));
+    fetchData();
   }, [router]);
 
-  const fetchData = async (userId: string) => {
+  useEffect(() => {
+    if (!localStorage.getItem('token')) return;
+    apiFetch(`/api/budgets?month=${selectedMonth + 1}&year=${selectedYear}`)
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data)) setBudgets(data); })
+      .catch(console.error);
+  }, [selectedMonth, selectedYear]);
+
+  const fetchData = async () => {
     try {
       const [txRes, walletRes] = await Promise.all([
-        fetch(`/api/transactions?userId=${userId}`),
-        fetch(`/api/wallets?userId=${userId}`)
+        apiFetch('/api/transactions'),
+        apiFetch('/api/wallets')
       ]);
       const txData = await txRes.json();
       const walletData = await walletRes.json();
@@ -63,19 +76,26 @@ export default function Home() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4);
 
-  // Kalkulasi Tren (Bulan Lalu)
+  // Kalkulasi Tren (Bulan sebelum periode yang dipilih)
+  const prevPeriod = new Date(selectedYear, selectedMonth - 1, 1);
   const prevMonthTransactions = transactions.filter(t => {
     const d = new Date(t.date);
-    const now = new Date();
-    const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-    return d.getMonth() === prevMonth && d.getFullYear() === prevYear && !t.category.startsWith('Transfer');
+    return d.getMonth() === prevPeriod.getMonth() && d.getFullYear() === prevPeriod.getFullYear() && !t.category.startsWith('Transfer');
   });
+
+  // Saldo akhir suatu bulan = saldo sekarang dikurangi mutasi setelah bulan itu.
+  // Transfer otomatis saling meniadakan karena dicatat masuk dan keluar.
+  const balanceAtEndOf = (year: number, month: number) => {
+    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999).getTime();
+    const netAfter = transactions
+      .filter(t => new Date(t.date).getTime() > endOfMonth)
+      .reduce((sum, t) => sum + (t.type === 'INCOME' ? t.amount : -t.amount), 0);
+    return totalWalletBalance - netAfter;
+  };
 
   const prevTotalIncome = prevMonthTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const prevTotalExpense = prevMonthTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
   const prevNetCashFlow = prevTotalIncome - prevTotalExpense;
-  const prevTotalWalletBalance = totalWalletBalance - netCashFlow + prevNetCashFlow;
 
   const calcTrend = (current: number, prev: number, invertColor: boolean = false) => {
     if (prev === 0) return { pct: 0, dir: 'none', color: 'var(--color-text-muted)' };
@@ -89,7 +109,7 @@ export default function Home() {
     return { pct: Math.abs(pct).toFixed(0), dir, color };
   };
 
-  const trendNW = calcTrend(totalWalletBalance, prevTotalWalletBalance);
+  const trendNW = calcTrend(balanceAtEndOf(selectedYear, selectedMonth), balanceAtEndOf(prevPeriod.getFullYear(), prevPeriod.getMonth()));
   const trendInc = calcTrend(totalIncome, prevTotalIncome);
   const trendExp = calcTrend(totalExpense, prevTotalExpense, true); // Expense up is danger
   const trendCF = calcTrend(netCashFlow, prevNetCashFlow);
@@ -100,33 +120,32 @@ export default function Home() {
     return <span style={{ color: trend.color }}>▼ {trend.pct}% vs bulan lalu</span>;
   };
 
-  // Chart Data (12 Bulan Riwayat Pertumbuhan)
+  // Chart Data (6 Bulan Riwayat Pertumbuhan)
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   
-  // Bentuk 6-12 titik waktu
   const areaData = Array.from({ length: 6 }).map((_, idx) => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - (5 - idx));
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
     const m = d.getMonth();
     const y = d.getFullYear();
-    
-    // Hitung akumulasi saldo sampai bulan tersebut
-    const endOfMonth = new Date(y, m + 1, 0, 23, 59, 59).getTime();
-    const txUpToMonth = transactions.filter(t => new Date(t.date).getTime() <= endOfMonth);
-    
-    const incomeUpTo = txUpToMonth.filter(t => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0);
-    const expenseUpTo = txUpToMonth.filter(t => t.type === 'EXPENSE').reduce((s, t) => s + t.amount, 0);
-    
-    // Perkiraan saldo di bulan tersebut
-    const calcSaldo = Math.max(0, (totalWalletBalance - (totalIncome - totalExpense)) + (incomeUpTo - expenseUpTo));
-    
+
     return {
       name: `${monthNames[m]} ${y.toString().slice(2)}`,
-      Saldo: calcSaldo > 0 ? calcSaldo : (idx === 5 ? totalWalletBalance : Math.round(totalWalletBalance * (0.6 + (idx * 0.08))))
+      Saldo: Math.max(0, balanceAtEndOf(y, m))
     };
   });
 
+  const insights = buildInsights(transactions, budgets, selectedMonth, selectedYear);
+  const visibleInsights = insights.filter(i => !dismissedInsights.includes(i.id));
+  const activeInsight = visibleInsights[0];
+
+  const updateDismissed = (ids: string[]) => {
+    setDismissedInsights(ids);
+    localStorage.setItem('dismissedInsights', JSON.stringify(ids));
+  };
+
   const recentTransactions = transactions.slice(0, 6);
+  const lastChartPoint = areaData[areaData.length - 1];
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
@@ -147,8 +166,9 @@ export default function Home() {
               fontSize: '0.85rem',
               color: 'var(--color-text)'
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-text)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
               <select 
+                aria-label="Pilih periode"
                 value={`${selectedYear}-${selectedMonth}`}
                 onChange={(e) => {
                   const [y, m] = e.target.value.split('-');
@@ -162,13 +182,12 @@ export default function Home() {
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  outline: 'none',
                   paddingRight: '4px'
                 }}
               >
                 {Array.from({ length: 12 }).map((_, idx) => {
-                  const d = new Date();
-                  d.setMonth(d.getMonth() - idx);
+                  const now = new Date();
+                  const d = new Date(now.getFullYear(), now.getMonth() - idx, 1);
                   const m = d.getMonth();
                   const y = d.getFullYear();
                   return (
@@ -187,70 +206,43 @@ export default function Home() {
         </button>
       </header>
 
-      {/* AI INSIGHT / FINANCIAL ASSISTANT (Human-AI Teaming W01) */}
-      <section style={{ marginBottom: '24px' }}>
-        <div className="card-glass" style={{ 
-          padding: '18px 22px', 
-          borderRadius: '20px', 
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.8) 100%)', 
-          border: '1px solid rgba(99, 102, 241, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ 
-              width: '42px', 
-              height: '42px', 
-              borderRadius: '12px', 
-              background: 'linear-gradient(135deg, #6366F1, #A78BFA)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
-            }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-              </svg>
+      {/* INSIGHT BERBASIS ATURAN (Human-AI Teaming W01): menyarankan dengan alasan, keputusan tetap di user */}
+      <section aria-label="Insight keuangan" style={{ marginBottom: '24px' }}>
+        {activeInsight ? (
+          <div className="card-glass" style={{
+            padding: '18px 22px',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.8) 100%)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary-text)' }}>
+                AI Insight • Berbasis Aturan
+              </span>
+              <p style={{ fontSize: '0.9rem', color: '#F1F5F9', marginTop: '4px', fontWeight: 700 }}>{activeInsight.title}</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>{activeInsight.message}</p>
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A78BFA' }}>AI Insight • Analis Keuangan</span>
-                <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(52, 211, 153, 0.15)', color: 'var(--color-success)', fontWeight: 700 }}>Aktif</span>
-              </div>
-              <p style={{ fontSize: '0.9rem', color: '#F1F5F9', marginTop: '4px', fontWeight: 500 }}>
-                {netCashFlow < 0 ? (
-                  <span>⚠️ <strong>Defisit Terdeteksi:</strong> Pengeluaran bulan ini melebihi pemasukan sebesar <span style={{ color: 'var(--color-danger)' }}>Rp {Math.abs(netCashFlow).toLocaleString('id-ID')}</span>. Pertimbangkan rem pos jajan non-esensial.</span>
-                ) : topCategories.length > 0 ? (
-                  <span>💡 <strong>Pola Sehat:</strong> Arus kas surplus <span style={{ color: 'var(--color-success)' }}>Rp {netCashFlow.toLocaleString('id-ID')}</span>. Alokasi terbesar di <strong>{topCategories[0][0]}</strong> (Rp {Number(topCategories[0][1]).toLocaleString('id-ID')}).</span>
-                ) : (
-                  <span>✨ <strong>Siap Memulai:</strong> Belum ada transaksi bulan ini. Catat transaksi pertama untuk mengaktifkan audit AI otomatis.</span>
-                )}
-              </p>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {activeInsight.action && (
+                <button type="button" onClick={() => router.push(activeInsight.action!.href)} className="tap-target" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: '#F1F5F9', padding: '8px 14px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                  {activeInsight.action.label}
+                </button>
+              )}
+              <button type="button" onClick={() => updateDismissed([...dismissedInsights, activeInsight.id])} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', padding: '8px 14px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                Abaikan
+              </button>
             </div>
           </div>
-          <button 
-            onClick={() => router.push('/reports')} 
-            style={{ 
-              background: 'rgba(255,255,255,0.06)', 
-              border: '1px solid rgba(255,255,255,0.15)', 
-              color: '#F1F5F9', 
-              padding: '8px 14px', 
-              borderRadius: '12px', 
-              fontSize: '0.75rem', 
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            Lihat Laporan Struk
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        ) : insights.length > 0 && (
+          <button type="button" onClick={() => updateDismissed(dismissedInsights.filter(id => !insights.some(i => i.id === id)))} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-primary-text)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            Tampilkan lagi insight yang diabaikan
           </button>
-        </div>
+        )}
       </section>
 
       {/* TOP 4 CARDS (CSS Grid) */}
@@ -259,7 +251,7 @@ export default function Home() {
         <div className="card-full card-mobile-sleek" style={{ position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: 'var(--color-primary)', filter: 'blur(50px)', opacity: 0.2 }}></div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
+            <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary-text)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
             </span>
             TOTAL KEKAYAAN
@@ -316,20 +308,20 @@ export default function Home() {
       <section className="card-mobile-sleek" style={{ marginBottom: '24px' }}>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          PERTUMBUHAN KEKAYAAN (12 BULAN)
+          PERTUMBUHAN KEKAYAAN (6 BULAN)
         </p>
-        <div style={{ width: '100%', height: '220px' }}>
+        <div role="img" aria-label={`Grafik saldo 6 bulan terakhir. Saldo terbaru ${lastChartPoint.Saldo.toLocaleString('id-ID')} rupiah.`} style={{ width: '100%', height: '220px' }}>
           {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPro" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.8}/>
+                    <stop offset="0%" stopColor="var(--color-primary-text)" stopOpacity={0.8}/>
                     <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity={0.8}/>
                   </linearGradient>
                   <linearGradient id="colorProBg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--color-primary-text)" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="var(--color-primary-text)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
@@ -352,7 +344,7 @@ export default function Home() {
                   contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px', color: '#fff', fontSize: '0.75rem' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary)', stroke: '#fff', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary-text)', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
@@ -371,7 +363,7 @@ export default function Home() {
         <div className="card-mobile-sleek">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '50%', color: 'var(--color-primary)' }}>
+              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '50%', color: 'var(--color-primary-text)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
               </span>
               KATEGORI PENGELUARAN
@@ -411,15 +403,15 @@ export default function Home() {
         <div className="card-mobile-sleek">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary)' }}>
+              <span style={{ background: 'rgba(99,102,241,0.2)', padding: '6px', borderRadius: '8px', color: 'var(--color-primary-text)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </span>
               TRANSAKSI TERBARU
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', cursor: 'pointer' }} onClick={() => router.push('/transactions')}>
+            <button type="button" className="tap-target" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary-text)', cursor: 'pointer', background: 'none', border: 'none' }} onClick={() => router.push('/transactions')}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Lihat Semua</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -449,8 +441,8 @@ export default function Home() {
             {recentTransactions.length === 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: '12px' }}>
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-text-muted)', opacity: 0.5 }}><path d="M3 7h18M3 12h18M3 17h18"></path></svg>
-                <p className="text-muted text-xs">Belum ada transaksi bulan ini.</p>
-                <button onClick={() => router.push('/transactions')} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>
+                <p className="text-muted text-xs">Belum ada transaksi.</p>
+                <button onClick={() => router.push('/transactions')} className="tap-target" style={{ background: 'var(--color-primary)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>
                   + Tambah Transaksi
                 </button>
               </div>

@@ -33,35 +33,37 @@ export default function CalculatorPage() {
           <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Data Bulanan</h3>
           
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pemasukan (Gaji, Bisnis, dll)</label>
+            <label htmlFor="calc-income" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pemasukan (Gaji, Bisnis, dll)</label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Rp</span>
               <input 
+                id="calc-income"
                 type="number" 
+                inputMode="numeric"
                 value={income} 
                 onChange={e => setIncome(e.target.value)} 
-                placeholder="0"
                 style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', fontSize: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
               />
             </div>
           </div>
 
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pengeluaran Wajib (Kosan, Cicilan)</label>
+            <label htmlFor="calc-expense" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Pengeluaran Wajib (Kosan, Cicilan)</label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Rp</span>
               <input 
+                id="calc-expense"
                 type="number" 
+                inputMode="numeric"
                 value={fixedExpense} 
                 onChange={e => setFixedExpense(e.target.value)} 
-                placeholder="0"
                 style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', fontSize: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)' }} 
               />
             </div>
           </div>
           
           {sisa < 0 && (
-            <div style={{ padding: '0.75rem', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(244, 63, 94, 0.3)', fontSize: '0.75rem' }}>
+            <div role="status" style={{ padding: '0.75rem', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(244, 63, 94, 0.3)', fontSize: '0.75rem' }}>
               ⚠️ Pengeluaran wajibmu lebih besar dari pendapatan!
             </div>
           )}
@@ -84,7 +86,7 @@ export default function CalculatorPage() {
             <div style={{ color: 'var(--color-text-muted)' }}>—</div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>Ideal (6x)</p>
-              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rp {emergencyMax.toLocaleString('id-ID')}</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary-text)' }}>Rp {emergencyMax.toLocaleString('id-ID')}</p>
             </div>
           </div>
         </section>
@@ -92,8 +94,8 @@ export default function CalculatorPage() {
         {/* Rule 50/30/20 */}
         <section className="card-glass" style={{ border: '1px solid rgba(37, 99, 235, 0.3)', padding: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary)' }}>Rekomendasi 50/30/20</h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-text)" strokeWidth="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary-text)' }}>Rekomendasi 50/30/20</h3>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

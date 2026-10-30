@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUserId, notFound, unauthorized } from '@/lib/auth';
+import { deleteUserTransaction } from '@/lib/transactions';
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const userId = url.searchParams.get('userId');
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
 
     const transactions = await prisma.transaction.findMany({
       where: { userId },
@@ -22,48 +20,50 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
     const data = await request.json();
-    
+    const amount = parseFloat(data.amount);
+
+    if (!(amount > 0) || !data.category || !['INCOME', 'EXPENSE'].includes(data.type)) {
+      return NextResponse.json({ error: 'Nominal, jenis, dan kategori wajib diisi dengan benar' }, { status: 400 });
+    }
+
+    const date = data.date ? new Date(data.date) : new Date();
+    if (isNaN(date.getTime())) {
+      return NextResponse.json({ error: 'Tanggal tidak valid' }, { status: 400 });
+    }
+
+    const record = {
+      amount,
+      type: data.type,
+      category: data.category,
+      paymentMethod: data.paymentMethod,
+      description: data.description,
+      date,
+      userId,
+    };
+
     // Jika tidak ada walletId, buat transaksi biasa
     if (!data.walletId) {
-      const transaction = await prisma.transaction.create({
-        data: {
-          amount: data.amount,
-          type: data.type,
-          category: data.category,
-          paymentMethod: data.paymentMethod,
-          description: data.description,
-          userId: data.userId,
-        },
-      });
+      const transaction = await prisma.transaction.create({ data: record });
       return NextResponse.json(transaction);
     }
 
+    const wallet = await prisma.wallet.findFirst({ where: { id: data.walletId, userId } });
+    if (!wallet) return notFound('Dompet tidak ditemukan');
+
     // Jika ada walletId, update saldo dompet sekaligus
-    const result = await prisma.$transaction(async (prisma) => {
-      const transaction = await prisma.transaction.create({
-        data: {
-          amount: data.amount,
-          type: data.type,
-          category: data.category,
-          paymentMethod: data.paymentMethod,
-          description: data.description,
-          userId: data.userId,
-          walletId: data.walletId,
-        },
+    const result = await prisma.$transaction(async (tx) => {
+      const transaction = await tx.transaction.create({
+        data: { ...record, walletId: wallet.id },
       });
 
-      const wallet = await prisma.wallet.findUnique({ where: { id: data.walletId } });
-      if (wallet) {
-        const newBalance = data.type === 'INCOME' 
-          ? wallet.balance + data.amount 
-          : wallet.balance - data.amount;
-        
-        await prisma.wallet.update({
-          where: { id: data.walletId },
-          data: { balance: newBalance }
-        });
-      }
+      await tx.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: data.type === 'INCOME' ? { increment: amount } : { decrement: amount } },
+      });
 
       return transaction;
     });
@@ -76,40 +76,21 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
       return NextResponse.json({ error: 'ID transaksi tidak ditemukan' }, { status: 400 });
     }
 
-    const transaction = await prisma.transaction.findUnique({ where: { id } });
-    if (!transaction) {
-      return NextResponse.json({ error: 'Transaksi tidak ditemukan' }, { status: 404 });
-    }
+    const deleted = await deleteUserTransaction(userId, id);
+    if (!deleted) return notFound('Transaksi tidak ditemukan');
 
-    // Jika transaksi terhubung ke dompet, kembalikan saldonya
-    if (transaction.walletId) {
-      const wallet = await prisma.wallet.findUnique({ where: { id: transaction.walletId } });
-      if (wallet) {
-        const newBalance = transaction.type === 'INCOME' 
-          ? wallet.balance - transaction.amount 
-          : wallet.balance + transaction.amount;
-        
-        await prisma.wallet.update({
-          where: { id: transaction.walletId },
-          data: { balance: newBalance }
-        });
-      }
-    }
-
-    await prisma.transaction.delete({
-      where: { id }
-    });
-
-    return NextResponse.json({ message: 'Transaksi berhasil dihapus' });
+    return NextResponse.json({ message: 'Transaksi berhasil dihapus', deleted });
   } catch (error) {
     return NextResponse.json({ error: 'Gagal menghapus transaksi' }, { status: 500 });
   }
 }
-

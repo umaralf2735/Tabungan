@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUserId, notFound, unauthorized } from '@/lib/auth';
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
     const { amountToAdd } = await request.json();
-    
+
     // Ambil goal saat ini
-    const goal = await prisma.goal.findUnique({ where: { id: params.id } });
-    if (!goal) return NextResponse.json({ error: 'Goal tidak ditemukan' }, { status: 404 });
-    
+    const goal = await prisma.goal.findFirst({ where: { id: params.id, userId } });
+    if (!goal) return notFound('Goal tidak ditemukan');
+
     // Update nominal
     const updatedGoal = await prisma.goal.update({
       where: { id: params.id },
@@ -16,7 +20,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         currentAmount: goal.currentAmount + amountToAdd,
       },
     });
-    
+
     return NextResponse.json(updatedGoal);
   } catch (error) {
     return NextResponse.json({ error: 'Gagal menambah saldo target tabungan' }, { status: 500 });

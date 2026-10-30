@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { apiFetch } from '@/lib/api';
 
 export default function ReportsPage() {
   const [user, setUser] = useState<any>(null);
@@ -17,12 +18,12 @@ export default function ReportsPage() {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     if (userData.id) {
       setUser(userData);
-      fetchTransactions(userData.id);
+      fetchTransactions();
     }
   }, []);
 
-  const fetchTransactions = async (userId: string) => {
-    const res = await fetch(`/api/transactions?userId=${userId}`);
+  const fetchTransactions = async () => {
+    const res = await apiFetch('/api/transactions');
     const data = await res.json();
     if (Array.isArray(data)) setTransactions(data);
   };
@@ -225,17 +226,17 @@ export default function ReportsPage() {
     }
   };
 
-  const monthlyDataMap: Record<string, { name: string, Masuk: number, Keluar: number }> = {};
+  const monthlyDataMap: Record<string, { name: string, order: number, Masuk: number, Keluar: number }> = {};
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   
   realTransactions.forEach(t => {
     const d = new Date(t.date);
     const key = `${d.getFullYear()}-${d.getMonth()}`;
-    if (!monthlyDataMap[key]) monthlyDataMap[key] = { name: monthNames[d.getMonth()], Masuk: 0, Keluar: 0 };
+    if (!monthlyDataMap[key]) monthlyDataMap[key] = { name: monthNames[d.getMonth()], order: d.getFullYear() * 12 + d.getMonth(), Masuk: 0, Keluar: 0 };
     if (t.type === 'INCOME') monthlyDataMap[key].Masuk += t.amount;
     if (t.type === 'EXPENSE') monthlyDataMap[key].Keluar += t.amount;
   });
-  const barData = Object.values(monthlyDataMap).slice(-6);
+  const barData = Object.values(monthlyDataMap).sort((a, b) => a.order - b.order).slice(-6);
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
@@ -243,27 +244,27 @@ export default function ReportsPage() {
       {/* HEADER HERO */}
       <header className="flex-between mb-4 mt-2">
         <div>
-          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Reports</h1>
+          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Laporan</h1>
           <p className="text-sm text-muted mt-1">Analisis finansial Anda</p>
         </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '24px', alignItems: 'start' }}>
         
         {/* LEFT COLUMN: FILTERS, STATS, EXPORT */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* DATE RANGE FILTER */}
           <div className="card-glass" style={{ padding: '16px', display: 'flex', gap: '12px', alignItems: 'center', borderRadius: '24px' }}>
             <div style={{ flex: 1 }}>
-              <label className="text-xs text-muted mb-1 block font-bold">Dari Tanggal</label>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
+              <label htmlFor="report-start" className="text-xs text-muted mb-1 block font-bold">Dari Tanggal</label>
+              <input id="report-start" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
             </div>
             <div style={{ color: 'var(--color-text-muted)', paddingTop: '20px' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
             </div>
             <div style={{ flex: 1 }}>
-              <label className="text-xs text-muted mb-1 block font-bold">Sampai Tanggal</label>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
+              <label htmlFor="report-end" className="text-xs text-muted mb-1 block font-bold">Sampai Tanggal</label>
+              <input id="report-end" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'var(--color-surface)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.05)', colorScheme: 'dark' }} />
             </div>
           </div>
 
@@ -300,7 +301,7 @@ export default function ReportsPage() {
                   </h3>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '16px' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={savings >= 0 ? 'var(--color-primary)' : 'var(--color-danger)'} strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={savings >= 0 ? 'var(--color-primary-text)' : 'var(--color-danger)'} strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                 </div>
               </div>
             </div>
@@ -315,7 +316,7 @@ export default function ReportsPage() {
               <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Export CSV</span>
             </button>
             <button onClick={handleExportPDF} style={{ padding: '16px', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(15,23,42,0.6))', border: '1px solid rgba(99,102,241,0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
-              <div style={{ background: 'rgba(99,102,241,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary)' }}>
+              <div style={{ background: 'rgba(99,102,241,0.2)', padding: '12px', borderRadius: '50%', marginBottom: '12px', color: 'var(--color-primary-text)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
               </div>
               <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#F1F5F9' }}>Struk PDF (Kasir)</span>
@@ -328,7 +329,7 @@ export default function ReportsPage() {
         <div className="card-glass" style={{ padding: '24px 16px', height: '100%', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '24px', textAlign: 'center', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>Arus Kas (6 Bulan Terakhir)</h3>
           {barData.length > 0 ? (
-            <div style={{ flex: 1, width: '100%', minHeight: '300px' }}>
+            <div role="img" aria-label="Grafik batang pemasukan dan pengeluaran per bulan, maksimal 6 bulan terakhir." style={{ flex: 1, width: '100%', minHeight: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -339,6 +340,7 @@ export default function ReportsPage() {
                     contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '16px', fontSize: '12px', fontWeight: 600, padding: '12px', color: '#fff' }}
                     itemStyle={{ color: '#fff' }}
                   />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar dataKey="Masuk" fill="var(--color-success)" radius={[6, 6, 0, 0]} barSize={24} />
                   <Bar dataKey="Keluar" fill="var(--color-danger)" radius={[6, 6, 0, 0]} barSize={24} />
                 </BarChart>

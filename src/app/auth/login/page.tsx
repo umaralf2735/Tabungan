@@ -50,15 +50,17 @@ export default function LoginPage() {
           </div>
           
           {error && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
+            <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
               {error}
             </div>
           )}
           
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
+              <label htmlFor="login-email" className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
               <input 
+                id="login-email"
+                autoComplete="email"
                 type="email" 
                 value={formData.email} 
                 onChange={e => setFormData({...formData, email: e.target.value})} 
@@ -68,12 +70,14 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="flex-between mb-1">
-                <label className="text-xs text-muted block font-bold">Kata Sandi</label>
-                <Link href="/auth/forgot-password" style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                <label htmlFor="login-password" className="text-xs text-muted block font-bold">Kata Sandi</label>
+                <Link href="/auth/forgot-password" style={{ fontSize: '0.75rem', color: 'var(--color-primary-text)', fontWeight: 700, textDecoration: 'none' }}>
                   Lupa Sandi?
                 </Link>
               </div>
               <input 
+                id="login-password"
+                autoComplete="current-password"
                 type="password" 
                 value={formData.password} 
                 onChange={e => setFormData({...formData, password: e.target.value})} 
@@ -89,7 +93,7 @@ export default function LoginPage() {
           
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
             <p className="text-sm text-muted">
-              Belum punya akun? <Link href="/auth/register" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Daftar di sini</Link>
+              Belum punya akun? <Link href="/auth/register" style={{ color: 'var(--color-primary-text)', fontWeight: 700, textDecoration: 'none' }}>Daftar di sini</Link>
             </p>
           </div>
         </div>

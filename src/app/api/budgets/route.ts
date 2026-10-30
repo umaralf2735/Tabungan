@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUserId, unauthorized } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
     const url = new URL(request.url);
-    const userId = url.searchParams.get('userId');
     const monthParam = url.searchParams.get('month');
     const month = monthParam ? parseInt(monthParam) : new Date().getMonth() + 1;
     const yearParam = url.searchParams.get('year');
     const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     // Ambil daftar budget
     const budgets = await prisma.budget.findMany({
@@ -55,10 +54,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { category, amount, month, year, userId } = await request.json();
-    
-    if (!category || !userId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
+    const { category, amount, month, year } = await request.json();
+
+    if (!category) {
+      return NextResponse.json({ error: 'Kategori wajib diisi' }, { status: 400 });
     }
 
     // Cek apakah budget untuk kategori dan bulan ini sudah ada

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
+import { signToken } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -36,7 +34,7 @@ export async function POST(request: Request) {
     });
 
     // Otomatis login
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = signToken(user.id);
 
     return NextResponse.json({ message: 'Verifikasi berhasil', token, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error: any) {

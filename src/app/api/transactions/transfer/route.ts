@@ -1,19 +1,30 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUserId, notFound, unauthorized } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { fromWalletId, toWalletId, amount, description, userId, date } = await request.json();
-    
-    if (!fromWalletId || !toWalletId || !amount || !userId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
+    const { fromWalletId, toWalletId, amount, description, date } = await request.json();
+    const parsedAmount = parseFloat(amount);
+
+    if (!fromWalletId || !toWalletId || !(parsedAmount > 0)) {
+      return NextResponse.json({ error: 'Dompet asal, dompet tujuan, dan nominal wajib diisi' }, { status: 400 });
     }
 
     if (fromWalletId === toWalletId) {
       return NextResponse.json({ error: 'Dompet asal dan tujuan tidak boleh sama' }, { status: 400 });
     }
 
-    const parsedAmount = parseFloat(amount);
+    const ownedWallets = await prisma.wallet.count({
+      where: { id: { in: [fromWalletId, toWalletId] }, userId },
+    });
+    if (ownedWallets !== 2) return notFound('Dompet tidak ditemukan');
+
+    // Satu waktu untuk kedua baris agar keduanya bisa dikenali sebagai pasangan
+    const transferDate = date ? new Date(date) : new Date();
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Kurangi saldo dompet asal
@@ -36,7 +47,7 @@ export async function POST(request: Request) {
           category: 'Transfer Keluar',
           paymentMethod: 'Transfer',
           description: description || 'Transfer antar dompet',
-          date: date ? new Date(date) : new Date(),
+          date: transferDate,
           userId,
           walletId: fromWalletId
         }
@@ -50,7 +61,7 @@ export async function POST(request: Request) {
           category: 'Transfer Masuk',
           paymentMethod: 'Transfer',
           description: description || 'Transfer antar dompet',
-          date: date ? new Date(date) : new Date(),
+          date: transferDate,
           userId,
           walletId: toWalletId
         }

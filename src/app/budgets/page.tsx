@@ -1,5 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { apiFetch, getApiError } from '@/lib/api';
+
+const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan'];
 
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<any[]>([]);
@@ -10,16 +13,15 @@ export default function BudgetsPage() {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1); // 1-12
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   
-  const [formData, setFormData] = useState({ category: 'Food', amount: '', month: selectedMonth, year: selectedYear });
+  const [formData, setFormData] = useState({ category: '', amount: '', month: selectedMonth, year: selectedYear });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchBudgets();
   }, [selectedMonth, selectedYear]);
 
   const fetchBudgets = async () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!user.id) return;
-    const res = await fetch(`/api/budgets?userId=${user.id}&month=${selectedMonth}&year=${selectedYear}`);
+    const res = await apiFetch(`/api/budgets?month=${selectedMonth}&year=${selectedYear}`);
     const data = await res.json();
     if (Array.isArray(data)) setBudgets(data);
   };
@@ -32,43 +34,43 @@ export default function BudgetsPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Yakin ingin menghapus budget ini?')) {
-      await fetch(`/api/budgets/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/budgets/${id}`, { method: 'DELETE' });
+      const apiError = await getApiError(res, 'Anggaran gagal dihapus.');
+      if (apiError) setError(apiError);
       fetchBudgets();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setError('');
     
     try {
       let res;
       if (editingId) {
-        res = await fetch(`/api/budgets/${editingId}`, {
+        res = await apiFetch(`/api/budgets/${editingId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount) })
         });
       } else {
-        res = await fetch('/api/budgets', {
+        res = await apiFetch('/api/budgets', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount), userId: user.id })
+          body: JSON.stringify({ ...formData, amount: parseFloat(formData.amount) })
         });
       }
       
       const data = await res.json();
       if (!res.ok) {
-        alert('Gagal: ' + (data.error || 'Terjadi kesalahan'));
+        setError(data.error || 'Anggaran gagal disimpan.');
         return;
       }
       
       setShowForm(false);
       setEditingId(null);
-      setFormData({ category: 'Food', amount: '', month: selectedMonth, year: selectedYear });
+      setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear });
       fetchBudgets();
     } catch (error) {
-      alert('Terjadi kesalahan jaringan atau server.');
+      setError('Tidak dapat terhubung ke server. Data belum tersimpan.');
     }
   };
 
@@ -82,24 +84,37 @@ export default function BudgetsPage() {
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Anggaran</h2>
           <p className="text-xs text-muted">Pantau batas pengeluaran</p>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: 'Food', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary">
+        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary tap-target">
           {showForm ? 'Batal' : '+ Buat Budget'}
         </button>
       </div>
 
       {/* Filter Compact */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        <select value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} style={{ flex: 1, padding: '0.6rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.8rem' }}>
+        <select aria-label="Bulan" value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))} style={{ flex: 1, padding: '0.6rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.8rem' }}>
           {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
         </select>
-        <input type="number" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} style={{ width: '80px', padding: '0.6rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.8rem', textAlign: 'center' }} />
+        <input aria-label="Tahun" type="number" value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} style={{ width: '80px', padding: '0.6rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.8rem', textAlign: 'center' }} />
       </div>
+
+      {error && (
+        <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
+          {error}
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="card mb-4" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem' }}>{editingId ? 'Edit Anggaran' : 'Buat Anggaran Baru'}</h3>
-          <input type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)', fontSize: '0.85rem' }} placeholder="Kategori (Cth: Makanan, Transport)" />
-          <input type="number" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)', fontSize: '0.85rem' }} placeholder="Batas Maksimal (Rp)" />
+          <label htmlFor="budget-category" className="text-xs text-muted block font-bold">Kategori</label>
+          <input id="budget-category" type="text" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)', fontSize: '0.85rem' }} />
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {QUICK_CATEGORIES.map(chip => (
+              <button key={chip} type="button" aria-pressed={formData.category === chip} onClick={() => setFormData({...formData, category: chip})} className="tap-target" style={{ background: formData.category === chip ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)', color: formData.category === chip ? '#fff' : 'var(--color-text-muted)', border: '1px solid rgba(255,255,255,0.1)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>{chip}</button>
+            ))}
+          </div>
+          <label htmlFor="budget-amount" className="text-xs text-muted block font-bold">Batas Maksimal (Rp)</label>
+          <input id="budget-amount" type="number" min="1" inputMode="numeric" required value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)', fontSize: '0.85rem' }} />
           <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '0.25rem' }}>{editingId ? 'Simpan' : 'Buat Anggaran'}</button>
         </form>
       )}
@@ -108,18 +123,18 @@ export default function BudgetsPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {budgets.map(b => {
           const percentage = Math.min((b.spent / b.amount) * 100, 100);
-          let statusColor = 'var(--color-primary)';
+          let statusColor = 'var(--color-primary-text)';
           let statusGlow = 'rgba(37, 99, 235, 0.4)';
           let statusText = 'Aman';
           
           if (percentage >= 100) {
             statusColor = 'var(--color-danger)';
             statusGlow = 'rgba(244, 63, 94, 0.4)';
-            statusText = 'Over Budget!';
+            statusText = 'Batas tercapai';
           } else if (percentage >= 80) {
             statusColor = '#f59e0b';
             statusGlow = 'rgba(245, 158, 11, 0.4)';
-            statusText = 'Hati-hati (Mendekati Limit)';
+            statusText = 'Mendekati batas';
           }
 
           return (
@@ -132,8 +147,8 @@ export default function BudgetsPage() {
                   <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>{b.category}</h3>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => handleEdit(b)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.8rem', cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => handleDelete(b.id)} style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer' }}>Hapus</button>
+                  <button onClick={() => handleEdit(b)} aria-label={`Edit anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-primary-text)', fontSize: '0.8rem', cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => handleDelete(b.id)} aria-label={`Hapus anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer' }}>Hapus</button>
                 </div>
               </div>
               

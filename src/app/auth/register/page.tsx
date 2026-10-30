@@ -79,7 +79,7 @@ export default function RegisterPage() {
           </div>
           
           {error && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
+            <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
               {error}
             </div>
           )}
@@ -87,8 +87,10 @@ export default function RegisterPage() {
           {step === 1 ? (
             <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
-                <label className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
+                <label htmlFor="register-name" className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
                 <input 
+                  id="register-name"
+                  autoComplete="name"
                   type="text" 
                   value={formData.name} 
                   onChange={e => setFormData({...formData, name: e.target.value})} 
@@ -97,8 +99,10 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
+                <label htmlFor="register-email" className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
                 <input 
+                  id="register-email"
+                  autoComplete="email"
                   type="email" 
                   value={formData.email} 
                   onChange={e => setFormData({...formData, email: e.target.value})} 
@@ -107,8 +111,10 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
+                <label htmlFor="register-password" className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
                 <input 
+                  id="register-password"
+                  autoComplete="new-password"
                   type="password" 
                   value={formData.password} 
                   onChange={e => setFormData({...formData, password: e.target.value})} 
@@ -125,11 +131,15 @@ export default function RegisterPage() {
             <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                 <p className="text-sm text-muted">Kode OTP 6-digit telah dikirim ke:</p>
-                <p className="text-sm font-bold" style={{ color: 'var(--color-primary)' }}>{formData.email}</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--color-primary-text)' }}>{formData.email}</p>
               </div>
               
               <div>
+                <label htmlFor="register-otp" className="text-xs text-muted mb-1 block font-bold">Kode OTP</label>
                 <input 
+                  id="register-otp"
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
                   type="text" 
                   value={otp} 
                   onChange={e => setOtp(e.target.value)} 
@@ -147,7 +157,7 @@ export default function RegisterPage() {
           
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
             <p className="text-sm text-muted">
-              Sudah punya akun? <Link href="/auth/login" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Masuk di sini</Link>
+              Sudah punya akun? <Link href="/auth/login" style={{ color: 'var(--color-primary-text)', fontWeight: 700, textDecoration: 'none' }}>Masuk di sini</Link>
             </p>
           </div>
         </div>

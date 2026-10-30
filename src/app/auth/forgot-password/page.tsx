@@ -77,14 +77,14 @@ export default function ForgotPasswordPage() {
           <p className="text-muted text-sm">{step === 1 ? 'Masukkan email Anda untuk menerima kode OTP.' : 'Masukkan kode OTP dan sandi baru Anda.'}</p>
         </div>
 
-        {error && <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', fontWeight: 600 }}>{error}</div>}
-        {success && <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', fontWeight: 600 }}>{success}</div>}
+        {error && <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', fontWeight: 600 }}>{error}</div>}
+        {success && <div role="status" style={{ background: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center', fontWeight: 600 }}>{success}</div>}
 
         {step === 1 ? (
           <form onSubmit={handleRequestOTP} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
-              <input type="email" placeholder="nama@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
+              <label htmlFor="forgot-email" className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
+              <input id="forgot-email" autoComplete="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <button type="submit" className="btn-primary mt-2" disabled={loading} style={{ width: '100%', padding: '14px' }}>
               {loading ? 'Mengirim...' : 'Kirim Kode OTP'}
@@ -93,12 +93,12 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Kode OTP 6 Digit</label>
-              <input type="text" placeholder="123456" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} required style={{ letterSpacing: '4px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }} />
+              <label htmlFor="forgot-otp" className="text-xs text-muted mb-1 block font-bold">Kode OTP 6 Digit</label>
+              <input id="forgot-otp" autoComplete="one-time-code" inputMode="numeric" type="text" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} required style={{ letterSpacing: '4px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }} />
             </div>
             <div>
-              <label className="text-xs text-muted mb-1 block font-bold">Sandi Baru</label>
-              <input type="password" placeholder="••••••••" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+              <label htmlFor="forgot-password" className="text-xs text-muted mb-1 block font-bold">Sandi Baru</label>
+              <input id="forgot-password" autoComplete="new-password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
             </div>
             <button type="submit" className="btn-primary mt-2" disabled={loading} style={{ width: '100%', padding: '14px' }}>
               {loading ? 'Menyimpan...' : 'Ubah Sandi'}

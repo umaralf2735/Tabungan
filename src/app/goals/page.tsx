@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { apiFetch, getApiError } from '@/lib/api';
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([]);
@@ -9,30 +10,34 @@ export default function GoalsPage() {
   // State untuk modal top-up
   const [topUpId, setTopUpId] = useState<string | null>(null);
   const [topUpAmount, setTopUpAmount] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchGoals();
   }, []);
 
   const fetchGoals = async () => {
-    const res = await fetch('/api/goals');
+    const res = await apiFetch('/api/goals');
     const data = await res.json();
     if (Array.isArray(data)) setGoals(data);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setError('');
     
-    await fetch('/api/goals', {
+    const res = await apiFetch('/api/goals', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...formData,
-        targetAmount: parseFloat(formData.targetAmount),
-        userId: user.id
+        targetAmount: parseFloat(formData.targetAmount)
       })
     });
+    const apiError = await getApiError(res, 'Target gagal disimpan.');
+    if (apiError) {
+      setError(apiError);
+      return;
+    }
     
     setShowForm(false);
     setFormData({ name: '', targetAmount: '', targetDate: '' });
@@ -43,11 +48,13 @@ export default function GoalsPage() {
     e.preventDefault();
     if (!topUpId) return;
     
-    await fetch(`/api/goals/${topUpId}`, {
+    setError('');
+    const res = await apiFetch(`/api/goals/${topUpId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amountToAdd: parseFloat(topUpAmount) })
     });
+    const apiError = await getApiError(res, 'Saldo target gagal ditambah.');
+    if (apiError) setError(apiError);
     
     setTopUpId(null);
     setTopUpAmount('');
@@ -66,21 +73,27 @@ export default function GoalsPage() {
         </button>
       </header>
 
+      {error && (
+        <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
+          {error}
+        </div>
+      )}
+
       {showForm && (
         <section className="card animate-fade-in" style={{ marginBottom: '2rem', padding: '2rem' }}>
           <h3 style={{ marginBottom: '1.5rem', fontWeight: 700, fontSize: '1.25rem' }}>Tambah Target Tabungan</h3>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))' }}>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Nama Target</label>
-              <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+              <label htmlFor="goal-name" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Nama Target</label>
+              <input id="goal-name" type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah Target (Rp)</label>
-              <input type="number" required value={formData.targetAmount} onChange={e => setFormData({...formData, targetAmount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+              <label htmlFor="goal-amount" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Jumlah Target (Rp)</label>
+              <input id="goal-amount" type="number" min="1" inputMode="numeric" required value={formData.targetAmount} onChange={e => setFormData({...formData, targetAmount: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Tenggat Waktu</label>
-              <input type="date" required value={formData.targetDate} onChange={e => setFormData({...formData, targetDate: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
+              <label htmlFor="goal-date" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Tenggat Waktu</label>
+              <input id="goal-date" type="date" required value={formData.targetDate} onChange={e => setFormData({...formData, targetDate: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} />
             </div>
             <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
               <button type="submit" className="btn-primary">Simpan Target</button>
@@ -92,15 +105,15 @@ export default function GoalsPage() {
       {/* Modal Top Up */}
       {topUpId && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-          <div className="card animate-fade-in" style={{ width: '400px', maxWidth: '90%' }}>
-            <h3 style={{ marginBottom: '1rem', fontWeight: 700 }}>Tambah Saldo Tabungan</h3>
+          <div role="dialog" aria-modal="true" aria-labelledby="goal-topup-title" className="card animate-fade-in" style={{ width: '400px', maxWidth: '90%' }}>
+            <h3 id="goal-topup-title" style={{ marginBottom: '1rem', fontWeight: 700 }}>Tambah Saldo Tabungan</h3>
             <form onSubmit={handleTopUp}>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Nominal (Rp)</label>
-                <input type="number" required value={topUpAmount} onChange={e => setTopUpAmount(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} autoFocus />
+                <label htmlFor="goal-topup" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Nominal (Rp)</label>
+                <input id="goal-topup" type="number" min="1" inputMode="numeric" required value={topUpAmount} onChange={e => setTopUpAmount(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text)' }} autoFocus />
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setTopUpId(null)} style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', fontWeight: 600, color: 'var(--color-text-muted)' }}>Batal</button>
+                <button type="button" onClick={() => setTopUpId(null)} className="tap-target" style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', fontWeight: 600, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>Batal</button>
                 <button type="submit" className="btn-primary">Tambah</button>
               </div>
             </form>
@@ -108,7 +121,7 @@ export default function GoalsPage() {
         </div>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(350px, 100%), 1fr))', gap: '1.5rem' }}>
         {goals.map(goal => {
           const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
           return (
@@ -120,7 +133,7 @@ export default function GoalsPage() {
                 </span>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <p style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.25rem', color: 'var(--color-primary)' }}>
+                <p style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.25rem', color: 'var(--color-primary-text)' }}>
                   Rp {goal.currentAmount.toLocaleString('id-ID')}
                 </p>
                 <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
@@ -137,7 +150,7 @@ export default function GoalsPage() {
                   {progress.toFixed(1)}% Terkumpul {progress >= 100 && '🎉'}
                 </p>
                 {progress < 100 && (
-                  <button onClick={() => setTopUpId(goal.id)} className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+                  <button onClick={() => setTopUpId(goal.id)} className="btn-primary tap-target" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
                     + Top Up
                   </button>
                 )}
