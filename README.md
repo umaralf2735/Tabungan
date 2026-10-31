@@ -60,8 +60,8 @@ Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini di komputer Anda:
 
 1. **Clone repository ini**
    ```bash
-   git clone https://github.com/USERNAME_ANDA/financeflow.git
-   cd financeflow
+   git clone https://github.com/umaralf2735/Tabungan.git
+   cd Tabungan
    ```
 
 2. **Install dependensi**
