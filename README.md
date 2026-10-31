@@ -17,6 +17,8 @@
 
 Aplikasi ini tidak hanya fokus pada pencatatan keuangan, tetapi juga analisis kas bulanan, target tabungan, dan keamanan akun yang ketat (menggunakan validasi OTP via Email).
 
+> **Batasan produk:** FinanceFlow adalah **buku catatan keuangan pribadi**, bukan dompet digital atau alat pembayaran. Tidak ada koneksi ke bank atau QRIS, dan tidak ada uang yang bergerak. Pemasukan dan pengeluaran dicatat sendiri oleh pengguna, dan "dompet" serta "transfer" hanyalah catatan pembagian dan perpindahan dana.
+
 ---
 
 ## ✨ Fitur Utama
@@ -510,7 +512,7 @@ Seluruh bagian ini berstatus **proto-persona** `[Hipotesis]`. Posisi P1-P6 harus
 | :--- | :--- |
 | **Header** | Pak Bambang, pemilik usaha grosir. *"Saya butuh pembukuan double-entry dan faktur pajak."* |
 | **Kebutuhan** | Jurnal akuntansi, faktur pajak, piutang, depresiasi aset. |
-| **Alasan eksklusi** | FinanceFlow untuk keuangan pribadi. Memenuhi kebutuhan ini akan membuat form dan istilahnya membebani user utama, sehingga dijadikan batas cakupan untuk mencegah *scope creep*. |
+| **Alasan eksklusi** | FinanceFlow hanya mencatat dan tidak memproses pembayaran, jadi bukan alat bayar atau dompet digital. FinanceFlow untuk keuangan pribadi. Memenuhi kebutuhan ini akan membuat form dan istilahnya membebani user utama, sehingga dijadikan batas cakupan untuk mencegah *scope creep*. |
 
 #### Hierarki Tujuan Norman
 | Level | Dimas | Sarah |

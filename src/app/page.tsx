@@ -14,6 +14,7 @@ export default function Home() {
   const [dismissedInsights, setDismissedInsights] = useState<string[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [chartRange, setChartRange] = useState<'30d' | '6m'>('30d');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -120,20 +121,47 @@ export default function Home() {
     return <span style={{ color: trend.color }}>▼ {trend.pct}% vs bulan lalu</span>;
   };
 
-  // Chart Data (6 Bulan Riwayat Pertumbuhan)
+  // Chart Data (Pilihan 1 Bulan Bergulir / 6 Bulan)
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  
-  const areaData = Array.from({ length: 6 }).map((_, idx) => {
-    const now = new Date();
+  const now = new Date();
+
+  // 1. Opsi 1 Bulan Bergulir (misal 9 Sep s.d. 9 Okt, atau 30 hari ke belakang dari hari ini)
+  const rollingStartDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+  const dayCount = Math.max(28, Math.min(31, Math.round((now.getTime() - rollingStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1));
+
+  const thirtyDaysData = Array.from({ length: dayCount }).map((_, idx) => {
+    const d = new Date(rollingStartDate.getFullYear(), rollingStartDate.getMonth(), rollingStartDate.getDate() + idx);
+    const endOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime();
+
+    // Hitung akumulasi mutasi yang terjadi setelah akhir hari d
+    const netAfter = transactions
+      .filter(t => new Date(t.date).getTime() > endOfDay)
+      .reduce((sum, t) => sum + (t.type === 'INCOME' ? t.amount : -t.amount), 0);
+
+    const saldo = Math.max(0, totalWalletBalance - netAfter);
+
+    return {
+      name: `${d.getDate()} ${monthNames[d.getMonth()]}`,
+      fullDate: `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`,
+      Saldo: saldo
+    };
+  });
+
+  // 2. Opsi 6 Bulan Terakhir
+  const sixMonthsData = Array.from({ length: 6 }).map((_, idx) => {
     const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
     const m = d.getMonth();
     const y = d.getFullYear();
 
     return {
       name: `${monthNames[m]} ${y.toString().slice(2)}`,
+      fullDate: `${monthNames[m]} ${y}`,
       Saldo: Math.max(0, balanceAtEndOf(y, m))
     };
   });
+
+  const areaData = chartRange === '30d' ? thirtyDaysData : sixMonthsData;
+  const lastChartPoint = (areaData && areaData.length > 0) ? areaData[areaData.length - 1] : { Saldo: totalWalletBalance };
 
   const insights = buildInsights(transactions, budgets, selectedMonth, selectedYear);
   const visibleInsights = insights.filter(i => !dismissedInsights.includes(i.id));
@@ -145,7 +173,6 @@ export default function Home() {
   };
 
   const recentTransactions = transactions.slice(0, 6);
-  const lastChartPoint = areaData[areaData.length - 1];
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
@@ -306,11 +333,59 @@ export default function Home() {
 
       {/* MAIN CHART */}
       <section className="card-mobile-sleek" style={{ marginBottom: '24px' }}>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          PERTUMBUHAN KEKAYAAN (6 BULAN)
-        </p>
-        <div role="img" aria-label={`Grafik saldo 6 bulan terakhir. Saldo terbaru ${lastChartPoint.Saldo.toLocaleString('id-ID')} rupiah.`} style={{ width: '100%', height: '220px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              {chartRange === '30d' ? 'TREN KEKAYAAN (1 BULAN BERGULIR)' : 'PERTUMBUHAN KEKAYAAN (6 BULAN)'}
+            </p>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+              {chartRange === '30d' && thirtyDaysData.length > 0
+                ? `Rentang: ${thirtyDaysData[0].fullDate} — ${thirtyDaysData[thirtyDaysData.length - 1].fullDate}`
+                : 'Histori perkembangan saldo per bulan'}
+            </span>
+          </div>
+
+          {/* TOGGLE 1 BULAN / 6 BULAN */}
+          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <button
+              type="button"
+              onClick={() => setChartRange('30d')}
+              style={{
+                background: chartRange === '30d' ? 'var(--color-primary)' : 'transparent',
+                color: chartRange === '30d' ? '#fff' : 'var(--color-text-muted)',
+                border: 'none',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              1 Bulan (Rolling)
+            </button>
+            <button
+              type="button"
+              onClick={() => setChartRange('6m')}
+              style={{
+                background: chartRange === '6m' ? 'var(--color-primary)' : 'transparent',
+                color: chartRange === '6m' ? '#fff' : 'var(--color-text-muted)',
+                border: 'none',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              6 Bulan
+            </button>
+          </div>
+        </div>
+
+        <div role="img" aria-label={`Grafik saldo ${chartRange === '30d' ? '1 bulan terakhir' : '6 bulan terakhir'}. Saldo terbaru ${lastChartPoint.Saldo.toLocaleString('id-ID')} rupiah.`} style={{ width: '100%', height: '220px' }}>
           {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
@@ -325,7 +400,15 @@ export default function Home() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={10} tickLine={false} axisLine={false} dy={10} />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="var(--color-text-muted)" 
+                  fontSize={10} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  dy={10}
+                  interval={chartRange === '30d' ? Math.floor(thirtyDaysData.length / 6) : 0} 
+                />
                 <YAxis 
                   domain={[0, 'auto']}
                   stroke="var(--color-text-muted)" 
@@ -341,10 +424,17 @@ export default function Home() {
                   dx={-10} 
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px', color: '#fff', fontSize: '0.75rem' }}
+                  contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '12px', color: '#fff', fontSize: '0.75rem', padding: '8px 12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                  formatter={(val: any) => [`Rp ${Number(val).toLocaleString('id-ID')}`, 'Total Kekayaan']}
+                  labelFormatter={(label: any, payload: any) => {
+                    if (payload && payload[0]?.payload?.fullDate) {
+                      return payload[0].payload.fullDate;
+                    }
+                    return label;
+                  }}
                 />
-                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary-text)', stroke: '#fff', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary-text)', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
