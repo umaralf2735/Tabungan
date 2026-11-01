@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUserId, notFound, unauthorized } from '@/lib/auth';
+import { sanitizeString } from '@/lib/security';
 
 export async function GET(request: Request) {
   try {
@@ -23,16 +24,17 @@ export async function POST(request: Request) {
     const userId = getAuthUserId(request);
     if (!userId) return unauthorized();
 
-    const { name, balance } = await request.json();
+    const body = await request.json();
+    const cleanName = sanitizeString(body.name, 50);
 
-    if (!name) {
+    if (!cleanName) {
       return NextResponse.json({ error: 'Nama dompet wajib diisi' }, { status: 400 });
     }
 
     const wallet = await prisma.wallet.create({
       data: {
-        name,
-        balance: parseFloat(balance) || 0,
+        name: cleanName,
+        balance: parseFloat(body.balance) || 0,
         userId
       }
     });

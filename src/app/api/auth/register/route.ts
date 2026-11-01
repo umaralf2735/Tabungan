@@ -1,13 +1,32 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit, getClientIp, sanitizeEmail, sanitizeString } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const ip = getClientIp(request);
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email dan password wajib diisi' }, { status: 400 });
+    // LAPIS 1: Proteksi Spam Registrasi (Maks 5 pendaftaran per IP per 5 menit)
+    const ipLimit = checkRateLimit(`register-ip-${ip}`, 5, 5 * 60 * 1000);
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { error: `Terlalu banyak permintaan pendaftaran. Silakan coba lagi dalam ${Math.ceil(ipLimit.retryAfterSeconds / 60)} menit.` },
+        { status: 429 }
+      );
+    }
+
+    const body = await request.json();
+    const name = sanitizeString(body.name, 60);
+    const email = sanitizeEmail(body.email);
+    const password = body.password;
+
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: 'Nama, email, dan password wajib diisi' }, { status: 400 });
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json({ error: 'Password minimal 6 karakter' }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });

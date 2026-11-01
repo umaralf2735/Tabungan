@@ -1,13 +1,40 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { signToken } from '@/lib/auth';
+import { checkRateLimit, getClientIp, sanitizeEmail, sanitizeString } from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
-    const { email, otp } = await request.json();
+    const ip = getClientIp(request);
+    
+    // LAPIS 1: Proteksi Brute Force IP (Maks 10 percobaan per menit)
+    const ipLimit = checkRateLimit(`otp-ip-${ip}`, 10, 60 * 1000);
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { error: `Terlalu banyak percobaan dari perangkat ini. Tunggu ${ipLimit.retryAfterSeconds} detik.` },
+        { status: 429 }
+      );
+    }
 
-    if (!email || !otp) {
+    const body = await request.json();
+    const rawEmail = body.email;
+    const rawOtp = body.otp;
+
+    if (!rawEmail || !rawOtp) {
       return NextResponse.json({ error: 'Email dan OTP wajib diisi' }, { status: 400 });
+    }
+
+    // LAPIS 2: Sanitasi Input
+    const email = sanitizeEmail(rawEmail);
+    const otp = sanitizeString(rawOtp, 10);
+
+    // LAPIS 1: Proteksi Brute Force Tebak 6-Digit OTP (Maks 5 tebakan per akun per 5 menit)
+    const otpLimit = checkRateLimit(`otp-guess-${email}`, 5, 5 * 60 * 1000);
+    if (!otpLimit.allowed) {
+      return NextResponse.json(
+        { error: `Percobaan OTP salah melebihi batas (5 kali). Kode diblokir sementara selama ${Math.ceil(otpLimit.retryAfterSeconds / 60)} menit demi keamanan.` },
+        { status: 429 }
+      );
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -20,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     if (user.otp !== otp || !user.otpExpiry || user.otpExpiry < new Date()) {
-      return NextResponse.json({ error: 'Kode OTP salah atau sudah kedaluwarsa' }, { status: 400 });
+      return NextResponse.json({ error: `Kode OTP salah atau sudah kedaluwarsa. Sisa kesempatan: ${otpLimit.remaining} kali.` }, { status: 400 });
     }
 
     // Verifikasi berhasil

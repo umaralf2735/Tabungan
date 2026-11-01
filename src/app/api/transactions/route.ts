@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUserId, notFound, unauthorized } from '@/lib/auth';
 import { deleteUserTransaction } from '@/lib/transactions';
+import { sanitizeString } from '@/lib/security';
 
 export async function GET(request: Request) {
   try {
@@ -25,8 +26,11 @@ export async function POST(request: Request) {
 
     const data = await request.json();
     const amount = parseFloat(data.amount);
+    const category = sanitizeString(data.category, 50);
+    const description = sanitizeString(data.description || data.category, 100);
+    const paymentMethod = sanitizeString(data.paymentMethod || 'Manual', 50);
 
-    if (!(amount > 0) || !data.category || !['INCOME', 'EXPENSE'].includes(data.type)) {
+    if (!(amount > 0) || !category || !['INCOME', 'EXPENSE'].includes(data.type)) {
       return NextResponse.json({ error: 'Nominal, jenis, dan kategori wajib diisi dengan benar' }, { status: 400 });
     }
 
@@ -38,9 +42,9 @@ export async function POST(request: Request) {
     const record = {
       amount,
       type: data.type,
-      category: data.category,
-      paymentMethod: data.paymentMethod,
-      description: data.description,
+      category,
+      paymentMethod,
+      description,
       date,
       userId,
     };
