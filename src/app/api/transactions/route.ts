@@ -49,23 +49,28 @@ export async function POST(request: Request) {
       userId,
     };
 
-    // Jika tidak ada walletId, buat transaksi biasa
-    if (!data.walletId) {
+    // Cari target dompet (berdasarkan walletId atau fallback ke dompet pertama user)
+    let targetWallet = null;
+    if (data.walletId) {
+      targetWallet = await prisma.wallet.findFirst({ where: { id: data.walletId, userId } });
+    } else {
+      targetWallet = await prisma.wallet.findFirst({ where: { userId }, orderBy: { createdAt: 'asc' } });
+    }
+
+    // Jika belum ada dompet sama sekali, simpan transaksi mandiri
+    if (!targetWallet) {
       const transaction = await prisma.transaction.create({ data: record });
       return NextResponse.json(transaction);
     }
 
-    const wallet = await prisma.wallet.findFirst({ where: { id: data.walletId, userId } });
-    if (!wallet) return notFound('Dompet tidak ditemukan');
-
-    // Jika ada walletId, update saldo dompet sekaligus
+    // Update saldo dompet sekaligus
     const result = await prisma.$transaction(async (tx) => {
       const transaction = await tx.transaction.create({
-        data: { ...record, walletId: wallet.id },
+        data: { ...record, walletId: targetWallet.id },
       });
 
       await tx.wallet.update({
-        where: { id: wallet.id },
+        where: { id: targetWallet.id },
         data: { balance: data.type === 'INCOME' ? { increment: amount } : { decrement: amount } },
       });
 

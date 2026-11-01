@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, ReferenceLine } from 'recharts';
 import { apiFetch } from '@/lib/api';
 import { buildInsights } from '@/lib/insight';
 
@@ -56,7 +56,11 @@ export default function Home() {
 
   if (!user) return <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>Mempersiapkan Workspace...</div>;
 
-  const totalWalletBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
+  const walletBalanceSum = wallets.reduce((sum, w) => sum + w.balance, 0);
+  const orphanNet = transactions
+    .filter(t => !t.walletId)
+    .reduce((sum, t) => sum + (t.type === 'INCOME' ? t.amount : -t.amount), 0);
+  const totalWalletBalance = walletBalanceSum + orphanNet;
   
   const currentMonthTransactions = transactions.filter(t => 
     new Date(t.date).getMonth() === selectedMonth && 
@@ -125,9 +129,13 @@ export default function Home() {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const now = new Date();
 
-  // 1. Opsi 1 Bulan Bergulir (misal 9 Sep s.d. 9 Okt, atau 30 hari ke belakang dari hari ini)
-  const rollingStartDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-  const dayCount = Math.max(28, Math.min(31, Math.round((now.getTime() - rollingStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1));
+  // 1. Opsi 1 Bulan Bergulir (30 hari ke belakang dari tanggal terpilih atau hari ini)
+  const baseDate = (selectedYear === now.getFullYear() && selectedMonth === now.getMonth())
+    ? now
+    : new Date(selectedYear, selectedMonth + 1, 0); // Akhir bulan yang dipilih
+
+  const rollingStartDate = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, baseDate.getDate());
+  const dayCount = Math.max(28, Math.min(31, Math.round((baseDate.getTime() - rollingStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1));
 
   const thirtyDaysData = Array.from({ length: dayCount }).map((_, idx) => {
     const d = new Date(rollingStartDate.getFullYear(), rollingStartDate.getMonth(), rollingStartDate.getDate() + idx);
@@ -138,7 +146,7 @@ export default function Home() {
       .filter(t => new Date(t.date).getTime() > endOfDay)
       .reduce((sum, t) => sum + (t.type === 'INCOME' ? t.amount : -t.amount), 0);
 
-    const saldo = Math.max(0, totalWalletBalance - netAfter);
+    const saldo = totalWalletBalance - netAfter; // Nilai bisa minus jika utang
 
     return {
       name: `${d.getDate()} ${monthNames[d.getMonth()]}`,
@@ -147,20 +155,32 @@ export default function Home() {
     };
   });
 
-  // 2. Opsi 6 Bulan Terakhir
+  // 2. Opsi 6 Bulan Terakhir (berakhir di bulan yang sedang dipilih user)
   const sixMonthsData = Array.from({ length: 6 }).map((_, idx) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
+    const d = new Date(selectedYear, selectedMonth - (5 - idx), 1);
     const m = d.getMonth();
     const y = d.getFullYear();
+
+    // Rincian transaksi bulan ini untuk transparansi data tooltip
+    const monthTx = transactions.filter(t => {
+      const td = new Date(t.date);
+      return td.getMonth() === m && td.getFullYear() === y && !t.category.startsWith('Transfer');
+    });
+    const mIncome = monthTx.filter(t => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0);
+    const mExpense = monthTx.filter(t => t.type === 'EXPENSE').reduce((s, t) => s + t.amount, 0);
 
     return {
       name: `${monthNames[m]} ${y.toString().slice(2)}`,
       fullDate: `${monthNames[m]} ${y}`,
-      Saldo: Math.max(0, balanceAtEndOf(y, m))
+      Saldo: balanceAtEndOf(y, m), // Bisa minus jika utang
+      pemasukan: mIncome,
+      pengeluaran: mExpense,
+      netFlow: mIncome - mExpense
     };
   });
 
   const areaData = chartRange === '30d' ? thirtyDaysData : sixMonthsData;
+  const hasDebt = areaData.some(d => d.Saldo < 0);
   const lastChartPoint = (areaData && areaData.length > 0) ? areaData[areaData.length - 1] : { Saldo: totalWalletBalance };
 
   const insights = buildInsights(transactions, budgets, selectedMonth, selectedYear);
@@ -284,9 +304,18 @@ export default function Home() {
             TOTAL KEKAYAAN
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Rp {totalWalletBalance.toLocaleString('id-ID')}</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: totalWalletBalance < 0 ? '#F87171' : 'inherit' }}>
+              {totalWalletBalance < 0 
+                ? `- Rp ${Math.abs(totalWalletBalance).toLocaleString('id-ID')}` 
+                : `Rp ${totalWalletBalance.toLocaleString('id-ID')}`}
+            </h2>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
+          {totalWalletBalance < 0 && (
+            <span style={{ display: 'inline-block', fontSize: '0.68rem', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.2)', color: '#F87171', marginTop: '4px' }}>
+              ⚠️ Posisi Defisit / Utang
+            </span>
+          )}
           <p style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: '8px' }}>{renderTrend(trendNW)}</p>
         </div>
 
@@ -385,7 +414,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div role="img" aria-label={`Grafik saldo ${chartRange === '30d' ? '1 bulan terakhir' : '6 bulan terakhir'}. Saldo terbaru ${lastChartPoint.Saldo.toLocaleString('id-ID')} rupiah.`} style={{ width: '100%', height: '220px' }}>
+        <div role="img" aria-label={`Grafik saldo ${chartRange === '30d' ? '1 bulan terakhir' : '6 bulan terakhir'}. Saldo terbaru ${lastChartPoint.Saldo < 0 ? `minus ${Math.abs(lastChartPoint.Saldo).toLocaleString('id-ID')}` : lastChartPoint.Saldo.toLocaleString('id-ID')} rupiah.`} style={{ width: '100%', height: '220px' }}>
           {areaData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
@@ -410,26 +439,56 @@ export default function Home() {
                   interval={chartRange === '30d' ? Math.floor(thirtyDaysData.length / 6) : 0} 
                 />
                 <YAxis 
-                  domain={[0, 'auto']}
+                  domain={['auto', 'auto']}
                   stroke="var(--color-text-muted)" 
                   fontSize={10} 
                   tickLine={false} 
                   axisLine={false} 
                   tickFormatter={(val) => {
                     if (val === 0) return '0';
-                    if (val >= 1000000) return (val / 1000000).toFixed(1) + ' jt';
-                    if (val >= 1000) return (val / 1000).toFixed(0) + ' rb';
-                    return val.toString();
+                    const isNeg = val < 0;
+                    const abs = Math.abs(val);
+                    let str = '';
+                    if (abs >= 1000000) str = (abs / 1000000).toFixed(1) + ' jt';
+                    else if (abs >= 1000) str = (abs / 1000).toFixed(0) + ' rb';
+                    else str = abs.toString();
+                    return isNeg ? `-${str}` : str;
                   }} 
                   dx={-10} 
                 />
+                {hasDebt && (
+                  <ReferenceLine y={0} stroke="rgba(239, 68, 68, 0.7)" strokeDasharray="3 3" />
+                )}
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '12px', color: '#fff', fontSize: '0.75rem', padding: '8px 12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+                  contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '12px', color: '#fff', fontSize: '0.75rem', padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                  formatter={(val: any) => [`Rp ${Number(val).toLocaleString('id-ID')}`, 'Total Kekayaan']}
+                  formatter={(val: any) => {
+                    const num = Number(val);
+                    const isDebt = num < 0;
+                    const formatted = isDebt 
+                      ? `- Rp ${Math.abs(num).toLocaleString('id-ID')}` 
+                      : `Rp ${num.toLocaleString('id-ID')}`;
+                    return [
+                      <span key="val" style={{ color: isDebt ? '#F87171' : '#60A5FA', fontWeight: 800 }}>
+                        {formatted} {isDebt ? '(Utang / Minus)' : ''}
+                      </span>,
+                      'Saldo Total'
+                    ];
+                  }}
                   labelFormatter={(label: any, payload: any) => {
-                    if (payload && payload[0]?.payload?.fullDate) {
-                      return payload[0].payload.fullDate;
+                    if (payload && payload[0]?.payload) {
+                      const p = payload[0].payload;
+                      return (
+                        <div>
+                          <div style={{ fontWeight: 800, marginBottom: '4px' }}>{p.fullDate || label}</div>
+                          {p.pemasukan !== undefined && (p.pemasukan > 0 || p.pengeluaran > 0) && (
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '4px' }}>
+                              <span style={{ color: '#34D399' }}>▲ Masuk: Rp {Number(p.pemasukan).toLocaleString('id-ID')}</span>
+                              <span style={{ color: '#F87171' }}>▼ Keluar: Rp {Number(p.pengeluaran).toLocaleString('id-ID')}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
                     }
                     return label;
                   }}
