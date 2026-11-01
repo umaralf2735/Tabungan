@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, ReferenceLine } from 'recharts';
 import { apiFetch } from '@/lib/api';
 import { buildInsights } from '@/lib/insight';
+import CustomSelect from '@/components/CustomSelect';
 
 export default function Home() {
   const router = useRouter();
@@ -214,51 +215,33 @@ export default function Home() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Dashboard</h1>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px', 
-              background: 'var(--color-surface)', 
-              border: '1px solid var(--color-border)', 
-              padding: '6px 14px', 
-              borderRadius: '12px', 
-              fontSize: '0.85rem',
-              color: 'var(--color-text)'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-text)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              <select 
-                aria-label="Pilih periode"
-                value={`${selectedYear}-${selectedMonth}`}
-                onChange={(e) => {
-                  const [y, m] = e.target.value.split('-');
-                  setSelectedYear(parseInt(y));
-                  setSelectedMonth(parseInt(m));
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  paddingRight: '4px'
-                }}
-              >
-                {Array.from({ length: 12 }).map((_, idx) => {
-                  const now = new Date();
-                  const d = new Date(now.getFullYear(), now.getMonth() - idx, 1);
-                  const m = d.getMonth();
-                  const y = d.getFullYear();
-                  return (
-                    <option key={`${y}-${m}`} value={`${y}-${m}`} style={{ background: '#111827', color: '#fff' }}>
-                      {monthNames[m]} {y}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
+          <CustomSelect
+            compact
+            ariaLabel="Pilih periode"
+            value={`${selectedYear}-${selectedMonth}`}
+            onChange={(val) => {
+              const [y, m] = val.split('-');
+              setSelectedYear(parseInt(y));
+              setSelectedMonth(parseInt(m));
+            }}
+            icon={
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            }
+            options={Array.from({ length: 12 }).map((_, idx) => {
+              const d = new Date(now.getFullYear(), now.getMonth() - idx, 1);
+              const m = d.getMonth();
+              const y = d.getFullYear();
+              return {
+                value: `${y}-${m}`,
+                label: `${monthNames[m]} ${y}`,
+              };
+            })}
+          />
         </div>
         <button className="btn-primary desktop-btn" onClick={() => router.push('/transactions')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

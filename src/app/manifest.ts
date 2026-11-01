@@ -11,13 +11,13 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#2563EB',
     icons: [
       {
-        src: '/FinanceFlow.png',
+        src: '/favicon.png',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any'
       },
       {
-        src: '/FinanceFlow.png',
+        src: '/favicon.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable'

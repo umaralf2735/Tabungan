@@ -69,12 +69,24 @@ export default function ReportsPage() {
     try {
       const { jsPDF } = await import('jspdf');
       
+      // Muat logo /favicon.png untuk bagian atas struk
+      const loadLogoImage = (): Promise<HTMLImageElement | null> =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null);
+          img.src = '/favicon.png';
+        });
+
+      const logoImg = await loadLogoImage();
+
       // Hitung tinggi dinamis berdasarkan jumlah transaksi (maksimal 20 item untuk struk)
       const maxItems = 20;
       const txToPrint = currentFilteredTransactions.slice(0, maxItems);
-      const baseHeight = 150;
+      const baseHeight = 166;
       const itemHeight = txToPrint.length * 6;
-      const totalHeight = Math.max(180, baseHeight + itemHeight);
+      const totalHeight = Math.max(195, baseHeight + itemHeight);
 
       const doc = new jsPDF({
         orientation: 'portrait',
@@ -82,10 +94,9 @@ export default function ReportsPage() {
         format: [80, totalHeight]
       });
       
-      let y = 12;
+      let y = 8;
       const pageWidth = 80;
       const margin = 6;
-      const contentWidth = pageWidth - (margin * 2);
 
       // Helper function untuk garis putus-putus
       const drawDashedLine = (yPos: number) => {
@@ -94,6 +105,15 @@ export default function ReportsPage() {
         doc.line(margin, yPos, pageWidth - margin, yPos);
         doc.setLineDashPattern([], 0); // reset
       };
+
+      // LOGO DI ATAS STRUK
+      if (logoImg) {
+        const logoSize = 12; // 12mm x 12mm (kecil & elegan di tengah atas)
+        doc.addImage(logoImg, 'PNG', (pageWidth - logoSize) / 2, y, logoSize, logoSize);
+        y += logoSize + 4.5;
+      } else {
+        y += 4;
+      }
 
       // HEADER
       doc.setFont('helvetica', 'bold');

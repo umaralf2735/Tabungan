@@ -6,6 +6,11 @@ import { TopNav, BottomNav } from '@/components/AppNav';
 export const metadata: Metadata = {
   title: 'FinanceFlow Pro - Aplikasi Pengelola Keuangan Pribadi',
   description: 'Catat pemasukan, pengeluaran, kelola multi-wallet, dan atur anggaran bulananmu.',
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiFetch, getApiError } from '@/lib/api';
+import CustomSelect from '@/components/CustomSelect';
 
 const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Gaji', 'Hiburan'];
 const UNDO_DURATION_MS = 8000;
@@ -191,10 +192,16 @@ export default function TransactionsPage() {
                 <>
                   <div>
                     <label htmlFor="tx-type" className="text-xs text-muted mb-1 block font-bold">Jenis</label>
-                    <select id="tx-type" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} required>
-                      <option value="EXPENSE">Pengeluaran</option>
-                      <option value="INCOME">Pemasukan</option>
-                    </select>
+                    <CustomSelect
+                      id="tx-type"
+                      ariaLabel="Jenis transaksi"
+                      value={formData.type}
+                      onChange={val => setFormData({ ...formData, type: val })}
+                      options={[
+                        { value: 'EXPENSE', label: 'Pengeluaran', dotColor: '#FB7185' },
+                        { value: 'INCOME', label: 'Pemasukan', dotColor: '#34D399' },
+                      ]}
+                    />
                   </div>
                   <div>
                     <label htmlFor="tx-amount" className="text-xs text-muted mb-1 block font-bold">Nominal (Rp)</label>
@@ -232,9 +239,19 @@ export default function TransactionsPage() {
                   </div>
                   <div>
                     <label htmlFor="tx-wallet" className="text-xs text-muted mb-1 block font-bold">Sumber Dana</label>
-                    <select id="tx-wallet" value={formData.walletId} onChange={e => setFormData({...formData, walletId: e.target.value})} required>
-                      {wallets.map(w => <option key={w.id} value={w.id}>{w.name} ({rupiah(w.balance)})</option>)}
-                    </select>
+                    <CustomSelect
+                      id="tx-wallet"
+                      ariaLabel="Sumber Dana"
+                      placeholder="Pilih Dompet..."
+                      value={formData.walletId}
+                      onChange={val => setFormData({ ...formData, walletId: val })}
+                      options={wallets.map(w => ({
+                        value: w.id,
+                        label: w.name,
+                        sublabel: rupiah(w.balance),
+                        dotColor: '#818CF8',
+                      }))}
+                    />
                     {wallets.length === 0 && (
                       <p className="text-xs text-muted mt-1">Belum ada dompet. <a href="/wallets" className="text-primary font-bold">Buat dompet dulu</a>.</p>
                     )}
@@ -253,17 +270,35 @@ export default function TransactionsPage() {
                 <>
                   <div>
                     <label htmlFor="tf-from" className="text-xs text-muted mb-1 block font-bold">Dari Dompet</label>
-                    <select id="tf-from" value={transferData.fromWalletId} onChange={e => setTransferData({...transferData, fromWalletId: e.target.value})} required>
-                      <option value="">Pilih Sumber...</option>
-                      {wallets.map(w => <option key={w.id} value={w.id}>{w.name} ({rupiah(w.balance)})</option>)}
-                    </select>
+                    <CustomSelect
+                      id="tf-from"
+                      ariaLabel="Dari Dompet"
+                      placeholder="Pilih Sumber..."
+                      value={transferData.fromWalletId}
+                      onChange={val => setTransferData({ ...transferData, fromWalletId: val })}
+                      options={wallets.map(w => ({
+                        value: w.id,
+                        label: w.name,
+                        sublabel: rupiah(w.balance),
+                        dotColor: '#FB7185',
+                      }))}
+                    />
                   </div>
                   <div>
                     <label htmlFor="tf-to" className="text-xs text-muted mb-1 block font-bold">Ke Dompet</label>
-                    <select id="tf-to" value={transferData.toWalletId} onChange={e => setTransferData({...transferData, toWalletId: e.target.value})} required>
-                      <option value="">Pilih Tujuan...</option>
-                      {wallets.map(w => <option key={w.id} value={w.id}>{w.name} ({rupiah(w.balance)})</option>)}
-                    </select>
+                    <CustomSelect
+                      id="tf-to"
+                      ariaLabel="Ke Dompet"
+                      placeholder="Pilih Tujuan..."
+                      value={transferData.toWalletId}
+                      onChange={val => setTransferData({ ...transferData, toWalletId: val })}
+                      options={wallets.map(w => ({
+                        value: w.id,
+                        label: w.name,
+                        sublabel: rupiah(w.balance),
+                        dotColor: '#34D399',
+                      }))}
+                    />
                     {wallets.length < 2 && (
                       <p className="text-xs text-muted mt-1">Transfer butuh minimal dua dompet. <a href="/wallets" className="text-primary font-bold">Tambah dompet</a>.</p>
                     )}
@@ -298,23 +333,25 @@ export default function TransactionsPage() {
           <input
             id="tx-search"
             type="search"
+            placeholder="Cari kategori atau catatan..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ paddingLeft: '40px', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', width: '100%' }}
           />
         </div>
         <label htmlFor="tx-filter" className="visually-hidden">Filter jenis transaksi</label>
-        <select
+        <CustomSelect
           id="tx-filter"
+          ariaLabel="Filter jenis transaksi"
           value={filterType}
-          onChange={e => setFilterType(e.target.value)}
-          style={{ width: '100%', borderRadius: '16px', background: 'rgba(0,0,0,0.3)', fontSize: '0.85rem' }}
-        >
-          <option value="ALL">Semua</option>
-          <option value="INCOME">Masuk</option>
-          <option value="EXPENSE">Keluar</option>
-          <option value="TRANSFER">Transfer</option>
-        </select>
+          onChange={val => setFilterType(val)}
+          options={[
+            { value: 'ALL', label: 'Semua', dotColor: '#818CF8' },
+            { value: 'INCOME', label: 'Masuk', dotColor: '#34D399' },
+            { value: 'EXPENSE', label: 'Keluar', dotColor: '#FB7185' },
+            { value: 'TRANSFER', label: 'Transfer', dotColor: '#A78BFA' },
+          ]}
+        />
       </div>
         </div>
 

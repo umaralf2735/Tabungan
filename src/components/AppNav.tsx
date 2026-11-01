@@ -58,12 +58,13 @@ export function TopNav() {
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             opacity: isHome ? 1 : 0.9,
             transition: 'opacity 0.2s, transform 0.2s',
           }}
         >
-          FinanceFlow
+          <img src="/favicon.png" alt="" width={28} height={28} style={{ objectFit: 'contain' }} />
+          <span>FinanceFlow</span>
         </a>
         <div className="top-nav-menu">
           {NAV_ITEMS.map(item => {
