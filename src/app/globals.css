@@ -290,6 +290,10 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.03em;
   margin: 0;
+  cursor: pointer;
+}
+.logo-text:hover {
+  filter: brightness(1.15);
 }
 
 .nav-menu {
@@ -306,12 +310,13 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  padding: 8px;
+  padding: 6px 4px;
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
   color: var(--color-text-muted);
-  font-size: 0.65rem;
-  width: 20%;
+  font-size: 0.62rem;
+  flex: 1;
+  min-width: 0;
 }
 .nav-link:hover, .nav-link.active {
   color: var(--color-text);

@@ -129,31 +129,44 @@ export default function Home() {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const now = new Date();
 
-  // 1. Opsi 1 Bulan Bergulir (30 hari ke belakang dari tanggal terpilih atau hari ini)
-  const baseDate = (selectedYear === now.getFullYear() && selectedMonth === now.getMonth())
-    ? now
-    : new Date(selectedYear, selectedMonth + 1, 0); // Akhir bulan yang dipilih
+  // 1. Opsi 1 Bulan Bergulir (selalu mengikuti tanggal terbaru / hari ini, misal 1 Okt s.d. 1 Nov)
+  const latestTxTime = transactions.reduce((max, t) => {
+    const time = new Date(t.date).getTime();
+    return time > max ? time : max;
+  }, now.getTime());
+  const baseDate = new Date(Math.max(now.getTime(), latestTxTime));
 
-  const rollingStartDate = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, baseDate.getDate());
-  const dayCount = Math.max(28, Math.min(31, Math.round((baseDate.getTime() - rollingStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1));
+  const rollingStartDate = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, baseDate.getDate(), 0, 0, 0, 0);
+  const rollingEndDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 23, 59, 59, 999);
 
-  const thirtyDaysData = Array.from({ length: dayCount }).map((_, idx) => {
-    const d = new Date(rollingStartDate.getFullYear(), rollingStartDate.getMonth(), rollingStartDate.getDate() + idx);
-    const endOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime();
+  const thirtyDaysData: { name: string; fullDate: string; Saldo: number; pemasukan: number; pengeluaran: number }[] = [];
+  const dayCursor = new Date(rollingStartDate);
+  while (dayCursor.getTime() <= rollingEndDate.getTime()) {
+    const startOfDay = new Date(dayCursor.getFullYear(), dayCursor.getMonth(), dayCursor.getDate(), 0, 0, 0, 0).getTime();
+    const endOfDay = new Date(dayCursor.getFullYear(), dayCursor.getMonth(), dayCursor.getDate(), 23, 59, 59, 999).getTime();
 
-    // Hitung akumulasi mutasi yang terjadi setelah akhir hari d
+    // Hitung akumulasi mutasi yang terjadi setelah akhir hari tersebut
     const netAfter = transactions
       .filter(t => new Date(t.date).getTime() > endOfDay)
       .reduce((sum, t) => sum + (t.type === 'INCOME' ? t.amount : -t.amount), 0);
 
-    const saldo = totalWalletBalance - netAfter; // Nilai bisa minus jika utang
+    const dayTx = transactions.filter(t => {
+      const tt = new Date(t.date).getTime();
+      return tt >= startOfDay && tt <= endOfDay && !t.category.startsWith('Transfer');
+    });
+    const dIncome = dayTx.filter(t => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0);
+    const dExpense = dayTx.filter(t => t.type === 'EXPENSE').reduce((s, t) => s + t.amount, 0);
 
-    return {
-      name: `${d.getDate()} ${monthNames[d.getMonth()]}`,
-      fullDate: `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`,
-      Saldo: saldo
-    };
-  });
+    thirtyDaysData.push({
+      name: `${dayCursor.getDate()} ${monthNames[dayCursor.getMonth()]}`,
+      fullDate: `${dayCursor.getDate()} ${monthNames[dayCursor.getMonth()]} ${dayCursor.getFullYear()}`,
+      Saldo: totalWalletBalance - netAfter, // Nilai bisa minus jika utang
+      pemasukan: dIncome,
+      pengeluaran: dExpense
+    });
+
+    dayCursor.setDate(dayCursor.getDate() + 1);
+  }
 
   // 2. Opsi 6 Bulan Terakhir (berakhir di bulan yang sedang dipilih user)
   const sixMonthsData = Array.from({ length: 6 }).map((_, idx) => {

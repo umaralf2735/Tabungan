@@ -3,12 +3,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch, getApiError } from '@/lib/api';
 
-const TOOL_LINKS = [
-  { href: '/budgets', title: 'Anggaran', desc: 'Tetapkan batas pengeluaran per kategori' },
-  { href: '/goals', title: 'Target Tabungan', desc: 'Lacak progres menabung untuk tujuan Anda' },
-  { href: '/calculator', title: 'Kalkulator Finansial', desc: 'Hitung rasio 50/30/20 dan dana darurat' },
-];
-
 export default function MenuPage() {
   const router = useRouter();
 
@@ -73,19 +67,6 @@ export default function MenuPage() {
             </span>
           </div>
         </div>
-
-        {/* Alat Keuangan */}
-        <nav aria-label="Alat keuangan" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {TOOL_LINKS.map(link => (
-            <a key={link.href} href={link.href} className="card-glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', borderRadius: '20px' }}>
-              <span>
-                <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700 }}>{link.title}</span>
-                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{link.desc}</span>
-              </span>
-              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-          ))}
-        </nav>
 
         {/* Security & Privacy by Design (W02/W03) */}
         <div className="card-glass" style={{ padding: '18px', borderRadius: '20px' }}>
