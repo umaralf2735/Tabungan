@@ -139,23 +139,29 @@ export default function ReportsPage() {
         const isInc = tx.type === 'INCOME';
         const dateStr = new Date(tx.date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' });
         
-        // Baris 1: Nama transaksi
+        // Baris 1: Nama transaksi (Title Case rapi, tidak huruf besar semua)
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(7);
         doc.setTextColor(15, 23, 42);
-        const desc = tx.description ? tx.description.substring(0, 20) : tx.category.substring(0, 20);
-        doc.text(desc.toUpperCase(), margin, y);
+        const rawLabel = (tx.description || tx.category || 'Transaksi').substring(0, 24);
+        const cleanLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+        doc.text(cleanLabel, margin, y);
         
         // Nominal di kanan
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(isInc ? 21 : 220, isInc ? 128 : 38, isInc ? 61 : 38); // Hijau / Merah gelap
-        doc.text(tx.amount.toLocaleString('id-ID'), pageWidth - margin, y, { align: "right" });
+        const amountPrefix = isInc ? '+' : '-';
+        doc.text(`${amountPrefix}${tx.amount.toLocaleString('id-ID')}`, pageWidth - margin, y, { align: "right" });
         
-        // Baris 2: Tanggal & Kategori
+        // Baris 2: Tanggal & Tipe/Kategori (tidak mengulang kata yang sama)
         y += 3.5;
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(6);
         doc.setTextColor(100, 116, 139);
-        doc.text(`${dateStr} | ${tx.category}`, margin, y);
+        const subInfo = (!tx.description || tx.description.toLowerCase() === tx.category.toLowerCase())
+          ? (isInc ? 'Pemasukan' : 'Pengeluaran')
+          : tx.category;
+        doc.text(`${dateStr} • ${subInfo}`, margin, y);
         
         y += 5.5;
       });
@@ -191,12 +197,16 @@ export default function ReportsPage() {
 
       // NET BALANCE
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
+      doc.setFontSize(8.5);
       doc.setTextColor(15, 23, 42);
-      doc.text("NET BALANCE", margin, y);
+      doc.text("Sisa Bersih", margin, y);
       
-      doc.setFontSize(11);
-      doc.text(`Rp ${savings.toLocaleString('id-ID')}`, pageWidth - margin, y, { align: "right" });
+      doc.setFontSize(10);
+      doc.setTextColor(savings < 0 ? 220 : 15, savings < 0 ? 38 : 23, savings < 0 ? 38 : 42);
+      const netFormatted = savings < 0
+        ? `- Rp ${Math.abs(savings).toLocaleString('id-ID')}`
+        : `Rp ${savings.toLocaleString('id-ID')}`;
+      doc.text(netFormatted, pageWidth - margin, y, { align: "right" });
       y += 8;
 
       drawDashedLine(y);
@@ -209,10 +219,12 @@ export default function ReportsPage() {
       doc.setTextColor(148, 163, 184);
       doc.text(`Tgl Cetak: ${printDate} WIB`, pageWidth / 2, y, { align: "center" });
       
-      y += 4;
-      doc.text(`MEMBER : ${user?.name ? user.name.toUpperCase() : 'GUEST'}`, pageWidth / 2, y, { align: "center" });
+      if (user?.name) {
+        y += 3.5;
+        doc.text(`Pengguna: ${user.name}`, pageWidth / 2, y, { align: "center" });
+      }
       
-      y += 6;
+      y += 5;
       doc.setFont('helvetica', 'italic');
       doc.text("Simpan struk ini sebagai bukti laporan sah.", pageWidth / 2, y, { align: "center" });
       y += 3;
