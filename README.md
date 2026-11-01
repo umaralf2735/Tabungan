@@ -54,49 +54,6 @@ Aplikasi ini dibangun menggunakan arsitektur modern (*Fullstack*):
 
 ---
 
-## 🛠️ Instalasi (Menjalankan secara Lokal)
-
-Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini di komputer Anda:
-
-1. **Clone repository ini**
-   ```bash
-   git clone https://github.com/USERNAME_ANDA/financeflow.git
-   cd financeflow
-   ```
-
-2. **Install dependensi**
-   ```bash
-   npm install
-   ```
-
-3. **Konfigurasi Environment Variables**
-   Buat file `.env` di folder utama (root) dan masukkan konfigurasi berikut:
-   ```env
-   # Koneksi ke PostgreSQL Database (Bisa pakai Neon DB / Supabase)
-   DATABASE_URL="postgresql://username:password@host:port/database"
-   
-   # JWT Secret untuk Autentikasi (wajib di production)
-   JWT_SECRET="isi_dengan_kunci_rahasia_bebas_yang_panjang"
-   
-   # Konfigurasi SMTP Nodemailer (Gmail disarankan)
-   EMAIL_USER="email.anda@gmail.com"
-   EMAIL_PASS="app_password_google_anda"
-   ```
-
-4. **Sinkronisasi Database (Prisma)**
-   ```bash
-   npx prisma db push
-   npx prisma generate
-   ```
-
-5. **Jalankan Aplikasi**
-   ```bash
-   npm run dev
-   ```
-   Buka `http://localhost:3000` di browser Anda.
-
----
-
 ## 🧪 Proses Desain & Riset (Interaction Design Lifecycle)
 
 Dokumentasi ini merangkum proses perancangan interaksi **FinanceFlow Pro** berdasarkan materi **Desain Interaksi (CAK4IBB3) Telkom University, Minggu 1-7**.
@@ -637,7 +594,4 @@ Kolom fitur dapat diperiksa di kode. Kolom temuan dan hasil test menunggu data a
 
 ---
 
-<div align="center">
-  <i>Dibuat dengan ❤️ untuk Portofolio Profesional & Tugas Besar Desain Interaksi (CAK4IBB3) Telkom University</i>
-</div>
 
