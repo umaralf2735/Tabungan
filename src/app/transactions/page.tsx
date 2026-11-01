@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch, getApiError } from '@/lib/api';
 import CustomSelect from '@/components/CustomSelect';
+import BackButton from '@/components/BackButton';
 
 const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Gaji', 'Hiburan'];
 const UNDO_DURATION_MS = 8000;
@@ -150,9 +151,12 @@ export default function TransactionsPage() {
 
       {/* HEADER HERO */}
       <header className="flex-between mb-4 mt-2">
-        <div>
-          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Transaksi</h1>
-          <p className="text-sm text-muted mt-1">Pantau semua arus kas Anda</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BackButton />
+          <div>
+            <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Transaksi</h1>
+            <p className="text-sm text-muted mt-1">Pantau semua arus kas Anda</p>
+          </div>
         </div>
         <button onClick={() => { setShowForm(!showForm); setError(''); }} className="btn-primary tap-target" style={{ padding: '0.6rem 1rem', borderRadius: '16px' }}>
           {showForm ? 'Batal' : '+ Tambah'}

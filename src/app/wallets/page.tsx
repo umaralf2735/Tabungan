@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch, getApiError } from '@/lib/api';
 import { WALLET_PRESETS, getWalletStyle } from '@/lib/walletStyles';
+import BackButton from '@/components/BackButton';
 
 export default function WalletsPage() {
   const [wallets, setWallets] = useState<any[]>([]);
@@ -83,9 +84,12 @@ export default function WalletsPage() {
     <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
       {/* HEADER HERO */}
       <header className="flex-between mb-4 mt-2">
-        <div>
-          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Dompet</h1>
-          <p className="text-sm text-muted mt-1">Kelola metode pembayaran dan rekening bank Anda</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BackButton />
+          <div>
+            <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Dompet</h1>
+            <p className="text-sm text-muted mt-1">Kelola metode pembayaran dan rekening bank Anda</p>
+          </div>
         </div>
         <button 
           onClick={handleToggleForm} 

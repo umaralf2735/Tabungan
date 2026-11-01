@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 import NotificationBell from '@/components/NotificationBell';
+import { useTrackNavigation } from '@/components/BackButton';
 
 const NAV_ITEMS: { href: string; label: string; topIcon: ReactNode; bottomIcon: ReactNode }[] = [
   {
@@ -28,6 +29,7 @@ const ACCOUNT_ICON = <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></pat
 
 export function TopNav() {
   const pathname = usePathname();
+  useTrackNavigation();
   const isHome = pathname === '/';
 
   return (

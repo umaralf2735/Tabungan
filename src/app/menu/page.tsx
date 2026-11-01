@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch, getApiError } from '@/lib/api';
+import BackButton from '@/components/BackButton';
 
 const TOOL_LINKS = [
   { href: '/budgets', title: 'Anggaran', desc: 'Tetapkan batas pengeluaran per kategori' },
@@ -53,9 +54,12 @@ export default function MenuPage() {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-      <header style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Profil & Akun</h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Kelola data pribadi dan preferensi aplikasi</p>
+      <header style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <BackButton />
+        <div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Profil & Akun</h2>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Kelola data pribadi dan preferensi aplikasi</p>
+        </div>
       </header>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

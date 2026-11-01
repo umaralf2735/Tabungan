@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { apiFetch } from '@/lib/api';
+import BackButton from '@/components/BackButton';
 
 export default function ReportsPage() {
   const [user, setUser] = useState<any>(null);
@@ -275,9 +276,12 @@ export default function ReportsPage() {
       
       {/* HEADER HERO */}
       <header className="flex-between mb-4 mt-2">
-        <div>
-          <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Laporan</h1>
-          <p className="text-sm text-muted mt-1">Analisis finansial Anda</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BackButton />
+          <div>
+            <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Laporan</h1>
+            <p className="text-sm text-muted mt-1">Analisis finansial Anda</p>
+          </div>
         </div>
       </header>
 

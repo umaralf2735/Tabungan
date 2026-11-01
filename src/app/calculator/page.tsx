@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import BackButton from '@/components/BackButton';
 
 export default function CalculatorPage() {
   const [income, setIncome] = useState<string>('');
@@ -21,9 +22,12 @@ export default function CalculatorPage() {
 
   return (
     <div className="animate-fade-in">
-      <header className="mb-4">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Kalkulator Finansial</h2>
-        <p className="text-xs text-muted">Hitung rasio ideal & dana darurat</p>
+      <header className="mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <BackButton />
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Kalkulator Finansial</h2>
+          <p className="text-xs text-muted">Hitung rasio ideal & dana darurat</p>
+        </div>
       </header>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

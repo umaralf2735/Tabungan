@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch, getApiError } from '@/lib/api';
 import CustomSelect from '@/components/CustomSelect';
+import BackButton from '@/components/BackButton';
 
 const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan'];
 
@@ -81,9 +82,12 @@ export default function BudgetsPage() {
     <div className="animate-fade-in">
       {/* Header Compact */}
       <div className="flex-between mb-4">
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Anggaran</h2>
-          <p className="text-xs text-muted">Pantau batas pengeluaran</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BackButton />
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Anggaran</h2>
+            <p className="text-xs text-muted">Pantau batas pengeluaran</p>
+          </div>
         </div>
         <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary tap-target">
           {showForm ? 'Batal' : '+ Buat Budget'}

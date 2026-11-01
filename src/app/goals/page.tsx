@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiFetch, getApiError } from '@/lib/api';
+import BackButton from '@/components/BackButton';
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([]);
@@ -64,9 +65,12 @@ export default function GoalsPage() {
   return (
     <div className="animate-fade-in">
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Target Tabungan</h2>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Lacak progres menabungmu untuk mencapai tujuan finansial.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <BackButton />
+          <div>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Target Tabungan</h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Lacak progres menabungmu untuk mencapai tujuan finansial.</p>
+          </div>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary">
           {showForm ? 'Batal' : '+ Buat Target Baru'}
