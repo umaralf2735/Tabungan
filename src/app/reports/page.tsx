@@ -281,7 +281,7 @@ export default function ReportsPage() {
           <div>
             <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
               Laporan{' '}
-              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Finansial
               </span>
             </h1>
@@ -298,14 +298,14 @@ export default function ReportsPage() {
           <div className="card-glass" style={{ padding: '16px', display: 'flex', gap: '12px', alignItems: 'center', borderRadius: '24px' }}>
             <div style={{ flex: 1 }}>
               <label htmlFor="report-start" className="text-xs text-muted mb-1 block font-bold">Dari Tanggal</label>
-              <input id="report-start" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'rgba(10, 8, 18, 0.85)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+              <input id="report-start" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'rgba(8, 13, 26, 0.85)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
             </div>
             <div style={{ color: 'var(--color-text-muted)', paddingTop: '20px' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
             </div>
             <div style={{ flex: 1 }}>
               <label htmlFor="report-end" className="text-xs text-muted mb-1 block font-bold">Sampai Tanggal</label>
-              <input id="report-end" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'rgba(10, 8, 18, 0.85)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+              <input id="report-end" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: '12px', background: 'rgba(8, 13, 26, 0.85)', color: 'white', fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
             </div>
           </div>
 
@@ -351,25 +351,25 @@ export default function ReportsPage() {
           {/* EXPORT BUTTONS */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <button onClick={handleExportCSV} className="card-glass" style={{ padding: '18px', borderRadius: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <div className="squircle-icon" style={{ marginBottom: '10px', background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.15)', color: '#FAFAFC' }}>
+              <div className="squircle-icon" style={{ marginBottom: '10px', background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.15)', color: '#F1F5F9' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               </div>
-              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#FAFAFC' }}>Export CSV</span>
+              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F1F5F9' }}>Export CSV</span>
               <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Spreadsheet / Excel</span>
             </button>
-            <button onClick={handleExportPDF} style={{ padding: '18px', borderRadius: '20px', background: 'radial-gradient(120% 130% at 50% 105%, rgba(168, 85, 247, 0.45) 0%, rgba(14, 11, 22, 0.96) 100%)', border: '1px solid rgba(216, 180, 254, 0.38)', boxShadow: '0 12px 28px -8px rgba(147, 51, 234, 0.45), inset 0 1px 0 rgba(255,255,255,0.22)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.25s' }}>
+            <button onClick={handleExportPDF} style={{ padding: '18px', borderRadius: '20px', background: 'radial-gradient(120% 130% at 50% 105%, rgba(99, 102, 241, 0.48) 0%, rgba(12, 19, 36, 0.96) 100%)', border: '1px solid rgba(165, 180, 252, 0.38)', boxShadow: '0 12px 28px -8px rgba(79, 70, 229, 0.45), inset 0 1px 0 rgba(255,255,255,0.22)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.25s' }}>
               <div className="squircle-icon" style={{ marginBottom: '10px' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
               </div>
-              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#FAFAFC' }}>Struk PDF (Kasir)</span>
-              <span style={{ fontSize: '0.68rem', color: '#E9D5FF', marginTop: '2px' }}>Format Nota Termal</span>
+              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F1F5F9' }}>Struk PDF (Kasir)</span>
+              <span style={{ fontSize: '0.68rem', color: '#E0E7FF', marginTop: '2px' }}>Format Nota Termal</span>
             </button>
           </div>
         </div>
 
         {/* RIGHT COLUMN: CHART SECTION */}
         <div className="card-glass" style={{ padding: '24px 16px', height: '100%', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '24px', textAlign: 'center', letterSpacing: '-0.02em', color: '#FAFAFC' }}>Perbandingan Arus Kas (6 Bulan)</h3>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '24px', textAlign: 'center', letterSpacing: '-0.02em', color: '#F1F5F9' }}>Perbandingan Arus Kas (6 Bulan)</h3>
           {barData.length > 0 ? (
             <div role="img" aria-label="Grafik batang pemasukan dan pengeluaran per bulan, maksimal 6 bulan terakhir." style={{ flex: 1, width: '100%', minHeight: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">

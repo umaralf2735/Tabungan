@@ -116,8 +116,8 @@ export default function BackButton() {
         transition: 'all 0.18s ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(147, 51, 234, 0.25)';
-        e.currentTarget.style.borderColor = 'rgba(216, 180, 254, 0.55)';
+        e.currentTarget.style.background = 'rgba(79, 70, 229, 0.25)';
+        e.currentTarget.style.borderColor = 'rgba(165, 180, 252, 0.55)';
         e.currentTarget.style.transform = 'translateX(-2px)';
       }}
       onMouseLeave={(e) => {

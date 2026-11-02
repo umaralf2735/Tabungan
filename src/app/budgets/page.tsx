@@ -87,7 +87,7 @@ export default function BudgetsPage() {
           <div>
             <h2 style={{ fontSize: '1.7rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
               Anggaran{' '}
-              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Bulanan
               </span>
             </h2>

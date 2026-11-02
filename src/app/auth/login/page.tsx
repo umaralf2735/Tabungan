@@ -44,9 +44,9 @@ export default function LoginPage() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px 16px',
-        background: '#050408',
+        background: 'var(--color-bg-base)',
         backgroundImage:
-          'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(139, 92, 246, 0.22) 0%, transparent 65%), radial-gradient(ellipse 50% 45% at 20% 85%, rgba(88, 28, 135, 0.2) 0%, transparent 65%)',
+          'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(79, 70, 229, 0.22) 0%, transparent 65%), radial-gradient(ellipse 50% 45% at 20% 85%, rgba(30, 58, 138, 0.22) 0%, transparent 65%)',
         zIndex: 60,
       }}
     >
@@ -59,7 +59,7 @@ export default function LoginPage() {
           right: '12%',
           width: '2px',
           height: '140vh',
-          background: 'linear-gradient(180deg, transparent 0%, rgba(216, 180, 254, 0.22) 50%, transparent 100%)',
+          background: 'linear-gradient(180deg, transparent 0%, rgba(165, 180, 252, 0.22) 50%, transparent 100%)',
           transform: 'rotate(-32deg)',
           pointerEvents: 'none',
         }}
@@ -74,12 +74,12 @@ export default function LoginPage() {
           position: 'relative',
           overflow: 'hidden',
           borderRadius: '26px',
-          background: 'linear-gradient(165deg, rgba(22, 17, 35, 0.92) 0%, rgba(7, 6, 12, 0.98) 65%, rgba(38, 19, 66, 0.55) 100%)',
+          background: 'linear-gradient(165deg, rgba(17, 28, 49, 0.92) 0%, rgba(8, 13, 26, 0.98) 65%, rgba(30, 41, 82, 0.55) 100%)',
           border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 0 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 0 rgba(168, 85, 247, 0.2)',
+          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 0 rgba(99, 102, 241, 0.2)',
         }}
       >
-        {/* Top Amethyst Specular Glow */}
+        {/* Top Indigo Specular Glow */}
         <div
           aria-hidden="true"
           style={{
@@ -88,7 +88,7 @@ export default function LoginPage() {
             right: '-40px',
             width: '180px',
             height: '180px',
-            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%)',
             filter: 'blur(30px)',
             pointerEvents: 'none',
           }}
@@ -119,7 +119,7 @@ export default function LoginPage() {
               Selamat datang{' '}
               <span
                 style={{
-                  background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)',
+                  background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -209,7 +209,7 @@ export default function LoginPage() {
           >
             <p className="text-sm text-muted">
               Belum punya akun?{' '}
-              <Link href="/auth/register" style={{ color: '#E9D5FF', fontWeight: 600, textDecoration: 'none' }}>
+              <Link href="/auth/register" style={{ color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}>
                 Daftar sekarang
               </Link>
             </p>

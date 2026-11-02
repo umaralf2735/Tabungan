@@ -99,7 +99,7 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* AVATAR / PROFIL PILL LINK (Ledger 'See It in Action' Pill Style) */}
+      {/* AVATAR / PROFIL PILL LINK */}
       <a
         href="/menu"
         aria-label="Profil Akun"
@@ -111,11 +111,11 @@ export default function NotificationBell() {
           justifyContent: 'center',
           gap: '8px',
           padding: '7px 14px',
-          background: 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.7) 0%, rgba(109, 40, 217, 0.4) 50%, rgba(14, 11, 22, 0.96) 100%)',
-          border: '1px solid rgba(216, 180, 254, 0.4)',
-          boxShadow: '0 8px 22px -6px rgba(147, 51, 234, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+          background: 'radial-gradient(115% 130% at 50% 105%, rgba(99, 102, 241, 0.75) 0%, rgba(79, 70, 229, 0.48) 50%, rgba(12, 19, 36, 0.96) 100%)',
+          border: '1px solid rgba(165, 180, 252, 0.4)',
+          boxShadow: '0 8px 22px -6px rgba(79, 70, 229, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
           borderRadius: '999px',
-          color: '#FAFAFC',
+          color: '#F8FAFC',
           fontSize: '0.82rem',
           fontWeight: 600,
           textDecoration: 'none',
@@ -137,10 +137,10 @@ export default function NotificationBell() {
           right: '0',
           width: '320px',
           maxWidth: 'calc(100vw - 32px)',
-          background: 'rgba(11, 9, 18, 0.98)',
-          border: '1px solid rgba(216, 180, 254, 0.28)',
+          background: 'rgba(12, 19, 36, 0.98)',
+          border: '1px solid rgba(165, 180, 252, 0.28)',
           borderRadius: '20px',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.14)',
+          boxShadow: '0 24px 48px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.14)',
           zIndex: 999,
           padding: '16px',
           backdropFilter: 'blur(20px)'

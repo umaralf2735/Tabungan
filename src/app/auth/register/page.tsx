@@ -70,9 +70,9 @@ export default function RegisterPage() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px 16px',
-        background: '#050408',
+        background: 'var(--color-bg-base)',
         backgroundImage:
-          'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(139, 92, 246, 0.22) 0%, transparent 65%), radial-gradient(ellipse 50% 45% at 20% 85%, rgba(88, 28, 135, 0.2) 0%, transparent 65%)',
+          'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(79, 70, 229, 0.22) 0%, transparent 65%), radial-gradient(ellipse 50% 45% at 20% 85%, rgba(30, 58, 138, 0.22) 0%, transparent 65%)',
         zIndex: 60,
       }}
     >
@@ -85,9 +85,9 @@ export default function RegisterPage() {
           position: 'relative',
           overflow: 'hidden',
           borderRadius: '26px',
-          background: 'linear-gradient(165deg, rgba(22, 17, 35, 0.92) 0%, rgba(7, 6, 12, 0.98) 65%, rgba(38, 19, 66, 0.55) 100%)',
+          background: 'linear-gradient(165deg, rgba(17, 28, 49, 0.92) 0%, rgba(8, 13, 26, 0.98) 65%, rgba(30, 41, 82, 0.55) 100%)',
           border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 0 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 0 rgba(168, 85, 247, 0.2)',
+          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 0 rgba(99, 102, 241, 0.2)',
         }}
       >
         <div style={{ position: 'relative', zIndex: 1 }}>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
               {step === 1 ? (
                 <>
                   Mulai kendalikan{' '}
-                  <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  <span style={{ background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     keuanganmu.
                   </span>
                 </>
@@ -170,9 +170,9 @@ export default function RegisterPage() {
             </form>
           ) : (
             <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
-              <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(147, 51, 234, 0.12)', border: '1px solid rgba(216, 180, 254, 0.2)' }}>
+              <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(79, 70, 229, 0.14)', border: '1px solid rgba(165, 180, 252, 0.22)' }}>
                 <p className="text-xs text-muted">Kode OTP 6-digit telah dikirim ke:</p>
-                <p className="text-sm font-bold" style={{ color: '#E9D5FF', marginTop: '2px' }}>{formData.email}</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--color-primary-text)', marginTop: '2px' }}>{formData.email}</p>
               </div>
 
               <div>
@@ -199,7 +199,7 @@ export default function RegisterPage() {
           <div style={{ textAlign: 'center', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(255, 255, 255, 0.07)' }}>
             <p className="text-sm text-muted">
               Sudah punya akun?{' '}
-              <Link href="/auth/login" style={{ color: '#E9D5FF', fontWeight: 600, textDecoration: 'none' }}>
+              <Link href="/auth/login" style={{ color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}>
                 Masuk di sini
               </Link>
             </p>

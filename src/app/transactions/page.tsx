@@ -156,7 +156,7 @@ export default function TransactionsPage() {
           <div>
             <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
               Catatan{' '}
-              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Transaksi
               </span>
             </h1>
@@ -192,9 +192,9 @@ export default function TransactionsPage() {
           {/* FLOATING FORM */}
           {showForm && (
             <form onSubmit={handleSave} className="card-glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div role="group" aria-label="Jenis pencatatan" style={{ display: 'flex', gap: '6px', background: 'rgba(8, 6, 14, 0.85)', padding: '5px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.09)' }}>
-                <button type="button" aria-pressed={!isTransferMode} onClick={() => { setIsTransferMode(false); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: !isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.65) 0%, rgba(88, 28, 135, 0.6) 100%)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: !isTransferMode ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Reguler</button>
-                <button type="button" aria-pressed={isTransferMode} onClick={() => { setIsTransferMode(true); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.65) 0%, rgba(88, 28, 135, 0.6) 100%)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: isTransferMode ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Transfer</button>
+              <div role="group" aria-label="Jenis pencatatan" style={{ display: 'flex', gap: '6px', background: 'rgba(8, 13, 26, 0.85)', padding: '5px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.09)' }}>
+                <button type="button" aria-pressed={!isTransferMode} onClick={() => { setIsTransferMode(false); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: !isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(99, 102, 241, 0.7) 0%, rgba(49, 46, 129, 0.65) 100%)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: !isTransferMode ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Reguler</button>
+                <button type="button" aria-pressed={isTransferMode} onClick={() => { setIsTransferMode(true); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(99, 102, 241, 0.7) 0%, rgba(49, 46, 129, 0.65) 100%)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: isTransferMode ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Transfer</button>
               </div>
 
               {!isTransferMode ? (
@@ -230,9 +230,9 @@ export default function TransactionsPage() {
                           onClick={() => setFormData(prev => ({ ...prev, category: chip }))}
                           className="tap-target"
                           style={{
-                            background: formData.category === chip ? 'rgba(147, 51, 234, 0.35)' : 'rgba(255,255,255,0.05)',
-                            color: formData.category === chip ? '#F3E8FF' : 'var(--color-text-muted)',
-                            border: formData.category === chip ? '1px solid rgba(216, 180, 254, 0.5)' : '1px solid rgba(255,255,255,0.1)',
+                            background: formData.category === chip ? 'rgba(79, 70, 229, 0.35)' : 'rgba(255,255,255,0.05)',
+                            color: formData.category === chip ? '#E0E7FF' : 'var(--color-text-muted)',
+                            border: formData.category === chip ? '1px solid rgba(165, 180, 252, 0.5)' : '1px solid rgba(255,255,255,0.1)',
                             padding: '4px 12px',
                             borderRadius: '999px',
                             fontSize: '0.75rem',
@@ -258,7 +258,7 @@ export default function TransactionsPage() {
                         value: w.id,
                         label: w.name,
                         sublabel: rupiah(w.balance),
-                        dotColor: '#C084FC',
+                        dotColor: '#818CF8',
                       }))}
                     />
                     {wallets.length === 0 && (

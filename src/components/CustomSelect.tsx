@@ -80,12 +80,12 @@ export default function CustomSelect({
           gap: '10px',
           padding: compact ? '8px 14px' : '13px 16px',
           background: isOpen
-            ? 'rgba(22, 16, 36, 0.96)'
+            ? 'rgba(17, 28, 49, 0.96)'
             : compact
-            ? 'rgba(14, 11, 22, 0.9)'
-            : 'rgba(10, 8, 18, 0.78)',
+            ? 'rgba(12, 19, 36, 0.9)'
+            : 'rgba(8, 13, 26, 0.78)',
           border: isOpen
-            ? '1px solid rgba(192, 132, 252, 0.65)'
+            ? '1px solid rgba(129, 140, 248, 0.65)'
             : '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: compact ? '999px' : '14px',
           color: selectedOption ? 'var(--color-text)' : 'var(--color-text-muted)',
@@ -94,8 +94,8 @@ export default function CustomSelect({
           cursor: 'pointer',
           textAlign: 'left',
           boxShadow: isOpen
-            ? '0 0 0 3px rgba(147, 51, 234, 0.2), 0 8px 20px rgba(0, 0, 0, 0.5)'
-            : 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3)',
+            ? '0 0 0 3px rgba(99, 102, 241, 0.2), 0 8px 20px rgba(0, 0, 0, 0.45)'
+            : 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.25)',
           transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
           outline: 'none',
         }}
@@ -158,13 +158,13 @@ export default function CustomSelect({
             minWidth: '185px',
             maxHeight: '260px',
             overflowY: 'auto',
-            background: 'rgba(11, 9, 18, 0.98)',
+            background: 'rgba(12, 19, 36, 0.98)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(192, 132, 252, 0.32)',
+            border: '1px solid rgba(129, 140, 248, 0.32)',
             borderRadius: '16px',
             padding: '6px',
-            boxShadow: '0 20px 44px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.14)',
+            boxShadow: '0 20px 44px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.14)',
             zIndex: 999,
             animation: 'fadeIn 0.16s cubic-bezier(0.22, 1, 0.36, 1) forwards',
           }}
@@ -195,8 +195,8 @@ export default function CustomSelect({
                     padding: '10px 12px',
                     borderRadius: '11px',
                     border: 'none',
-                    background: isSelected ? 'rgba(147, 51, 234, 0.25)' : 'transparent',
-                    color: isSelected ? '#F3E8FF' : 'var(--color-text)',
+                    background: isSelected ? 'rgba(79, 70, 229, 0.25)' : 'transparent',
+                    color: isSelected ? '#E0E7FF' : 'var(--color-text)',
                     fontSize: '0.86rem',
                     fontWeight: isSelected ? 700 : 500,
                     cursor: 'pointer',
@@ -231,7 +231,7 @@ export default function CustomSelect({
                       {option.label}
                     </span>
                     {option.sublabel && (
-                      <span style={{ fontSize: '0.76rem', color: isSelected ? '#D8B4FE' : 'var(--color-text-muted)', fontWeight: 500 }}>
+                      <span style={{ fontSize: '0.76rem', color: isSelected ? '#A5B4FC' : 'var(--color-text-muted)', fontWeight: 500 }}>
                         ({option.sublabel})
                       </span>
                     )}
@@ -243,7 +243,7 @@ export default function CustomSelect({
                       height="15"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#C084FC"
+                      stroke="#818CF8"
                       strokeWidth="2.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"

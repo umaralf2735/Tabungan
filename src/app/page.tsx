@@ -215,14 +215,14 @@ export default function Home() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div className="ledger-badge" style={{ marginBottom: '10px' }}>
-            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#C084FC', boxShadow: '0 0 8px #C084FC' }}></span>
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#818CF8', boxShadow: '0 0 8px #818CF8' }}></span>
             <span>Ringkasan Keuangan</span>
             <span className="ledger-badge-pill">Real-Time</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
               Arus Kas{' '}
-              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Personal
               </span>
             </h1>
@@ -267,8 +267,8 @@ export default function Home() {
           <div className="card-glass" style={{
             padding: '18px 22px',
             borderRadius: '22px',
-            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(11, 9, 18, 0.92) 70%)',
-            border: '1px solid rgba(216, 180, 254, 0.28)',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(12, 19, 36, 0.9) 70%)',
+            border: '1px solid rgba(165, 180, 252, 0.28)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -276,15 +276,15 @@ export default function Home() {
             gap: '16px'
           }}>
             <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', color: '#E9D5FF' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', color: 'var(--color-primary-text)' }}>
                 Analisis Otomatis • {monthNames[selectedMonth]} {selectedYear}
               </span>
-              <p style={{ fontSize: '0.92rem', color: '#FAFAFC', marginTop: '4px', fontWeight: 700 }}>{activeInsight.title}</p>
+              <p style={{ fontSize: '0.92rem', color: '#F1F5F9', marginTop: '4px', fontWeight: 700 }}>{activeInsight.title}</p>
               <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>{activeInsight.message}</p>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {activeInsight.action && (
-                <button type="button" onClick={() => router.push(activeInsight.action!.href)} className="tap-target" style={{ background: 'rgba(168, 85, 247, 0.18)', border: '1px solid rgba(216, 180, 254, 0.35)', color: '#FAFAFC', padding: '8px 16px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
+                <button type="button" onClick={() => router.push(activeInsight.action!.href)} className="tap-target" style={{ background: 'rgba(99, 102, 241, 0.18)', border: '1px solid rgba(165, 180, 252, 0.35)', color: '#F1F5F9', padding: '8px 16px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
                   {activeInsight.action.label}
                 </button>
               )}
@@ -300,7 +300,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* TOP 4 CARDS (Ledger Specular Pill Cards with Squircle Icons) */}
+      {/* TOP 4 CARDS (Specular Pill Cards with Squircle Icons) */}
       <section className="dashboard-cards" style={{ marginBottom: '24px' }}>
         {/* Card 1: Net Worth */}
         <div
@@ -308,7 +308,7 @@ export default function Home() {
           onClick={() => router.push('/wallets')}
           style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
         >
-          <div style={{ position: 'absolute', bottom: '-30px', right: '-10px', width: '120px', height: '80px', background: 'rgba(168, 85, 247, 0.28)', filter: 'blur(36px)', pointerEvents: 'none' }}></div>
+          <div style={{ position: 'absolute', bottom: '-30px', right: '-10px', width: '120px', height: '80px', background: 'rgba(99, 102, 241, 0.25)', filter: 'blur(36px)', pointerEvents: 'none' }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px' }}>
             <div className="squircle-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -384,14 +384,14 @@ export default function Home() {
 
         {/* Card 4: Net Cash Flow */}
         <div className="card-full card-mobile-sleek" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', bottom: '-30px', right: '-10px', width: '120px', height: '80px', background: 'rgba(192, 132, 252, 0.22)', filter: 'blur(36px)', pointerEvents: 'none' }}></div>
+          <div style={{ position: 'absolute', bottom: '-30px', right: '-10px', width: '120px', height: '80px', background: 'rgba(129, 140, 248, 0.22)', filter: 'blur(36px)', pointerEvents: 'none' }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px' }}>
             <div
               className="squircle-icon"
               style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(24, 22, 34, 0.9) 100%)',
+                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(17, 28, 49, 0.9) 100%)',
                 borderColor: 'rgba(255, 255, 255, 0.22)',
-                color: '#F3E8FF',
+                color: '#E0E7FF',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
@@ -423,17 +423,17 @@ export default function Home() {
             </span>
           </div>
 
-          {/* TOGGLE 1 BULAN / 6 BULAN (Ledger Pill Switcher) */}
-          <div style={{ display: 'flex', gap: '4px', background: 'rgba(10, 8, 18, 0.85)', padding: '4px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          {/* TOGGLE 1 BULAN / 6 BULAN (Pill Switcher) */}
+          <div style={{ display: 'flex', gap: '4px', background: 'rgba(8, 13, 26, 0.85)', padding: '4px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.1)' }}>
             <button
               type="button"
               onClick={() => setChartRange('30d')}
               style={{
                 background: chartRange === '30d'
-                  ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.7) 0%, rgba(88, 28, 135, 0.65) 100%)'
+                  ? 'radial-gradient(115% 130% at 50% 105%, rgba(99, 102, 241, 0.75) 0%, rgba(49, 46, 129, 0.7) 100%)'
                   : 'transparent',
                 color: chartRange === '30d' ? '#fff' : 'var(--color-text-muted)',
-                border: chartRange === '30d' ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent',
+                border: chartRange === '30d' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
                 padding: '6px 14px',
                 borderRadius: '999px',
                 fontSize: '0.74rem',
@@ -449,10 +449,10 @@ export default function Home() {
               onClick={() => setChartRange('6m')}
               style={{
                 background: chartRange === '6m'
-                  ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.7) 0%, rgba(88, 28, 135, 0.65) 100%)'
+                  ? 'radial-gradient(115% 130% at 50% 105%, rgba(99, 102, 241, 0.75) 0%, rgba(49, 46, 129, 0.7) 100%)'
                   : 'transparent',
                 color: chartRange === '6m' ? '#fff' : 'var(--color-text-muted)',
-                border: chartRange === '6m' ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent',
+                border: chartRange === '6m' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
                 padding: '6px 14px',
                 borderRadius: '999px',
                 fontSize: '0.74rem',
@@ -472,12 +472,12 @@ export default function Home() {
               <AreaChart data={areaData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPro" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#E9D5FF" stopOpacity={0.95}/>
-                    <stop offset="100%" stopColor="#A855F7" stopOpacity={0.95}/>
+                    <stop offset="0%" stopColor="var(--color-primary-text)" stopOpacity={0.95}/>
+                    <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity={0.95}/>
                   </linearGradient>
                   <linearGradient id="colorProBg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#A855F7" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#581C87" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="var(--color-primary-text)" stopOpacity={0.38}/>
+                    <stop offset="95%" stopColor="var(--color-primary-text)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
@@ -512,7 +512,7 @@ export default function Home() {
                   <ReferenceLine y={0} stroke="rgba(251, 113, 133, 0.75)" strokeDasharray="3 3" />
                 )}
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(11, 9, 18, 0.96)', border: '1px solid rgba(216, 180, 254, 0.3)', borderRadius: '14px', color: '#fff', fontSize: '0.75rem', padding: '10px 14px', boxShadow: '0 14px 32px rgba(0,0,0,0.75)' }}
+                  contentStyle={{ backgroundColor: 'rgba(12, 19, 36, 0.96)', border: '1px solid rgba(165, 180, 252, 0.3)', borderRadius: '14px', color: '#fff', fontSize: '0.75rem', padding: '10px 14px', boxShadow: '0 14px 32px rgba(0,0,0,0.65)' }}
                   itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                   formatter={(val: any) => {
                     const num = Number(val);
@@ -521,7 +521,7 @@ export default function Home() {
                       ? `- Rp ${Math.abs(num).toLocaleString('id-ID')}` 
                       : `Rp ${num.toLocaleString('id-ID')}`;
                     return [
-                      <span key="val" style={{ color: isDebt ? '#FB7185' : '#E9D5FF', fontWeight: 700 }}>
+                      <span key="val" style={{ color: isDebt ? '#FB7185' : '#A5B4FC', fontWeight: 700 }}>
                         {formatted} {isDebt ? '(Utang / Minus)' : ''}
                       </span>,
                       'Saldo Total'
@@ -545,7 +545,7 @@ export default function Home() {
                     return label;
                   }}
                 />
-                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: '#E9D5FF', stroke: '#7C3AED', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="Saldo" stroke="url(#colorPro)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProBg)" activeDot={{ r: 5, fill: 'var(--color-primary-text)', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
@@ -571,7 +571,7 @@ export default function Home() {
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px' }}>
             {topCategories.map((cat: any, index: number) => {
-              const colors = ['#C084FC', '#FB7185', '#34D399', '#FBBF24'];
+              const colors = ['#818CF8', '#FB7185', '#34D399', '#FBBF24'];
               const color = colors[index % colors.length];
               const amount = cat[1] as number;
               const percentage = totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : 0;
@@ -583,8 +583,8 @@ export default function Home() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <p style={{ fontWeight: 600, fontSize: '0.86rem', color: '#FAFAFC' }}>{cat[0]}</p>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#E9D5FF' }}>Rp {amount.toLocaleString('id-ID')}</span>
+                      <p style={{ fontWeight: 600, fontSize: '0.86rem', color: '#F1F5F9' }}>{cat[0]}</p>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#A5B4FC' }}>Rp {amount.toLocaleString('id-ID')}</span>
                     </div>
                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem', marginTop: '2px' }}>{percentage}% dari pengeluaran</p>
                   </div>
