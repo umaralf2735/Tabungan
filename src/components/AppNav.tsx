@@ -8,8 +8,8 @@ const NAV_ITEMS: { href: string; label: string; topIcon: ReactNode; bottomIcon: 
   {
     href: '/transactions',
     label: 'Transaksi',
-    topIcon: <path d="M9 21h6M9 17h6M9 13h6M5 6h14M5 10h14M5 14h14M5 18h14"></path>,
-    bottomIcon: <path d="M9 21h6M9 17h6M9 13h6M5 6h14M5 10h14M5 14h14M5 18h14"></path>,
+    topIcon: <><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></>,
+    bottomIcon: <><path d="M8 3 4 7l4 4" /><path d="M4 7h16" /><path d="m16 21 4-4-4-4" /><path d="M20 17H4" /></>,
   },
   {
     href: '/wallets',
@@ -64,7 +64,7 @@ export function TopNav() {
             const isActive = pathname === item.href;
             return (
               <a key={item.href} href={item.href} className={`top-nav-link${isActive ? ' active' : ''}`} aria-current={isActive ? 'page' : undefined}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{item.topIcon}</svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{item.topIcon}</svg>
                 {item.label}
               </a>
             );
