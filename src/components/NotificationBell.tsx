@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
 import { buildInsights, Insight } from '@/lib/insight';
 
 const SEEN_KEY = 'seenNotifications';
 
 export default function NotificationBell() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Insight[]>([]);
   const [unread, setUnread] = useState(false);
@@ -29,36 +31,56 @@ export default function NotificationBell() {
     };
   }, []);
 
-  // Notifikasi dihitung dari data user pada bulan berjalan; tanpa kondisi nyata, daftarnya kosong.
-  useEffect(() => {
-    if (!localStorage.getItem('token')) return;
+  // Notifikasi dihitung secara real-time dari data user pada bulan berjalan
+  const loadNotifications = useCallback(async () => {
+    if (typeof window === 'undefined' || !localStorage.getItem('token')) return;
 
-    const load = async () => {
-      try {
-        const now = new Date();
-        const [txRes, budgetRes] = await Promise.all([
-          apiFetch('/api/transactions'),
-          apiFetch(`/api/budgets?month=${now.getMonth() + 1}&year=${now.getFullYear()}`),
-        ]);
-        const transactions = await txRes.json();
-        const budgets = await budgetRes.json();
-        if (!Array.isArray(transactions) || !Array.isArray(budgets)) return;
+    try {
+      const now = new Date();
+      const [txRes, budgetRes] = await Promise.all([
+        apiFetch('/api/transactions'),
+        apiFetch(`/api/budgets?month=${now.getMonth() + 1}&year=${now.getFullYear()}`),
+      ]);
+      const transactions = await txRes.json();
+      const budgets = await budgetRes.json();
+      if (!Array.isArray(transactions) || !Array.isArray(budgets)) return;
 
-        const warnings = buildInsights(transactions, budgets, now.getMonth(), now.getFullYear()).filter(n => n.tone === 'warning');
-        const seen: string[] = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
-        setNotifications(warnings);
-        setUnread(warnings.some(n => !seen.includes(n.id)));
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    load();
+      const warnings = buildInsights(transactions, budgets, now.getMonth(), now.getFullYear()).filter(
+        n => n.tone === 'warning'
+      );
+      const seen: string[] = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
+      setNotifications(warnings);
+      setUnread(warnings.some(n => !seen.includes(n.id)));
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
+  // Muat ulang setiap pindah halaman atau saat ada perubahan transaksi/anggaran
+  useEffect(() => {
+    loadNotifications();
+  }, [pathname, loadNotifications]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      loadNotifications();
+    };
+    window.addEventListener('financeflow:data-updated', handleUpdate);
+    window.addEventListener('focus', handleUpdate);
+    return () => {
+      window.removeEventListener('financeflow:data-updated', handleUpdate);
+      window.removeEventListener('focus', handleUpdate);
+    };
+  }, [loadNotifications]);
+
   const handleToggle = () => {
-    setIsOpen(!isOpen);
-    setUnread(false);
-    localStorage.setItem(SEEN_KEY, JSON.stringify(notifications.map(n => n.id)));
+    const nextOpen = !isOpen;
+    setIsOpen(nextOpen);
+    if (nextOpen) {
+      loadNotifications();
+      setUnread(false);
+      localStorage.setItem(SEEN_KEY, JSON.stringify(notifications.map(n => n.id)));
+    }
   };
 
   return (

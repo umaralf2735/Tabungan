@@ -37,6 +37,9 @@ export default function BudgetsPage() {
     const res = await apiFetch(`/api/budgets?month=${selectedMonth}&year=${selectedYear}`);
     const data = await res.json();
     if (Array.isArray(data)) setBudgets(data);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('financeflow:data-updated'));
+    }
   };
 
   const handleEdit = (b: any) => {

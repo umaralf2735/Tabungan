@@ -67,6 +67,9 @@ export default function TransactionsPage() {
       const txData = await txRes.json();
       const walletData = await walletRes.json();
       if(Array.isArray(txData)) setTransactions(txData);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('financeflow:data-updated'));
+      }
       if(Array.isArray(walletData)) {
         setWallets(walletData);
         if (walletData.length > 0) {
@@ -101,7 +104,7 @@ export default function TransactionsPage() {
           })
         : await apiFetch('/api/transactions', {
             method: 'POST',
-            body: JSON.stringify({ ...formData, description: formData.category, amount: parseFloat(formData.amount), date: formData.date ? new Date(formData.date).toISOString() : undefined })
+            body: JSON.stringify({ ...formData, description: formData.category, amount: parseFloat(formData.amount), date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString() })
           });
 
       const apiError = await getApiError(res, 'Transaksi gagal disimpan. Coba lagi.');
