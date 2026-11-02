@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 import { buildInsights, Insight } from '@/lib/insight';
@@ -100,7 +101,7 @@ export default function NotificationBell() {
       </button>
 
       {/* AVATAR / PROFIL PILL LINK */}
-      <a
+      <Link
         href="/menu"
         aria-label="Profil Akun"
         title="Profil & Alat Keuangan"
@@ -119,7 +120,7 @@ export default function NotificationBell() {
           fontSize: '0.82rem',
           fontWeight: 600,
           textDecoration: 'none',
-          transition: 'all 0.2s ease'
+          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
@@ -127,7 +128,7 @@ export default function NotificationBell() {
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
         <span style={{ letterSpacing: '-0.01em' }}>Profil</span>
-      </a>
+      </Link>
 
       {/* DROPDOWN POPOVER */}
       {isOpen && (
@@ -170,7 +171,7 @@ export default function NotificationBell() {
                   <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#F1F5F9' }}>{n.title}</span>
                   <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', lineHeight: '1.3' }}>{n.message}</p>
                   {n.action && (
-                    <a href={n.action.href} style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-primary-text)', marginTop: '4px' }}>{n.action.label}</a>
+                    <Link href={n.action.href} onClick={() => setIsOpen(false)} style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-primary-text)', marginTop: '4px' }}>{n.action.label}</Link>
                   )}
                 </div>
               ))}

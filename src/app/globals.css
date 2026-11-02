@@ -43,19 +43,57 @@
   padding: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  color-scheme: dark;
+}
+
+/* Custom Sleek Dark Scrollbar (Anti-Geser & Menyatu dengan Tema) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050816;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.25);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.48);
+}
+
 body {
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-bg-base);
+  color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+}
+
+/* GPU-Composited Ambient Background Layer (120Hz Scroll Tanpa Repaint) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
   background-image:
     radial-gradient(ellipse 65% 45% at 78% 12%, rgba(79, 70, 229, 0.16) 0%, transparent 65%),
     radial-gradient(ellipse 55% 40% at 15% 85%, rgba(30, 58, 138, 0.18) 0%, transparent 65%),
     linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, transparent 45%, rgba(79, 70, 229, 0.04) 100%);
-  background-attachment: fixed;
-  color: var(--color-text);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.015em;
-  font-variant-numeric: tabular-nums;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 /* ==========================================
@@ -444,6 +482,7 @@ input::placeholder {
   }
   /* Floating pill container */
   .top-nav-menu {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -453,27 +492,45 @@ input::placeholder {
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 28px -8px rgba(0, 0, 0, 0.6);
   }
+  .top-nav-pill-indicator {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 0;
+    border-radius: 999px;
+    background: radial-gradient(120% 120% at 50% 100%, rgba(79, 70, 229, 0.52) 0%, rgba(17, 28, 49, 0.92) 100%);
+    border: 1px solid rgba(165, 180, 252, 0.34);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 4px 14px -2px rgba(79, 70, 229, 0.35);
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform, width, opacity;
+    transition:
+      transform 0.36s cubic-bezier(0.16, 1, 0.3, 1),
+      width 0.36s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
   .top-nav-link {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.88rem;
     padding: 7px 16px;
     border-radius: 999px;
-    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    transition: color 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .top-nav-link:hover {
     color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.05);
+  }
+  .top-nav-link:not(.active):hover {
+    background: rgba(255, 255, 255, 0.04);
   }
   .top-nav-link.active {
     color: #FFFFFF;
-    font-weight: 600;
-    background: radial-gradient(120% 120% at 50% 100%, rgba(79, 70, 229, 0.5) 0%, rgba(17, 28, 49, 0.9) 100%);
-    border: 1px solid rgba(165, 180, 252, 0.32);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .main-content {
@@ -512,7 +569,7 @@ input::placeholder {
   border-radius: 22px;
   padding: 1.3rem;
   box-shadow: 0 18px 38px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 0 rgba(99, 102, 241, 0.15);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-mobile-sleek:hover {
@@ -554,13 +611,21 @@ input::placeholder {
 }
 
 /* ==========================================
-   ANIMATIONS
+   ANIMATIONS (120Hz ProMotion Spring Physics)
    ========================================== */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0) scale(0.996);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  animation: fadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

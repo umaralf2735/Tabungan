@@ -1,6 +1,7 @@
 'use client';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import NotificationBell from '@/components/NotificationBell';
 import { useTrackNavigation } from '@/components/BackButton';
 
@@ -30,6 +31,34 @@ const ACCOUNT_ICON = <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></pat
 export function TopNav() {
   const pathname = usePathname();
   useTrackNavigation();
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
+
+  const activeIdx = NAV_ITEMS.findIndex(item => item.href === pathname);
+
+  useEffect(() => {
+    const updatePill = () => {
+      if (activeIdx === -1) {
+        setPillStyle(prev => ({ ...prev, visible: false }));
+        return;
+      }
+      const el = linkRefs.current[activeIdx];
+      if (el) {
+        setPillStyle({
+          left: el.offsetLeft,
+          width: el.offsetWidth,
+          visible: true,
+        });
+      }
+    };
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    return () => window.removeEventListener('resize', updatePill);
+  }, [activeIdx, pathname]);
 
   // Halaman Login / Register / Forgot Password murni tanpa navbar
   if (pathname?.startsWith('/auth')) {
@@ -40,7 +69,7 @@ export function TopNav() {
 
   return (
     <nav className="top-navbar" aria-label="Navigasi utama">
-      <a
+      <Link
         href="/"
         className="logo-text"
         aria-label="FinanceFlow — Kembali ke Beranda (Home)"
@@ -51,22 +80,37 @@ export function TopNav() {
           alignItems: 'center',
           gap: '10px',
           opacity: isHome ? 1 : 0.92,
-          transition: 'opacity 0.2s, transform 0.2s',
+          transition: 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         <img src="/favicon.png" alt="" width={26} height={26} style={{ objectFit: 'contain' }} />
         <span>FinanceFlow</span>
-      </a>
+      </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div className="top-nav-menu">
-          {NAV_ITEMS.map(item => {
+          <span
+            aria-hidden="true"
+            className="top-nav-pill-indicator"
+            style={{
+              width: `${pillStyle.width}px`,
+              transform: `translate3d(${pillStyle.left}px, 0, 0)`,
+              opacity: pillStyle.visible ? 1 : 0,
+            }}
+          />
+          {NAV_ITEMS.map((item, idx) => {
             const isActive = pathname === item.href;
             return (
-              <a key={item.href} href={item.href} className={`top-nav-link${isActive ? ' active' : ''}`} aria-current={isActive ? 'page' : undefined}>
+              <Link
+                key={item.href}
+                href={item.href}
+                ref={el => { linkRefs.current[idx] = el; }}
+                className={`top-nav-link${isActive ? ' active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{item.topIcon}</svg>
                 {item.label}
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -93,10 +137,10 @@ export function BottomNav() {
         {items.map(item => {
           const isActive = pathname === item.href;
           return (
-            <a key={item.href} href={item.href} className={`nav-link${isActive ? ' active' : ''}`} aria-current={isActive ? 'page' : undefined}>
+            <Link key={item.href} href={item.href} className={`nav-link${isActive ? ' active' : ''}`} aria-current={isActive ? 'page' : undefined}>
               <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">{item.bottomIcon}</svg>
               <span className="nav-text">{item.label}</span>
-            </a>
+            </Link>
           );
         })}
       </div>
