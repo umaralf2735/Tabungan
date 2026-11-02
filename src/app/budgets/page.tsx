@@ -4,7 +4,18 @@ import { apiFetch, getApiError } from '@/lib/api';
 import CustomSelect from '@/components/CustomSelect';
 import BackButton from '@/components/BackButton';
 
-const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan'];
+const QUICK_CATEGORIES = [
+  'Makan',
+  'Transportasi',
+  'Uang Kos',
+  'Iuran',
+  'Belanja',
+  'Tagihan & Kuota',
+  'Hiburan',
+  'Kesehatan',
+  'Pendidikan',
+  'Lainnya',
+];
 
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<any[]>([]);

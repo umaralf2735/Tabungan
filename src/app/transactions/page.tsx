@@ -4,7 +4,31 @@ import { apiFetch, getApiError } from '@/lib/api';
 import CustomSelect from '@/components/CustomSelect';
 import BackButton from '@/components/BackButton';
 
-const QUICK_CATEGORIES = ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Gaji', 'Hiburan'];
+const EXPENSE_CATEGORIES = [
+  'Makan',
+  'Transportasi',
+  'Uang Kos',
+  'Iuran',
+  'Belanja',
+  'Tagihan & Kuota',
+  'Hiburan',
+  'Kesehatan',
+  'Pendidikan',
+  'Lainnya',
+];
+
+const INCOME_CATEGORIES = [
+  'Gaji',
+  'Kiriman',
+  'Utang Dibayar',
+  'Bonus / THR',
+  'Freelance',
+  'Hasil Usaha',
+  'Beasiswa',
+  'Hadiah',
+  'Investasi',
+  'Lainnya',
+];
 const UNDO_DURATION_MS = 8000;
 
 const rupiah = (value: number) => `Rp ${value.toLocaleString('id-ID')}`;
@@ -205,7 +229,11 @@ export default function TransactionsPage() {
                       id="tx-type"
                       ariaLabel="Jenis transaksi"
                       value={formData.type}
-                      onChange={val => setFormData({ ...formData, type: val })}
+                      onChange={val => {
+                        const prevList = formData.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+                        const nextCategory = prevList.includes(formData.category) ? '' : formData.category;
+                        setFormData({ ...formData, type: val, category: nextCategory });
+                      }}
                       options={[
                         { value: 'EXPENSE', label: 'Pengeluaran', dotColor: '#FB7185' },
                         { value: 'INCOME', label: 'Pemasukan', dotColor: '#34D399' },
@@ -217,33 +245,48 @@ export default function TransactionsPage() {
                     <input id="tx-amount" type="number" min="1" inputMode="numeric" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required />
                   </div>
                   <div>
-                    <label htmlFor="tx-category" className="text-xs text-muted mb-1 block font-bold">Kategori</label>
-                    <input id="tx-category" type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label htmlFor="tx-category" className="text-xs text-muted block font-bold">
+                        Kategori {formData.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'}
+                      </label>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Pilih di bawah atau ketik sendiri</span>
+                    </div>
+                    <input
+                      id="tx-category"
+                      type="text"
+                      placeholder={formData.type === 'INCOME' ? 'Contoh: Gaji, Kiriman, Utang Dibayar...' : 'Contoh: Makan, Transportasi, Uang Kos, Iuran...'}
+                      value={formData.category}
+                      onChange={e => setFormData({...formData, category: e.target.value})}
+                      required
+                    />
 
-                    {/* QUICK CATEGORY CHIPS */}
+                    {/* QUICK CATEGORY CHIPS (DYNAMIC BY TYPE) */}
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
-                      {QUICK_CATEGORIES.map(chip => (
-                        <button
-                          key={chip}
-                          type="button"
-                          aria-pressed={formData.category === chip}
-                          onClick={() => setFormData(prev => ({ ...prev, category: chip }))}
-                          className="tap-target"
-                          style={{
-                            background: formData.category === chip ? 'rgba(79, 70, 229, 0.35)' : 'rgba(255,255,255,0.05)',
-                            color: formData.category === chip ? '#E0E7FF' : 'var(--color-text-muted)',
-                            border: formData.category === chip ? '1px solid rgba(165, 180, 252, 0.5)' : '1px solid rgba(255,255,255,0.1)',
-                            padding: '4px 12px',
-                            borderRadius: '999px',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          {chip}
-                        </button>
-                      ))}
+                      {(formData.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(chip => {
+                        const isSelected = formData.category === chip;
+                        return (
+                          <button
+                            key={chip}
+                            type="button"
+                            aria-pressed={isSelected}
+                            onClick={() => setFormData(prev => ({ ...prev, category: chip }))}
+                            className="tap-target"
+                            style={{
+                              background: isSelected ? 'rgba(79, 70, 229, 0.35)' : 'rgba(255,255,255,0.05)',
+                              color: isSelected ? '#E0E7FF' : 'var(--color-text-muted)',
+                              border: isSelected ? '1px solid rgba(165, 180, 252, 0.55)' : '1px solid rgba(255,255,255,0.1)',
+                              padding: '5px 12px',
+                              borderRadius: '999px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            {chip}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   <div>
