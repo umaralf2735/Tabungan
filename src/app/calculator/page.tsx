@@ -22,11 +22,16 @@ export default function CalculatorPage() {
 
   return (
     <div className="animate-fade-in">
-      <header className="mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <header className="mb-4 mt-2" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <BackButton />
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Kalkulator Finansial</h2>
-          <p className="text-xs text-muted">Hitung rasio ideal & dana darurat</p>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
+            Kalkulator{' '}
+            <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Finansial
+            </span>
+          </h2>
+          <p className="text-sm text-muted mt-1">Hitung alokasi ideal 50/30/20 & target dana darurat</p>
         </div>
       </header>
 

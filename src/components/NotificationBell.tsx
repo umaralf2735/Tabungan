@@ -99,26 +99,34 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* AVATAR LINK */}
+      {/* AVATAR / PROFIL PILL LINK (Ledger 'See It in Action' Pill Style) */}
       <a
         href="/menu"
         aria-label="Profil Akun"
-        title="Profil Akun"
+        title="Profil & Alat Keuangan"
         className="tap-target"
         style={{
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'var(--color-primary)',
-          borderRadius: '50%',
-          color: 'white',
-          overflow: 'hidden',
-          textDecoration: 'none'
+          gap: '8px',
+          padding: '7px 14px',
+          background: 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.7) 0%, rgba(109, 40, 217, 0.4) 50%, rgba(14, 11, 22, 0.96) 100%)',
+          border: '1px solid rgba(216, 180, 254, 0.4)',
+          boxShadow: '0 8px 22px -6px rgba(147, 51, 234, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+          borderRadius: '999px',
+          color: '#FAFAFC',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          textDecoration: 'none',
+          transition: 'all 0.2s ease'
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"></path>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
+        <span style={{ letterSpacing: '-0.01em' }}>Profil</span>
       </a>
 
       {/* DROPDOWN POPOVER */}
@@ -129,13 +137,13 @@ export default function NotificationBell() {
           right: '0',
           width: '320px',
           maxWidth: 'calc(100vw - 32px)',
-          background: 'var(--color-surface-secondary, #111827)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(11, 9, 18, 0.98)',
+          border: '1px solid rgba(216, 180, 254, 0.28)',
           borderRadius: '20px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+          boxShadow: '0 24px 48px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.14)',
           zIndex: 999,
           padding: '16px',
-          backdropFilter: 'blur(16px)'
+          backdropFilter: 'blur(20px)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>Notifikasi</h4>

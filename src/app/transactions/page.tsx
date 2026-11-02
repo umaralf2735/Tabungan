@@ -154,12 +154,17 @@ export default function TransactionsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <BackButton />
           <div>
-            <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Transaksi</h1>
-            <p className="text-sm text-muted mt-1">Pantau semua arus kas Anda</p>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
+              Catatan{' '}
+              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Transaksi
+              </span>
+            </h1>
+            <p className="text-sm text-muted mt-1">Pantau semua arus kas masuk, keluar, dan mutasi dompet</p>
           </div>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setError(''); }} className="btn-primary tap-target" style={{ padding: '0.6rem 1rem', borderRadius: '16px' }}>
-          {showForm ? 'Batal' : '+ Tambah'}
+        <button onClick={() => { setShowForm(!showForm); setError(''); }} className="btn-primary tap-target">
+          {showForm ? 'Batal' : '+ Catat Transaksi'}
         </button>
       </header>
 
@@ -187,9 +192,9 @@ export default function TransactionsPage() {
           {/* FLOATING FORM */}
           {showForm && (
             <form onSubmit={handleSave} className="card-glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div role="group" aria-label="Jenis pencatatan" style={{ display: 'flex', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '6px', borderRadius: '20px' }}>
-                <button type="button" aria-pressed={!isTransferMode} onClick={() => { setIsTransferMode(false); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: !isTransferMode ? 'var(--color-surface)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '14px', border: 'none', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.3s' }}>Reguler</button>
-                <button type="button" aria-pressed={isTransferMode} onClick={() => { setIsTransferMode(true); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: isTransferMode ? 'var(--color-surface)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '14px', border: 'none', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.3s' }}>Transfer</button>
+              <div role="group" aria-label="Jenis pencatatan" style={{ display: 'flex', gap: '6px', background: 'rgba(8, 6, 14, 0.85)', padding: '5px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.09)' }}>
+                <button type="button" aria-pressed={!isTransferMode} onClick={() => { setIsTransferMode(false); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: !isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.65) 0%, rgba(88, 28, 135, 0.6) 100%)' : 'transparent', color: !isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: !isTransferMode ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Reguler</button>
+                <button type="button" aria-pressed={isTransferMode} onClick={() => { setIsTransferMode(true); setError(''); }} className="tap-target" style={{ flex: 1, padding: '8px', background: isTransferMode ? 'radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.65) 0%, rgba(88, 28, 135, 0.6) 100%)' : 'transparent', color: isTransferMode ? 'white' : 'var(--color-text-muted)', borderRadius: '999px', border: isTransferMode ? '1px solid rgba(216, 180, 254, 0.35)' : '1px solid transparent', fontSize: '0.84rem', fontWeight: 600, transition: 'all 0.25s', cursor: 'pointer' }}>Transfer</button>
               </div>
 
               {!isTransferMode ? (
@@ -215,7 +220,7 @@ export default function TransactionsPage() {
                     <label htmlFor="tx-category" className="text-xs text-muted mb-1 block font-bold">Kategori</label>
                     <input id="tx-category" type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
 
-                    {/* QUICK CATEGORY CHIPS (Recognition over Recall W02 & JTBD 1) */}
+                    {/* QUICK CATEGORY CHIPS */}
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
                       {QUICK_CATEGORIES.map(chip => (
                         <button
@@ -225,11 +230,11 @@ export default function TransactionsPage() {
                           onClick={() => setFormData(prev => ({ ...prev, category: chip }))}
                           className="tap-target"
                           style={{
-                            background: formData.category === chip ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)',
-                            color: formData.category === chip ? '#fff' : 'var(--color-text-muted)',
-                            border: '1px solid rgba(255,255,255,0.1)',
+                            background: formData.category === chip ? 'rgba(147, 51, 234, 0.35)' : 'rgba(255,255,255,0.05)',
+                            color: formData.category === chip ? '#F3E8FF' : 'var(--color-text-muted)',
+                            border: formData.category === chip ? '1px solid rgba(216, 180, 254, 0.5)' : '1px solid rgba(255,255,255,0.1)',
                             padding: '4px 12px',
-                            borderRadius: '12px',
+                            borderRadius: '999px',
                             fontSize: '0.75rem',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -253,7 +258,7 @@ export default function TransactionsPage() {
                         value: w.id,
                         label: w.name,
                         sublabel: rupiah(w.balance),
-                        dotColor: '#818CF8',
+                        dotColor: '#C084FC',
                       }))}
                     />
                     {wallets.length === 0 && (

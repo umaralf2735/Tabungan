@@ -1,40 +1,40 @@
 :root {
   /* ==========================================
-     TITANIUM DESIGN SYSTEM (Stripe/Apple Vibe)
+     LEDGER OBSIDIAN & AMETHYST DESIGN SYSTEM
      ========================================== */
-  
+
   /* Backgrounds */
-  --color-bg-base: #050816;
-  --color-surface-secondary: #0C1324;
-  --color-surface: #111C31; 
-  
-  /* Brand Colors */
-  --color-primary: #4F46E5; /* Latar tombol: teks putih 6.3:1 */
-  --color-primary-text: #A5B4FC; /* Teks & ikon di atas permukaan gelap */
-  --color-secondary: #818CF8;
-  --color-accent: #14B8A6;
-  
+  --color-bg-base: #050408;
+  --color-surface-secondary: #0B0912;
+  --color-surface: #120E1E;
+
+  /* Brand Colors (Obsidian Amethyst & Lavender Specular) */
+  --color-primary: #7C3AED;
+  --color-primary-text: #D8B4FE;
+  --color-secondary: #A855F7;
+  --color-accent: #C084FC;
+
   /* Status Colors */
   --color-success: #34D399;
   --color-warning: #FBBF24;
   --color-danger: #FB7185;
-  
+
   /* Typography */
-  --color-text: #F1F5F9;
-  --color-text-muted: #94A3B8;
-  
-  /* Borders & Shadows */
-  --color-border: rgba(255,255,255,0.06);
-  --shadow-premium: 0 10px 30px rgba(0,0,0,0.35);
-  --shadow-soft: 0 4px 12px rgba(0,0,0,0.2);
-  --shadow-glow: 0 8px 24px rgba(99, 102, 241, 0.25);
-  
+  --color-text: #FAFAFC;
+  --color-text-muted: #9E98B0;
+
+  /* Borders & Specular Shadows */
+  --color-border: rgba(255, 255, 255, 0.09);
+  --shadow-premium: 0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 0 28px -8px rgba(139, 92, 246, 0.22);
+  --shadow-soft: 0 14px 34px -10px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 12px 30px -6px rgba(147, 51, 234, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+
   /* Radius */
   --radius-sm: 12px;
   --radius-md: 16px;
-  --radius-button: 16px;
-  --radius-card: 24px;
-  --radius-xl: 32px;
+  --radius-button: 999px;
+  --radius-card: 22px;
+  --radius-xl: 28px;
 }
 
 * {
@@ -44,12 +44,17 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-bg-base);
+  background-image:
+    radial-gradient(ellipse 65% 45% at 78% 12%, rgba(124, 58, 237, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 40% at 15% 85%, rgba(88, 28, 135, 0.16) 0%, transparent 65%),
+    linear-gradient(135deg, rgba(168, 85, 247, 0.03) 0%, transparent 45%, rgba(124, 58, 237, 0.04) 100%);
+  background-attachment: fixed;
   color: var(--color-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.01em; /* Modern elegant spacing */
+  letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -92,54 +97,54 @@ a {
 }
 
 /* ==========================================
-   CARDS & CONTAINERS
+   CARDS & CONTAINERS (Ledger Specular Obsidian)
    ========================================== */
 .card {
-  background: var(--color-surface);
+  background: linear-gradient(160deg, rgba(22, 18, 34, 0.92) 0%, rgba(8, 7, 13, 0.97) 65%, rgba(30, 17, 52, 0.55) 100%);
   border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  padding: 1.5rem; /* Generous whitespace */
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 0 rgba(168, 85, 247, 0.14);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-premium);
+  border-color: rgba(216, 180, 254, 0.28);
+  box-shadow: var(--shadow-premium), inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
 }
 
 .card-glass {
-  background: rgba(17, 28, 49, 0.65); /* Sangat subtle */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-border);
+  background: linear-gradient(160deg, rgba(20, 16, 31, 0.86) 0%, rgba(8, 7, 13, 0.94) 62%, rgba(34, 19, 58, 0.5) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-card);
   padding: 1.5rem;
-  box-shadow: var(--shadow-soft);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 0 rgba(168, 85, 247, 0.14);
+  transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .card-glass:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-premium);
-  background: rgba(17, 28, 49, 0.75);
+  border-color: rgba(216, 180, 254, 0.25);
+  box-shadow: var(--shadow-premium), inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
 }
 
 /* ==========================================
-   BUTTONS
+   BUTTONS (Ledger Specular Pill Style)
    ========================================== */
 .btn-primary {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-button);
+  background: radial-gradient(115% 130% at 50% 105%, rgba(168, 85, 247, 0.75) 0%, rgba(109, 40, 217, 0.45) 48%, rgba(14, 11, 22, 0.96) 100%);
+  color: #FAFAFC;
+  border: 1px solid rgba(216, 180, 254, 0.42);
+  padding: 0.7rem 1.45rem;
+  border-radius: 999px;
   font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  box-shadow: var(--shadow-glow);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 28px -6px rgba(147, 51, 234, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.32), inset 0 -1px 0 0 rgba(192, 132, 252, 0.28);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -148,32 +153,34 @@ a {
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35);
-  filter: brightness(1.05);
+  border-color: rgba(233, 213, 255, 0.65);
+  box-shadow: 0 14px 34px -4px rgba(168, 85, 247, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+  filter: brightness(1.08);
 }
 
 .btn-primary:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .btn-ghost {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.03);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-button);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   transition: all 0.25s ease;
 }
 
 .btn-ghost:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.15);
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(216, 180, 254, 0.32);
 }
 
 .btn-icon {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   padding: 0.5rem;
@@ -186,16 +193,63 @@ a {
 }
 
 .btn-icon:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(216, 180, 254, 0.3);
 }
 
 /* ==========================================
-   TYPOGRAPHY
+   TYPOGRAPHY & EDITORIAL ACCENTS
    ========================================== */
 h1, h2, h3, h4, h5, h6 {
-  line-height: 1.2;
-  font-weight: 800; /* Extra Bold untuk judul besar / nominal */
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.editorial-title {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  background: linear-gradient(100deg, #FFFFFF 0%, #F3E8FF 55%, #C4B5FD 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ledger-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 12, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.ledger-badge-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.45), rgba(88, 28, 135, 0.65));
+  border: 1px solid rgba(216, 180, 254, 0.35);
+  color: #F3E8FF;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.squircle-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(168, 85, 247, 0.28) 0%, rgba(30, 20, 50, 0.85) 100%);
+  border: 1px solid rgba(216, 180, 254, 0.28);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #E9D5FF;
 }
 
 .text-label {
@@ -216,13 +270,13 @@ h1, h2, h3, h4, h5, h6 {
 .text-accent { color: var(--color-accent); }
 .block { display: block; }
 .font-bold { font-weight: 700; }
-.font-extrabold { font-weight: 800; }
+.font-extrabold { font-weight: 700; }
 .text-sm { font-size: 0.85rem; }
 .text-xs { font-size: 0.75rem; }
 .text-lg { font-size: 1.125rem; }
 .text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.text-3xl { font-size: 1.875rem; }
+.text-2xl { font-size: 1.55rem; }
+.text-3xl { font-size: 1.9rem; }
 
 /* 8pt Spacing System */
 .mb-1 { margin-bottom: 8px; }
@@ -240,7 +294,7 @@ h1, h2, h3, h4, h5, h6 {
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
 /* ==========================================
-   LAYOUT
+   LAYOUT & FLOATING PILL NAVBAR
    ========================================== */
 .app-container {
   display: flex;
@@ -254,15 +308,16 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background: rgba(12, 19, 36, 0.85);
+  padding: 14px 20px;
+  background: rgba(5, 4, 8, 0.78);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: sticky;
   top: 0;
   z-index: 50;
 }
+
 .top-nav-menu {
   display: none;
 }
@@ -272,28 +327,25 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(12, 19, 36, 0.85);
+  background: rgba(7, 5, 12, 0.9);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
   z-index: 50;
-  padding: 8px 16px 24px 16px;
+  padding: 8px 16px 22px 16px;
 }
 
 .logo-text {
   font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text);
-  background: linear-gradient(135deg, #FFFFFF, #94A3B8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.04em;
   margin: 0;
   cursor: pointer;
 }
 .logo-text:hover {
-  filter: brightness(1.15);
+  opacity: 0.9;
 }
 
 .nav-menu {
@@ -312,31 +364,31 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   padding: 8px;
   border-radius: var(--radius-sm);
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   color: var(--color-text-muted);
   font-size: 0.65rem;
   flex: 1;
   min-width: 0;
 }
 .nav-link:hover, .nav-link.active {
-  color: var(--color-text);
+  color: #FFFFFF;
 }
 
 .nav-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 6px;
+  width: 22px;
+  height: 22px;
+  margin-bottom: 5px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.5;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .nav-link.active .nav-icon {
   stroke: var(--color-primary-text);
-  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.75));
   transform: translateY(-2px);
 }
 .nav-link.active {
@@ -346,7 +398,7 @@ h1, h2, h3, h4, h5, h6 {
 .main-content {
   flex: 1;
   padding: 16px;
-  padding-bottom: 160px; /* Supaya bisa di-scroll melewati FAB */
+  padding-bottom: 150px;
   width: 100%;
 }
 
@@ -355,25 +407,27 @@ h1, h2, h3, h4, h5, h6 {
    ========================================== */
 input, select, textarea {
   width: 100%;
-  padding: 14px 16px;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid var(--color-border);
+  padding: 13px 16px;
+  background: rgba(10, 8, 18, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--color-text);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
+  border-radius: 14px;
+  font-size: 0.92rem;
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  transition: all 0.25s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.22s ease;
   color-scheme: dark;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--color-primary-text);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  background: rgba(0,0,0,0.4);
+  outline: none;
+  border-color: rgba(192, 132, 252, 0.6);
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: rgba(15, 11, 26, 0.92);
 }
 
 input::placeholder {
-  color: rgba(148, 163, 184, 0.5);
+  color: rgba(158, 152, 176, 0.5);
 }
 
 /* Desktop styles */
@@ -384,34 +438,44 @@ input::placeholder {
   .bottom-nav {
     display: none;
   }
-  
+
   .top-navbar {
     padding: 16px 48px;
   }
+  /* Floating pill container exactly like Ledger reference */
   .top-nav-menu {
-    display: flex;
-    gap: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(12, 10, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 10px 28px -8px rgba(0, 0, 0, 0.7);
   }
   .top-nav-link {
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--color-text-muted);
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding: 8px 16px;
-    border-radius: 99px;
-    transition: all 0.2s;
+    font-weight: 500;
+    font-size: 0.88rem;
+    padding: 7px 16px;
+    border-radius: 999px;
+    transition: all 0.2s ease;
   }
   .top-nav-link:hover {
-    color: var(--color-text);
-    background: rgba(255,255,255,0.05);
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.05);
   }
   .top-nav-link.active {
-    color: var(--color-primary-text);
-    background: rgba(99, 102, 241, 0.15);
+    color: #FFFFFF;
+    font-weight: 600;
+    background: radial-gradient(120% 120% at 50% 100%, rgba(147, 51, 234, 0.45) 0%, rgba(30, 18, 54, 0.85) 100%);
+    border: 1px solid rgba(216, 180, 254, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
-  
+
   .main-content {
     padding: 32px 48px;
     padding-bottom: 48px;
@@ -441,13 +505,18 @@ input::placeholder {
   gap: 12px;
 }
 
-/* Redesign Mobile Cards to match image */
+/* Specular Obsidian Pill Card (matches Ledger bottom cards) */
 .card-mobile-sleek {
-  background: #0C1222;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 20px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  background: linear-gradient(160deg, rgba(20, 16, 31, 0.9) 0%, rgba(8, 7, 13, 0.96) 60%, rgba(35, 19, 60, 0.52) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 22px;
+  padding: 1.3rem;
+  box-shadow: 0 18px 38px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 0 rgba(168, 85, 247, 0.16);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card-mobile-sleek:hover {
+  border-color: rgba(216, 180, 254, 0.28);
 }
 
 .mobile-header-bell {
@@ -455,7 +524,6 @@ input::placeholder {
   right: 24px;
   color: var(--color-text);
 }
-
 
 .desktop-btn {
   display: none !important;
@@ -494,5 +562,5 @@ input::placeholder {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

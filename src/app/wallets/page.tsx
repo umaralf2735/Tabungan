@@ -87,14 +87,18 @@ export default function WalletsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <BackButton />
           <div>
-            <h1 className="font-extrabold text-2xl" style={{ letterSpacing: '-0.03em', textTransform: 'uppercase' }}>Dompet</h1>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
+              Dompet &{' '}
+              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Rekening
+              </span>
+            </h1>
             <p className="text-sm text-muted mt-1">Kelola metode pembayaran dan rekening bank Anda</p>
           </div>
         </div>
         <button 
           onClick={handleToggleForm} 
-          className="btn-primary tap-target" 
-          style={{ padding: '0.6rem 1.2rem', borderRadius: '16px', fontWeight: 600 }}
+          className="btn-primary tap-target"
         >
           {showForm ? 'Tutup' : '+ Tambah Dompet'}
         </button>

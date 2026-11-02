@@ -68,8 +68,13 @@ export default function GoalsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <BackButton />
           <div>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Target Tabungan</h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>Lacak progres menabungmu untuk mencapai tujuan finansial.</p>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
+              Target{' '}
+              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Tabungan
+              </span>
+            </h2>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', marginTop: '4px' }}>Lacak progres menabungmu untuk mencapai tujuan finansial.</p>
           </div>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary">

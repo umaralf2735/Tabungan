@@ -81,12 +81,17 @@ export default function BudgetsPage() {
   return (
     <div className="animate-fade-in">
       {/* Header Compact */}
-      <div className="flex-between mb-4">
+      <div className="flex-between mb-4 mt-2">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <BackButton />
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Anggaran</h2>
-            <p className="text-xs text-muted">Pantau batas pengeluaran</p>
+            <h2 style={{ fontSize: '1.7rem', fontWeight: 700, letterSpacing: '-0.035em', color: '#FFFFFF' }}>
+              Anggaran{' '}
+              <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Bulanan
+              </span>
+            </h2>
+            <p className="text-sm text-muted mt-1">Tetapkan dan pantau batas pengeluaran per kategori</p>
           </div>
         </div>
         <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary tap-target">

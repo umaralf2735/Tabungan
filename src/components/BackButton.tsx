@@ -106,22 +106,22 @@ export default function BackButton() {
         minWidth: '34px',
         minHeight: '34px',
         borderRadius: '11px',
-        background: 'rgba(255, 255, 255, 0.06)',
+        background: 'rgba(255, 255, 255, 0.05)',
         border: '1px solid rgba(255, 255, 255, 0.14)',
         color: '#F8FAFC',
         cursor: 'pointer',
         padding: 0,
         flexShrink: 0,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 12px rgba(0, 0, 0, 0.4)',
         transition: 'all 0.18s ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)';
-        e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.5)';
+        e.currentTarget.style.background = 'rgba(147, 51, 234, 0.25)';
+        e.currentTarget.style.borderColor = 'rgba(216, 180, 254, 0.55)';
         e.currentTarget.style.transform = 'translateX(-2px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
         e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
         e.currentTarget.style.transform = 'translateX(0)';
       }}

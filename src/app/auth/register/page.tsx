@@ -15,18 +15,18 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      
-      setStep(2); // Pindah ke form verifikasi OTP
+
+      setStep(2);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -38,21 +38,20 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       const res = await fetch('/api/auth/verify-register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, otp })
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      
-      // Simpan data login
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       router.push('/');
     } catch (err: any) {
       setError(err.message);
@@ -62,102 +61,147 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', background: 'var(--color-bg-base)' }}>
-      <div className="card-glass" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', position: 'relative', overflow: 'hidden', borderRadius: '32px' }}>
-        {/* Abstract Deco */}
-        <div style={{ position: 'absolute', top: '-40%', right: '-20%', width: '180px', height: '180px', background: 'var(--color-secondary)', filter: 'blur(80px)', opacity: 0.25, zIndex: 0 }}></div>
-        <div style={{ position: 'absolute', bottom: '-40%', left: '-20%', width: '180px', height: '180px', background: 'var(--color-primary)', filter: 'blur(80px)', opacity: 0.2, zIndex: 0 }}></div>
-        
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        overflowY: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px 16px',
+        background: '#050408',
+        backgroundImage:
+          'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(139, 92, 246, 0.22) 0%, transparent 65%), radial-gradient(ellipse 50% 45% at 20% 85%, rgba(88, 28, 135, 0.2) 0%, transparent 65%)',
+        zIndex: 60,
+      }}
+    >
+      <div
+        className="card-glass animate-fade-in"
+        style={{
+          width: '100%',
+          maxWidth: '420px',
+          padding: '2.5rem 2.25rem',
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: '26px',
+          background: 'linear-gradient(165deg, rgba(22, 17, 35, 0.92) 0%, rgba(7, 6, 12, 0.98) 65%, rgba(38, 19, 66, 0.55) 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 0 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 0 rgba(168, 85, 247, 0.2)',
+        }}
+      >
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h1 className="font-extrabold text-3xl mb-2" style={{ letterSpacing: '-0.04em', background: 'linear-gradient(135deg, #FFFFFF, #94A3B8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              FinanceFlow
+          <div style={{ marginBottom: '1.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <img src="/favicon.png" alt="" width={28} height={28} style={{ objectFit: 'contain' }} />
+              <span style={{ fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#FFFFFF' }}>
+                FinanceFlow
+              </span>
+              <span className="ledger-badge-pill" style={{ marginLeft: 'auto' }}>
+                {step === 1 ? 'Buat Akun' : 'Verifikasi OTP'}
+              </span>
+            </div>
+
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.15, color: '#FFFFFF' }}>
+              {step === 1 ? (
+                <>
+                  Mulai kendalikan{' '}
+                  <span style={{ background: 'linear-gradient(90deg, #E9D5FF 0%, #C084FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    keuanganmu.
+                  </span>
+                </>
+              ) : (
+                'Verifikasi email Anda'
+              )}
             </h1>
-            <p className="text-muted text-sm font-bold">
-              {step === 1 ? 'Mulai perjalanan finansial Anda' : 'Verifikasi email Anda'}
+            <p className="text-muted text-sm" style={{ marginTop: '6px' }}>
+              {step === 1 ? 'Daftar dalam hitungan detik dengan proteksi OTP.' : 'Masukkan 6 digit kode yang dikirim ke email Anda.'}
             </p>
           </div>
-          
+
           {error && (
-            <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', padding: '0.75rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
+            <div role="alert" style={{ background: 'rgba(251, 113, 133, 0.1)', border: '1px solid rgba(251, 113, 133, 0.28)', color: 'var(--color-danger)', padding: '0.75rem 1rem', borderRadius: '14px', fontSize: '0.84rem', marginBottom: '1.25rem', fontWeight: 600 }}>
               {error}
             </div>
           )}
-          
+
           {step === 1 ? (
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
               <div>
-                <label htmlFor="register-name" className="text-xs text-muted mb-1 block font-bold">Nama Lengkap</label>
-                <input 
+                <label htmlFor="register-name" className="text-xs text-muted mb-1 block" style={{ fontWeight: 600 }}>Nama Lengkap</label>
+                <input
                   id="register-name"
                   autoComplete="name"
-                  type="text" 
-                  value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} 
-                  required 
-                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                  type="text"
+                  placeholder="Nama Anda"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  required
                 />
               </div>
               <div>
-                <label htmlFor="register-email" className="text-xs text-muted mb-1 block font-bold">Alamat Email</label>
-                <input 
+                <label htmlFor="register-email" className="text-xs text-muted mb-1 block" style={{ fontWeight: 600 }}>Alamat Email</label>
+                <input
                   id="register-email"
                   autoComplete="email"
-                  type="email" 
-                  value={formData.email} 
-                  onChange={e => setFormData({...formData, email: e.target.value})} 
-                  required 
-                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                  type="email"
+                  placeholder="nama@email.com"
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  required
                 />
               </div>
               <div>
-                <label htmlFor="register-password" className="text-xs text-muted mb-1 block font-bold">Kata Sandi</label>
-                <input 
+                <label htmlFor="register-password" className="text-xs text-muted mb-1 block" style={{ fontWeight: 600 }}>Kata Sandi</label>
+                <input
                   id="register-password"
                   autoComplete="new-password"
-                  type="password" 
-                  value={formData.password} 
-                  onChange={e => setFormData({...formData, password: e.target.value})} 
-                  required 
-                  style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem' }} 
+                  type="password"
+                  placeholder="Minimal 6 karakter"
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  required
                 />
               </div>
-              
-              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '16px', marginTop: '0.5rem', borderRadius: '16px', fontSize: '0.95rem' }}>
+
+              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '14px', marginTop: '0.5rem', fontSize: '0.92rem' }}>
                 {loading ? 'Memproses...' : 'Buat Akun'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <p className="text-sm text-muted">Kode OTP 6-digit telah dikirim ke:</p>
-                <p className="text-sm font-bold" style={{ color: 'var(--color-primary-text)' }}>{formData.email}</p>
+            <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div style={{ padding: '12px 14px', borderRadius: '14px', background: 'rgba(147, 51, 234, 0.12)', border: '1px solid rgba(216, 180, 254, 0.2)' }}>
+                <p className="text-xs text-muted">Kode OTP 6-digit telah dikirim ke:</p>
+                <p className="text-sm font-bold" style={{ color: '#E9D5FF', marginTop: '2px' }}>{formData.email}</p>
               </div>
-              
+
               <div>
-                <label htmlFor="register-otp" className="text-xs text-muted mb-1 block font-bold">Kode OTP</label>
-                <input 
+                <label htmlFor="register-otp" className="text-xs text-muted mb-1 block" style={{ fontWeight: 600 }}>Kode OTP</label>
+                <input
                   id="register-otp"
                   autoComplete="one-time-code"
                   inputMode="numeric"
-                  type="text" 
-                  value={otp} 
-                  onChange={e => setOtp(e.target.value)} 
+                  type="text"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
                   required
                   maxLength={6}
-                  style={{ width: '100%', padding: '16px', borderRadius: '16px', background: 'var(--color-surface)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '8px', fontWeight: 'bold' }} 
+                  style={{ fontSize: '1.25rem', textAlign: 'center', letterSpacing: '8px', fontWeight: 700 }}
                 />
               </div>
-              
-              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '16px', marginTop: '0.5rem', borderRadius: '16px', fontSize: '0.95rem' }}>
+
+              <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '14px', marginTop: '0.5rem', fontSize: '0.92rem' }}>
                 {loading ? 'Memverifikasi...' : 'Verifikasi Akun'}
               </button>
             </form>
           )}
-          
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+
+          <div style={{ textAlign: 'center', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(255, 255, 255, 0.07)' }}>
             <p className="text-sm text-muted">
-              Sudah punya akun? <Link href="/auth/login" style={{ color: 'var(--color-primary-text)', fontWeight: 700, textDecoration: 'none' }}>Masuk di sini</Link>
+              Sudah punya akun?{' '}
+              <Link href="/auth/login" style={{ color: '#E9D5FF', fontWeight: 600, textDecoration: 'none' }}>
+                Masuk di sini
+              </Link>
             </p>
           </div>
         </div>
