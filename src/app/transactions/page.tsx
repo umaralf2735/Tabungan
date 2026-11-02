@@ -245,16 +245,10 @@ export default function TransactionsPage() {
                     <input id="tx-amount" type="number" min="1" inputMode="numeric" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required />
                   </div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <label htmlFor="tx-category" className="text-xs text-muted block font-bold">
-                        Kategori {formData.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'}
-                      </label>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Pilih di bawah atau ketik sendiri</span>
-                    </div>
+                    <label htmlFor="tx-category" className="text-xs text-muted mb-1 block font-bold">Kategori</label>
                     <input
                       id="tx-category"
                       type="text"
-                      placeholder={formData.type === 'INCOME' ? 'Contoh: Gaji, Kiriman, Utang Dibayar...' : 'Contoh: Makan, Transportasi, Uang Kos, Iuran...'}
                       value={formData.category}
                       onChange={e => setFormData({...formData, category: e.target.value})}
                       required
