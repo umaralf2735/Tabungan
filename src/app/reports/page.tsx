@@ -82,12 +82,11 @@ export default function ReportsPage() {
 
       const logoImg = await loadLogoImage();
 
-      // Hitung tinggi dinamis berdasarkan jumlah transaksi (maksimal 20 item untuk struk)
-      const maxItems = 20;
-      const txToPrint = currentFilteredTransactions.slice(0, maxItems);
-      const baseHeight = 166;
-      const itemHeight = txToPrint.length * 6;
-      const totalHeight = Math.max(195, baseHeight + itemHeight);
+      // Hitung tinggi dinamis berdasarkan seluruh transaksi agar tampil semua tanpa terpotong
+      const txToPrint = currentFilteredTransactions;
+      const baseHeight = 125;
+      const itemHeight = txToPrint.length * 9.2;
+      const totalHeight = Math.max(165, baseHeight + itemHeight);
 
       const doc = new jsPDF({
         orientation: 'portrait',
@@ -186,13 +185,6 @@ export default function ReportsPage() {
         
         y += 5.5;
       });
-
-      if (currentFilteredTransactions.length > maxItems) {
-        doc.setFontSize(6);
-        doc.setTextColor(100, 116, 139);
-        doc.text(`+ ${currentFilteredTransactions.length - maxItems} transaksi lainnya...`, pageWidth / 2, y, { align: "center" });
-        y += 6;
-      }
 
       drawDashedLine(y);
       y += 6;
@@ -373,14 +365,22 @@ export default function ReportsPage() {
           {barData.length > 0 ? (
             <div role="img" aria-label="Grafik batang pemasukan dan pengeluaran per bulan, maksimal 6 bulan terakhir." style={{ flex: 1, width: '100%', minHeight: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                <BarChart data={barData} margin={{ top: 8, right: 8, left: 4, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                   <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
-                  <YAxis stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
+                  <YAxis
+                    width={56}
+                    stroke="var(--color-text-muted)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(val) => `${(val / 1000).toLocaleString('id-ID')}k`}
+                  />
                   <Tooltip 
                     cursor={{ fill: 'rgba(255,255,255,0.02)' }}
                     contentStyle={{ backgroundColor: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)', borderRadius: '16px', fontSize: '12px', fontWeight: 600, padding: '12px', color: '#fff' }}
                     itemStyle={{ color: '#fff' }}
+                    formatter={(val: any) => `Rp ${Number(val).toLocaleString('id-ID')}`}
                   />
                   <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar dataKey="Masuk" fill="var(--color-success)" radius={[6, 6, 0, 0]} barSize={24} />
