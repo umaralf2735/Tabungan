@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getAuthUserId, unauthorized } from '@/lib/auth';
+import { getAuthPayload, getAuthUserId, unauthorized } from '@/lib/auth';
 import { sanitizeString } from '@/lib/security';
 
 export async function GET(request: Request) {
   try {
-    const userId = getAuthUserId(request);
-    if (!userId) return unauthorized();
+    const payload = getAuthPayload(request);
+    if (!payload || payload.role === 'FOSII_ADMIN') {
+      return unauthorized('Fitur export/import khusus untuk akun pengguna non-admin.');
+    }
+    const userId = payload.userId;
 
     const [user, wallets, transactions, budgets, goals] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } }),

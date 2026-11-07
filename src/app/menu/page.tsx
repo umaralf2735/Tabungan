@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch, getApiError } from '@/lib/api';
 import BackButton from '@/components/BackButton';
@@ -20,11 +20,15 @@ const FOSII_SLOT_DEFS: { key: 'pusat' | 'cabang' | 'pesmi'; title: string; subti
 
 export default function MenuPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [user, setUser] = useState<any>(null);
   const [showDelete, setShowDelete] = useState(false);
   const [password, setPassword] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
   const [clearingData, setClearingData] = useState(false);
   const [error, setError] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
@@ -116,6 +120,71 @@ export default function MenuPage() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleExportBackup = async () => {
+    if (user?.isAdmin) return;
+    setError('');
+    setStatusMsg('');
+    setExporting(true);
+    try {
+      const res = await apiFetch('/api/backup');
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error || 'Gagal mengekspor data.');
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      const safeName = (user?.name || 'Akun').replace(/[^a-zA-Z0-9_-]/g, '_');
+      a.href = url;
+      a.download = `FinanceFlow_Backup_${safeName}_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setStatusMsg(`Berhasil mengekspor ${data.wallets?.length || 0} dompet & ${data.transactions?.length || 0} transaksi.`);
+    } catch {
+      setError('Gagal mengunduh file backup.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImportBackup = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || user?.isAdmin) return;
+
+    setError('');
+    setStatusMsg('');
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      const res = await apiFetch('/api/backup', {
+        method: 'POST',
+        body: JSON.stringify({ ...parsed, mode: importMode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error || 'Gagal mengimpor data.');
+        return;
+      }
+
+      setStatusMsg(data.message || 'Data berhasil diimpor ke akun ini!');
+      window.dispatchEvent(new Event('financeflow:data-updated'));
+      window.dispatchEvent(new Event('financeflow:unit-changed'));
+    } catch {
+      setError('File tidak valid. Pastikan memilih file .json hasil Export FinanceFlow.');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -354,20 +423,95 @@ export default function MenuPage() {
           ))}
         </nav>
 
-        {/* Reset Data Keuangan (Hanya untuk Pengguna Reguler, disembunyikan untuk Admin Read-Only) */}
+        {/* Export, Import & Reset Data Keuangan (Khusus Pengguna Non-Admin) */}
         {!isAdmin && (
-          <div className="card-glass" style={{ padding: '18px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="card-glass" style={{ padding: '20px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#FFFFFF' }}>Reset Data Keuangan</h4>
-              <p style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                Kosongkan seluruh dompet, saldo, riwayat transaksi, anggaran, dan target tabungan kembali ke 0 tanpa menghapus akun login Anda.
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>Export, Import & Reset Data</h4>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                Cadangkan atau pindahkan seluruh dompet, saldo, transaksi, dan anggaran ke akun lain, atau reset data keuangan ke 0.
               </p>
             </div>
+
+            <div role="group" aria-label="Mode impor data" style={{ display: 'flex', gap: '6px', background: 'rgba(8, 13, 26, 0.85)', padding: '4px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <button
+                type="button"
+                onClick={() => setImportMode('merge')}
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  borderRadius: '999px',
+                  border: importMode === 'merge' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
+                  background: importMode === 'merge' ? 'rgba(79, 70, 229, 0.45)' : 'transparent',
+                  color: importMode === 'merge' ? '#fff' : 'var(--color-text-muted)',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Saat Import: Gabungkan Data
+              </button>
+              <button
+                type="button"
+                onClick={() => setImportMode('replace')}
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  borderRadius: '999px',
+                  border: importMode === 'replace' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
+                  background: importMode === 'replace' ? 'rgba(79, 70, 229, 0.45)' : 'transparent',
+                  color: importMode === 'replace' ? '#fff' : 'var(--color-text-muted)',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Saat Import: Ganti Semua Data
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={handleExportBackup}
+                disabled={exporting}
+                className="btn-ghost tap-target"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.82rem', padding: '10px 14px' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                {exporting ? 'Mengekspor...' : 'Export Data (.json)'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importing}
+                className="btn-primary tap-target"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.82rem', padding: '10px 14px' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                {importing ? 'Mengimpor...' : 'Import Data (.json)'}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleImportBackup}
+                style={{ display: 'none' }}
+              />
+            </div>
+
             {statusMsg && (
               <div role="status" style={{ background: 'rgba(52, 211, 153, 0.12)', border: '1px solid rgba(52, 211, 153, 0.3)', color: 'var(--color-success)', padding: '10px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 }}>
                 ✓ {statusMsg}
               </div>
             )}
+            {error && !showDelete && (
+              <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--color-danger)', padding: '10px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 }}>
+                {error}
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleClearAllData}
