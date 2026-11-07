@@ -1,7 +1,7 @@
 import './globals.css';
 import { ReactNode } from 'react';
 import type { Metadata } from 'next';
-import { TopNav, BottomNav } from '@/components/AppNav';
+import { TopNav, BottomNav, MainStage } from '@/components/AppNav';
 
 export const metadata: Metadata = {
   title: 'FinanceFlow Pro - Aplikasi Pengelola Keuangan Pribadi',
@@ -26,9 +26,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <TopNav />
 
           {/* MAIN CONTENT */}
-          <main className="main-content animate-fade-in">
+          <MainStage>
             {children}
-          </main>
+          </MainStage>
 
           {/* BOTTOM NAV (Mobile Only) */}
           <BottomNav />

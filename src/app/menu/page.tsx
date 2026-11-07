@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch, getApiError } from '@/lib/api';
 import BackButton from '@/components/BackButton';
@@ -13,6 +13,7 @@ const TOOL_LINKS = [
 
 export default function MenuPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [user, setUser] = useState<any>(null);
   const [showDelete, setShowDelete] = useState(false);
@@ -20,14 +21,100 @@ export default function MenuPage() {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
+  // Backup / Migrasi Data & Mode FOSII
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
+  const [backupMessage, setBackupMessage] = useState('');
+  const [backupError, setBackupError] = useState('');
+  const [fosiiMode, setFosiiMode] = useState(false);
+  const [isFosiiDomain, setIsFosiiDomain] = useState(false);
+
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) setUser(JSON.parse(userData));
+
+    const host = window.location.hostname.toLowerCase();
+    const onFosiiHost = host.startsWith('fosii.') || host.includes('fosii');
+    setIsFosiiDomain(onFosiiHost);
+    setFosiiMode(onFosiiHost || localStorage.getItem('fosiiMode') === 'true');
   }, []);
+
+  const handleToggleFosiiMode = () => {
+    if (isFosiiDomain) return; // Di domain fosii.* selalu aktif otomatis
+    const next = !fosiiMode;
+    setFosiiMode(next);
+    localStorage.setItem('fosiiMode', next ? 'true' : 'false');
+    window.dispatchEvent(new Event('financeflow:fosii-mode-changed'));
+  };
+
+  const handleExportBackup = async () => {
+    setBackupError('');
+    setBackupMessage('');
+    setExporting(true);
+    try {
+      const res = await apiFetch('/api/backup');
+      const data = await res.json();
+      if (!res.ok) {
+        setBackupError(data?.error || 'Gagal mengekspor data.');
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      const safeName = (user?.name || 'Akun').replace(/[^a-zA-Z0-9_-]/g, '_');
+      a.href = url;
+      a.download = `FinanceFlow_Backup_${safeName}_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setBackupMessage(`Berhasil mengekspor ${data.wallets?.length || 0} dompet & ${data.transactions?.length || 0} transaksi.`);
+    } catch {
+      setBackupError('Gagal mengunduh file backup.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImportBackup = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setBackupError('');
+    setBackupMessage('');
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      const res = await apiFetch('/api/backup', {
+        method: 'POST',
+        body: JSON.stringify({ ...parsed, mode: importMode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setBackupError(data?.error || 'Gagal mengimpor data.');
+        return;
+      }
+
+      setBackupMessage(data.message || 'Data berhasil diimpor ke akun/unit ini!');
+      window.dispatchEvent(new Event('financeflow:data-updated'));
+    } catch {
+      setBackupError('File tidak valid. Pastikan memilih file .json hasil Export FinanceFlow.');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('fosiiUnit');
     router.push('/auth/login');
   };
 
@@ -64,7 +151,7 @@ export default function MenuPage() {
               Alat Keuangan
             </span>
           </h2>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Kelola data pribadi, anggaran, target, dan kalkulator</p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Kelola data pribadi, anggaran, target, dan migrasi data antar akun</p>
         </div>
       </header>
 
@@ -96,6 +183,130 @@ export default function MenuPage() {
             </Link>
           ))}
         </nav>
+
+        {/* BACKUP & PINDAH DATA ANTAR AKUN / DOMAIN */}
+        <div className="card-glass" style={{ padding: '20px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>Export & Import Data Antar Akun</h4>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                Pindahkan seluruh dompet, saldo, transaksi, dan anggaran dari akun lama ke akun/unit baru (misal ke <strong style={{ color: '#A5B4FC' }}>fosii.financeflowpro.my.id</strong>)
+              </p>
+            </div>
+          </div>
+
+          <div role="group" aria-label="Mode impor data" style={{ display: 'flex', gap: '6px', background: 'rgba(8, 13, 26, 0.85)', padding: '4px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <button
+              type="button"
+              onClick={() => setImportMode('merge')}
+              style={{
+                flex: 1,
+                padding: '6px 10px',
+                borderRadius: '999px',
+                border: importMode === 'merge' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
+                background: importMode === 'merge' ? 'rgba(79, 70, 229, 0.45)' : 'transparent',
+                color: importMode === 'merge' ? '#fff' : 'var(--color-text-muted)',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Saat Import: Gabungkan Data
+            </button>
+            <button
+              type="button"
+              onClick={() => setImportMode('replace')}
+              style={{
+                flex: 1,
+                padding: '6px 10px',
+                borderRadius: '999px',
+                border: importMode === 'replace' ? '1px solid rgba(165, 180, 252, 0.35)' : '1px solid transparent',
+                background: importMode === 'replace' ? 'rgba(79, 70, 229, 0.45)' : 'transparent',
+                color: importMode === 'replace' ? '#fff' : 'var(--color-text-muted)',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Saat Import: Ganti Semua Data
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <button
+              type="button"
+              onClick={handleExportBackup}
+              disabled={exporting}
+              className="btn-ghost tap-target"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.82rem', padding: '10px 14px' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              {exporting ? 'Mengekspor...' : 'Export Data (.json)'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+              className="btn-primary tap-target"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.82rem', padding: '10px 14px' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              {importing ? 'Mengimpor...' : 'Import Data (.json)'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleImportBackup}
+              style={{ display: 'none' }}
+            />
+          </div>
+
+          {backupMessage && (
+            <div role="status" style={{ background: 'rgba(52, 211, 153, 0.12)', border: '1px solid rgba(52, 211, 153, 0.3)', color: 'var(--color-success)', padding: '10px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 }}>
+              ✓ {backupMessage}
+            </div>
+          )}
+          {backupError && (
+            <div role="alert" style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--color-danger)', padding: '10px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 }}>
+              {backupError}
+            </div>
+          )}
+
+          {/* Saklar Mode 3 Unit FOSII */}
+          <div style={{ marginTop: '4px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <span style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F1F5F9' }}>
+                Mode 3 Unit FOSII (Pesma Pusat / Cabang / Pesmi)
+              </span>
+              <span style={{ display: 'block', fontSize: '0.73rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                {isFosiiDomain
+                  ? 'Aktif otomatis di domain fosii.financeflowpro.my.id'
+                  : 'Tampilkan tombol pindah unit (Pesma Pusat, Pesma Cabang, Pesmi) di atas halaman'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleFosiiMode}
+              disabled={isFosiiDomain}
+              aria-pressed={fosiiMode}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '999px',
+                border: fosiiMode ? '1px solid rgba(52, 211, 153, 0.45)' : '1px solid rgba(255,255,255,0.15)',
+                background: fosiiMode ? 'rgba(52, 211, 153, 0.18)' : 'rgba(255,255,255,0.05)',
+                color: fosiiMode ? '#34D399' : 'var(--color-text-muted)',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: isFosiiDomain ? 'default' : 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {fosiiMode ? 'Aktif' : 'Nonaktif'}
+            </button>
+          </div>
+        </div>
 
         {/* Security & Privacy by Design (W02/W03) */}
         <div className="card-glass" style={{ padding: '18px', borderRadius: '20px' }}>
