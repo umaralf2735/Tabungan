@@ -7,6 +7,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', targetAmount: '', targetDate: '' });
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // State untuk modal top-up
   const [topUpId, setTopUpId] = useState<string | null>(null);
@@ -14,6 +15,10 @@ export default function GoalsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      setIsAdmin(Boolean(u?.isAdmin));
+    } catch {}
     fetchGoals();
   }, []);
 
@@ -77,9 +82,11 @@ export default function GoalsPage() {
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', marginTop: '4px' }}>Lacak progres menabungmu untuk mencapai tujuan finansial.</p>
           </div>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          {showForm ? 'Batal' : '+ Buat Target Baru'}
-        </button>
+        {!isAdmin && (
+          <button onClick={() => setShowForm(!showForm)} className="btn-primary">
+            {showForm ? 'Batal' : '+ Buat Target Baru'}
+          </button>
+        )}
       </header>
 
       {error && (
@@ -158,7 +165,7 @@ export default function GoalsPage() {
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, color: progress >= 100 ? 'var(--color-success)' : 'inherit' }}>
                   {progress.toFixed(1)}% Terkumpul {progress >= 100 && '🎉'}
                 </p>
-                {progress < 100 && (
+                {progress < 100 && !isAdmin && (
                   <button onClick={() => setTopUpId(goal.id)} className="btn-primary tap-target" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
                     + Top Up
                   </button>

@@ -10,8 +10,13 @@ export default function WalletsPage() {
   const [selectedPreset, setSelectedPreset] = useState<string>('bca');
   const [formData, setFormData] = useState({ name: 'BCA', balance: '' });
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      setIsAdmin(Boolean(u?.isAdmin));
+    } catch {}
     fetchWallets();
   }, []);
 
@@ -96,12 +101,14 @@ export default function WalletsPage() {
             <p className="text-sm text-muted mt-1">Kelola metode pembayaran dan rekening bank Anda</p>
           </div>
         </div>
-        <button 
-          onClick={handleToggleForm} 
-          className="btn-primary tap-target"
-        >
-          {showForm ? 'Tutup' : '+ Tambah Dompet'}
-        </button>
+        {!isAdmin && (
+          <button 
+            onClick={handleToggleForm} 
+            className="btn-primary tap-target"
+          >
+            {showForm ? 'Tutup' : '+ Tambah Dompet'}
+          </button>
+        )}
       </header>
 
       {error && (
@@ -409,25 +416,27 @@ export default function WalletsPage() {
                       Rp {w.balance.toLocaleString('id-ID')}
                     </h2>
                   </div>
-                  <button 
-                    onClick={() => handleDelete(w.id)} 
-                    aria-label={`Hapus dompet ${w.name}`} 
-                    className="tap-target" 
-                    style={{ 
-                      background: 'rgba(239, 68, 68, 0.25)', 
-                      border: '1px solid rgba(239, 68, 68, 0.4)', 
-                      color: '#FECDD3', 
-                      padding: '8px 12px', 
-                      borderRadius: '12px', 
-                      fontSize: '0.75rem', 
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      backdropFilter: 'blur(4px)',
-                      transition: 'background 0.15s ease'
-                    }}
-                  >
-                    Hapus
-                  </button>
+                  {!isAdmin && (
+                    <button 
+                      onClick={() => handleDelete(w.id)} 
+                      aria-label={`Hapus dompet ${w.name}`} 
+                      className="tap-target" 
+                      style={{ 
+                        background: 'rgba(239, 68, 68, 0.25)', 
+                        border: '1px solid rgba(239, 68, 68, 0.4)', 
+                        color: '#FECDD3', 
+                        padding: '8px 12px', 
+                        borderRadius: '12px', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        backdropFilter: 'blur(4px)',
+                        transition: 'background 0.15s ease'
+                      }}
+                    >
+                      Hapus
+                    </button>
+                  )}
                 </div>
               </div>
             );

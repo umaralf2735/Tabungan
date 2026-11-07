@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -10,6 +10,13 @@ export default function RegisterPage() {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Di domain fosii.financeflowpro.my.id tidak ada fitur daftar akun / OTP
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname.toLowerCase().startsWith('fosii.')) {
+      router.replace('/auth/login');
+    }
+  }, [router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -255,10 +255,12 @@ export default function Home() {
             />
           </div>
         </div>
-        <button className="btn-primary desktop-btn" onClick={() => router.push('/transactions')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          <span className="desktop-only-text">Catat Transaksi</span>
-        </button>
+        {!user?.isAdmin && (
+          <button className="btn-primary desktop-btn" onClick={() => router.push('/transactions')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span className="desktop-only-text">Catat Transaksi</span>
+          </button>
+        )}
       </header>
 
       {/* INSIGHT BERBASIS ATURAN */}
@@ -641,9 +643,11 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 0', gap: '12px' }}>
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ color: 'var(--color-text-muted)', opacity: 0.5 }}><path d="M3 7h18M3 12h18M3 17h18"></path></svg>
                 <p className="text-muted text-xs">Belum ada transaksi.</p>
-                <button onClick={() => router.push('/transactions')} className="btn-primary tap-target" style={{ padding: '8px 18px', fontSize: '0.78rem', marginTop: '4px' }}>
-                  + Catat Transaksi
-                </button>
+                {!user?.isAdmin && (
+                  <button onClick={() => router.push('/transactions')} className="btn-primary tap-target" style={{ padding: '8px 18px', fontSize: '0.78rem', marginTop: '4px' }}>
+                    + Catat Transaksi
+                  </button>
+                )}
               </div>
             )}
           </div>
