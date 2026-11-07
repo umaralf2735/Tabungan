@@ -1,42 +1,76 @@
 <div align="center">
-  <img src="https://img.icons8.com/fluent/96/000000/wallet.png" alt="FinanceFlow Logo" width="80"/>
+  <img src="public/favicon.png" alt="FinanceFlow Pro Logo" width="80"/>
   <h1>FinanceFlow Pro</h1>
-  <p><strong>Premium Personal Finance Dashboard</strong></p>
+  <p><strong>Premium Personal Finance & FOSII Multi-Unit Oversight Dashboard</strong></p>
   
   <p>
-    <a href="#fitur-utama">Fitur</a> •
-    <a href="#teknologi">Teknologi</a> •
-    <a href="#instalasi">Instalasi</a>
+    <a href="#-fitur-utama">Fitur Utama</a> •
+    <a href="#-portal-admin-pengawas-fosii-read-only">Portal Admin FOSII</a> •
+    <a href="#-teknologi-yang-digunakan">Teknologi</a> •
+    <a href="#-proses-desain--riset-interaction-design-lifecycle">Dokumentasi IxD</a>
   </p>
 </div>
 
 ---
 
 ## 📖 Tentang Aplikasi
-**FinanceFlow Pro** adalah aplikasi manajemen keuangan pribadi (*Personal Finance*) yang dirancang dengan **Titanium Design System**—menawarkan antarmuka modern, elegan (berbasis *glassmorphism*), dan pengalaman pengguna kelas atas ala *startup fintech*. 
+**FinanceFlow Pro** adalah aplikasi manajemen keuangan pribadi (*Personal Finance*) dan pemantauan kas organisasi yang dirancang dengan **Titanium Deep Navy & Indigo Design System**—menawarkan antarmuka modern bergaya *Specular Glassmorphism*, navigasi kapsul melayang (*Floating Pill Navigation Dock*) berkecepatan **120Hz**, serta pengalaman pengguna kelas atas ala *startup fintech*.
 
-Aplikasi ini tidak hanya fokus pada pencatatan keuangan, tetapi juga analisis kas bulanan, target tabungan, dan keamanan akun yang ketat (menggunakan validasi OTP via Email).
+Aplikasi ini beroperasi dalam dua mode dalam satu *codebase* dan satu *database* terpusat:
+1. **Mode Pengguna Reguler (`financeflowpro.my.id`)**: Pencatatan pemasukan/pengeluaran/transfer antar-dompet, analitik kas bulanan, anggaran bulanan, target tabungan, kalkulator finansial, cetak struk PDF kasir lengkap dengan logo, serta fitur **Export/Import Data (`.json`)** dan **Hapus Semua Data (Reset Keuangan ke 0)**.
+2. **Mode Portal Admin Pengawas FOSII (`fosii.financeflowpro.my.id`)**: Portal khusus *Read-Only* (100% mode pantau tanpa fitur daftar/OTP dan tanpa tombol ubah/hapus data) yang memungkinkan Admin FOSII memilih dan memantau kinerja arus kas keluar-masuk maksimal **3 akun unit FOSII** (**Pesma Pusat**, **Pesma Cabang**, dan **Pesmi**) secara *real-time*.
 
-> **Batasan produk:** FinanceFlow adalah **buku catatan keuangan pribadi**, bukan dompet digital atau alat pembayaran. Tidak ada koneksi ke bank atau QRIS, dan tidak ada uang yang bergerak. Pemasukan dan pengeluaran dicatat sendiri oleh pengguna, dan "dompet" serta "transfer" hanyalah catatan pembagian dan perpindahan dana.
+> **Batasan produk:** FinanceFlow adalah **buku catatan keuangan pribadi & organisasi**, bukan dompet digital atau alat pembayaran. Tidak ada koneksi ke bank atau QRIS, dan tidak ada uang yang bergerak. Pemasukan dan pengeluaran dicatat sendiri oleh pengguna, dan "dompet" serta "transfer" hanyalah catatan pembagian dan perpindahan dana.
 
 ---
 
 ## ✨ Fitur Utama
 
-- 🔐 **Autentikasi & Kontrol Akun**: 
-  - Kata sandi disimpan sebagai hash `Bcrypt`, dan setiap permintaan data diverifikasi dengan token sesi (JWT).
-  - Verifikasi akun dan pemulihan kata sandi menggunakan **Kode OTP via Email** (Integrasi *Nodemailer*).
-  - Hapus akun beserta seluruh datanya dari menu Akun.
-- 💰 **Manajemen Multi-Dompet**: Buat dan pantau saldo dari berbagai dompet (Rekening, E-Wallet, Uang Tunai) secara terpisah.
-- 🔁 **Transfer Antar-Dompet**: Pindah dana tidak dihitung sebagai pengeluaran pada laporan.
-- 📊 **Analitik & AI Insight**:
-  - Grafik Area saldo (6 bulan terakhir) menggunakan `Recharts`.
-  - Insight berbasis aturan: peringatan defisit, anggaran terlampaui, dan kenaikan kategori minimal 30% dibanding rata-rata 3 bulan sebelumnya, lengkap dengan alasan dan angkanya.
-- 🎯 **Anggaran & Target Tabungan**: Tetapkan batas per kategori dan lacak progres menabung dari menu Akun.
-- 🖨️ **Ekspor Laporan Keuangan**:
+- 🔐 **Autentikasi & Keamanan Akun**: 
+  - Kata sandi disimpan sebagai hash `Bcrypt`, dan setiap permintaan data diverifikasi dengan token sesi (`HTTP-only Cookie` berbasis HMAC SHA-256).
+  - Verifikasi pendaftaran akun dan pemulihan kata sandi menggunakan **Kode OTP 6 Digit via Email** (Integrasi *Nodemailer*).
+  - Halaman *Login*, *Register*, dan *Forgot Password* tampil *pure full-screen* tanpa distraksi navigasi.
+- 💰 **Manajemen Multi-Dompet & Transfer Antar-Dompet**:
+  - Buat dan pantau saldo dari berbagai dompet (Rekening Bank, E-Wallet, Uang Tunai) secara terpisah.
+  - **Transfer Antar-Dompet** otomatis memindahkan saldo dari dompet asal ke dompet tujuan tanpa dihitung sebagai pengeluaran pada laporan bulanan.
+- 🏷️ **Kategori Transaksi Dinamis (Pengeluaran vs Pemasukan)**:
+  - Saat memilih **Pengeluaran (`EXPENSE`)**: menampilkan chip kategori cepat `Makan`, `Transportasi`, `Uang Kos`, `Iuran`, `Belanja`, `Tagihan & Kuota`, `Hiburan`, `Kesehatan`, `Pendidikan`, dan `Lainnya` (tersinkronisasi penuh dengan halaman **Anggaran Bulanan**).
+  - Saat memilih **Pemasukan (`INCOME`)**: chip kategori otomatis berubah menjadi `Gaji`, `Kiriman`, `Utang Dibayar`, `Bonus / THR`, `Freelance`, `Hasil Usaha`, `Beasiswa`, `Hadiah`, `Investasi`, dan `Lainnya`.
+- 📊 **Analitik Visual & AI Insight Berbasis Aturan**:
+  - **Grafik Perbandingan Arus Kas (6 Bulan)** (`Recharts` BarChart) dan **Grafik Tren Kekayaan (1 Bulan Bergulir / 6 Bulan)** (`AreaChart` dengan dukungan visualisasi saldo minus/utang).
+  - **AI Insight • Berbasis Aturan**: mendeteksi peringatan defisit, anggaran kategori yang melampaui ≥ 80% atau 100%, serta kenaikan kategori minimal 30% dibanding rata-rata 3 bulan sebelumnya, lengkap dengan alasan dan angkanya secara *real-time* di lonceng notifikasi (`NotificationBell`).
+- 🖨️ **Ekspor Laporan Keuangan & Struk PDF Termal Tanpa Batas**:
   - Unduh data riwayat transaksi dalam format **Excel (CSV)**.
-  - Cetak otomatis dalam format **Struk PDF Thermal** elegan (menggunakan `jsPDF`).
-- 🎨 **Titanium UI (Premium UX)**: Tema gelap (*Dark Mode*), animasi transisi mulus, dan kartu melayang bergaya *Glassmorphism*.
+  - Cetak otomatis dalam format **Struk PDF Kasir (Nota Termal)** menggunakan `jsPDF`, lengkap dengan **Logo aplikasi (`/favicon.png`)** di bagian atas dan mencetak **100% seluruh transaksi** pada rentang tanggal yang dipilih (tanpa pemotongan item).
+- 🔄 **Backup, Pindah Akun, & Reset Data (Khusus Pengguna Non-Admin)**:
+  - **Export Data (`.json`)** & **Import Data (`.json`)** (pilihan mode **Gabungkan Data** atau **Ganti Semua Data**) di menu Profil (`/menu`) untuk memindahkan atau mencadangkan seluruh dompet, transaksi, anggaran, dan target tabungan antar-akun dengan mudah.
+  - **Hapus Semua Data (Reset Keuangan ke 0)** untuk mengosongkan seluruh riwayat transaksi, dompet, anggaran, dan target tabungan tanpa menghapus akun login.
+  - **Hapus Akun Permanen** dengan konfirmasi kata sandi.
+- 🎯 **Alat Keuangan Terpusat di Menu Profil (`/menu`)**:
+  - **Anggaran Bulanan (`/budgets`)**, **Target Tabungan (`/goals`)**, dan **Kalkulator Finansial 50/30/20 & Dana Darurat (`/calculator`)**.
+- 🎨 **Titanium Deep Navy & Indigo UI (120Hz Smooth UX)**:
+  - Palet warna **Titanium Deep Navy & Indigo** (`#050816`, `#0C1324`, `#111C31`, `#4F46E5`, `#818CF8`, `#A5B4FC`) dengan kartu *Specular Glassmorphism*.
+  - **Floating Pill Navigation Dock** dengan indikator kapsul aktif yang meluncur mulus (`translate3d` GPU-accelerated 120Hz) dan ikon transaksi standar fintech (`arrow-left-right`).
+  - Komponen dropdown kustom (`<CustomSelect />`) bergaya *glassmorphism*, tombol kembali pintar (`<BackButton />`) berdasarkan riwayat halaman di seluruh sub-halaman, serta `scrollbar-gutter: stable` agar tata letak tidak bergeser 1 piksel pun saat berpindah halaman.
+
+---
+
+## 🏛️ Portal Admin Pengawas FOSII (Read-Only)
+
+Khusus untuk subdomain **`fosii.financeflowpro.my.id`** (atau melalui akses akun Admin FOSII):
+
+- 🔒 **Akun Admin Tertanam Tanpa Registrasi/OTP**:
+  - Di subdomain `fosii.*`, fitur daftar akun baru dan lupa sandi otomatis disembunyikan untuk mencegah pembuatan akun liar.
+  - Login menggunakan kredensial khusus Admin Pengawas FOSII (`admin@fosii.id` / password default `fosiiadmin123` atau melalui *environment variable* `FOSII_ADMIN_PASSWORD`).
+- 🏢 **Pemilihan Maksimal 3 Akun Unit FOSII dari Database**:
+  - Melalui halaman **Profil & Pengaturan Admin (`/menu`)**, Admin dapat memilih dan menetapkan maksimal **3 akun** yang sudah terdaftar di database ke dalam 3 slot unit FOSII:
+    1. **Pesma Pusat** (Maksimal 1 Akun)
+    2. **Pesma Cabang** (Maksimal 1 Akun)
+    3. **Pesmi** (Maksimal 1 Akun)
+  - Privasi terjaga: akun pengguna lain di database yang **tidak** ditetapkan sebagai ke-3 unit FOSII tersebut tidak dapat dilihat datanya oleh Admin.
+- 👁️ **100% Mode Pantau (*Strict Read-Only*)**:
+  - Admin dapat berpindah melihat laporan, saldo dompet, grafik arus kas, dan riwayat keluar-masuk uang antara **Pesma Pusat**, **Pesma Cabang**, dan **Pesmi** secara instan melalui bar kapsul di bagian atas layar.
+  - Seluruh aksi penambahan, pengubahan, penghapusan, maupun ekspor/impor data dikunci sepenuhnya baik pada tampilan antarmuka (UI) maupun pada lapisan keamanan server (`requireUser()` di `src/lib/auth.ts`).
 
 ---
 
@@ -44,13 +78,13 @@ Aplikasi ini tidak hanya fokus pada pencatatan keuangan, tetapi juga analisis ka
 
 Aplikasi ini dibangun menggunakan arsitektur modern (*Fullstack*):
 
-- **Frontend:** Next.js 14 (App Router), React, TypeScript.
-- **Styling:** Vanilla CSS (Titanium Design System).
-- **Backend/API:** Next.js Route Handlers.
+- **Frontend:** Next.js 14 (App Router), React 18, TypeScript.
+- **Styling:** Vanilla CSS (Titanium Deep Navy & Indigo Design System, 120Hz GPU Transitions).
+- **Backend/API:** Next.js Route Handlers (`REST API` dengan proteksi sesi & *Read-Only Admin Guard*).
 - **Database:** PostgreSQL (Cloud Database by Neon DB).
-- **ORM:** Prisma.
-- **Lainnya:** Nodemailer (SMTP), jsPDF (PDF Generator), Recharts (Data Visualization).
-- **Deployment:** Vercel.
+- **ORM:** Prisma ORM (`Wallet`, `Transaction`, `Budget`, `Goal`, `User`, `Otp`, `FosiiAssignment`).
+- **Lainnya:** Nodemailer (SMTP Email OTP), jsPDF (Thermal Receipt PDF Generator), Recharts (Data Visualization).
+- **Deployment:** Vercel (mendukung *multi-domain*: `financeflowpro.my.id` & `fosii.financeflowpro.my.id`).
 
 ---
 
@@ -73,9 +107,9 @@ Dokumentasi ini merangkum proses perancangan interaksi **FinanceFlow Pro** berda
 #### Tiga Pilar: Easy, Effective, Enjoyable
 | Pilar | Bukti Fitur `[Kode]` |
 | :--- | :--- |
-| **Easy** | Form transaksi satu layar tanpa pindah halaman, chip kategori cepat, label tetap di luar kolom, tanggal otomatis hari ini jika dikosongkan, navigasi bawah pada seluler. |
-| **Effective** | Arus kas bersih per bulan, transfer antar-dompet yang tidak dihitung sebagai pengeluaran, grafik saldo 6 bulan, ekspor CSV dan struk PDF. |
-| **Enjoyable** | Tema gelap Titanium dengan *glassmorphism*, animasi transisi (mengikuti `prefers-reduced-motion`), struk PDF bergaya nota kasir. |
+| **Easy** | Form transaksi satu layar tanpa pindah halaman, chip kategori dinamis (otomatis menyesuaikan Pengeluaran vs Pemasukan), label tetap di luar kolom tanpa *placeholder* yang mengecoh, tanggal otomatis hari ini jika dikosongkan, tombol kembali (`<BackButton />`) di setiap halaman selain Home, dan navigasi kapsul bawah pada seluler. |
+| **Effective** | Arus kas bersih per bulan, transfer antar-dompet yang tidak dihitung sebagai pengeluaran, grafik arus kas 6 bulan & grafik tren kekayaan, ekspor CSV, struk PDF kasir berlogo untuk seluruh item transaksi, fitur *Export/Import* `.json` antar-akun, serta Portal Admin Pengawas FOSII (*Read-Only*) untuk memantau 3 unit organisasi. |
+| **Enjoyable** | Tema gelap Titanium Deep Navy & Indigo dengan *specular glassmorphism*, indikator kapsul navbar meluncur mulus 120Hz (mengikuti `prefers-reduced-motion`), dropdown kustom (`<CustomSelect />`), dan struk PDF bergaya nota kasir termal. |
 
 #### Human-AI Teaming & Intelligence Amplification (IA)
 AI Insight saat ini **berbasis aturan**, bukan model bahasa atau *machine learning*, dan label di antarmuka menyatakannya secara terbuka: "AI Insight • Berbasis Aturan". Kerangka IA tetap dipakai sebagai prinsip desain:
@@ -87,7 +121,7 @@ AI Insight saat ini **berbasis aturan**, bukan model bahasa atau *machine learni
 | Prinsip | Penerapan `[Kode]` |
 | :--- | :--- |
 | **Intervention UI** | Banner insight punya dua pilihan: "Atur Anggaran" untuk mengubah batas, atau "Abaikan". Insight yang diabaikan dapat ditampilkan lagi. |
-| **Safe Exploration** | Pratinjau saldo sebelum menyimpan, tombol "Batal" pada form, konfirmasi sebelum menghapus, dan "Urungkan" selama 8 detik setelah transaksi dihapus. |
+| **Safe Exploration** | Pratinjau saldo sebelum menyimpan, tombol "Batal" pada form, konfirmasi sebelum menghapus, tombol "Urungkan" selama 8 detik setelah transaksi dihapus, fitur *Export/Import* `.json` untuk cadangan data, serta mode *Read-Only* penuh pada Portal Admin FOSII agar pengawas dapat mengeksplorasi laporan tanpa risiko merusak data. |
 | **Meaningful Mediation** | Peringatan menyebut alasan dan angkanya, misalnya: *"Naik 38% dibanding rata-rata 3 bulan sebelumnya (Rp 100.000 menjadi Rp 138.000)."* |
 
 ---
@@ -97,8 +131,8 @@ AI Insight saat ini **berbasis aturan**, bukan model bahasa atau *machine learni
 #### Norman's 3 Levels
 | Level | Keputusan Desain Konkret |
 | :--- | :--- |
-| **Visceral** | Latar `#050816`, permukaan `#111C31`, aksen indigo, kartu *glassmorphism* dengan `backdrop-filter`, animasi masuk halus. |
-| **Behavioral** | Satu form untuk pemasukan dan pengeluaran, pratinjau saldo saat mengetik, tombol "Menyimpan...", pesan error di form tanpa menghilangkan isian. |
+| **Visceral** | Latar `#050816`, permukaan `#0C1324` & `#111C31`, aksen indigo `#4F46E5` & `#818CF8`, kartu *glassmorphism* dengan `backdrop-filter`, indikator kapsul navigasi 120Hz, serta `scrollbar-gutter: stable` yang bebas geser. |
+| **Behavioral** | Satu form untuk pemasukan dan pengeluaran dengan chip kategori dinamis, pratinjau saldo saat mengetik, tombol "Menyimpan...", pesan error di form tanpa menghilangkan isian. |
 | **Reflective** | Kartu Total Kekayaan dan Arus Kas Bersih serta tren per bulan untuk menumbuhkan rasa "saya mengendalikan keuangan saya". `[Hipotesis]` terhadap dampak emosinya. |
 
 #### Interaction Framework (Abowd & Beale): Mencatat Pengeluaran
@@ -115,7 +149,7 @@ sequenceDiagram
     I->>S: POST /api/transactions dengan token sesi
     Note over I,S: Failure 2: permintaan gagal atau jaringan putus
     S->>O: Transaksi tersimpan, saldo dompet diperbarui
-    O->>U: Form tertutup, daftar dan saldo terbarui
+    O->>U: Form tertutup, daftar, saldo, dan lonceng notifikasi terbarui
     Note over O,U: Failure 3: user tidak yakin data tersimpan
 ```
 
@@ -123,15 +157,15 @@ sequenceDiagram
 | :--- | :--- |
 | **User → Input:** bingung membedakan pengeluaran dan pindah saldo. | Pilihan `Reguler / Transfer` di bagian atas form, dan pratinjau transfer menyatakan "Tidak dihitung sebagai pengeluaran". |
 | **Input → System:** permintaan gagal. | Form tetap terbuka dengan isian utuh dan pesan error dibacakan lewat `role="alert"`. |
-| **System → Output:** user ragu data tersimpan. | Tombol berubah menjadi "Menyimpan...", lalu form tertutup hanya jika server menjawab berhasil. |
+| **System → Output:** user ragu data tersimpan. | Tombol berubah menjadi "Menyimpan...", lalu form tertutup dan lonceng notifikasi langsung terbarui hanya jika server menjawab berhasil. |
 
 #### Audit Dark Patterns
 | Pola | Status `[Kode]` |
 | :--- | :--- |
-| **Roach Motel** | Dihindari. Akun dapat dihapus dari menu Akun dengan konfirmasi kata sandi. |
+| **Roach Motel** | Dihindari. Pengguna dapat mengekspor seluruh datanya (`.json` / `.csv`), mereset data ke 0, atau menghapus akun beserta seluruh datanya dari menu Profil dengan konfirmasi kata sandi. |
 | **Confirmshaming** | Dihindari. Tombol memakai kata netral: "Batal", "Abaikan". |
 | **Hidden Costs** | Dihindari. Tidak ada biaya; pratinjau transfer menampilkan saldo kedua dompet sebelum disimpan. |
-| **False Urgency** | Dihindari. Tidak ada hitung mundur; notifikasi hanya muncul jika kondisi nyata terpenuhi, dan kosong bila tidak ada. |
+| **False Urgency** | Dihindari. Tidak ada hitung mundur; notifikasi hanya muncul jika kondisi nyata terpenuhi, dan langsung hilang begitu kondisi diperbaiki. |
 
 #### Checklist WCAG 2.2 (POUR)
 Rasio kontras dihitung dari token warna. Pengujian manual dengan *screen reader* belum dilakukan.
@@ -140,18 +174,18 @@ Rasio kontras dihitung dari token warna. Pengujian manual dengan *screen reader*
 | :--- | :---: | :--- |
 | **P - 1.4.3 Contrast** | ✅ | Teks utama 18,2:1; teks sekunder 6,6:1; teks aksen 8,5:1; teks putih pada tombol 6,3:1. |
 | **P - 1.4.1 Use of Color** | ✅ | Tren memakai panah `▲ ▼ —`, nominal memakai tanda `+/-`, grafik batang punya legenda. |
-| **O - 2.1.1 Keyboard** | ⚠️ Sebagian | Kontrol utama berupa tombol dan tautan asli; notifikasi dapat ditutup dengan `Esc`. Modal Top Up belum punya *focus trap*, dan tooltip grafik hanya untuk pointer. |
+| **O - 2.1.1 Keyboard** | ⚠️ Sebagian | Kontrol utama berupa tombol, `<CustomSelect />`, dan tautan asli; notifikasi dan dropdown dapat ditutup dengan `Esc`. Modal Top Up belum punya *focus trap*, dan tooltip grafik hanya untuk pointer. |
 | **O - 2.4.7 Focus Visible** | ✅ | Cincin fokus global `:focus-visible`. |
 | **O - 2.5.8 Target Size (Minimum)** | ✅ | Tombol aksi minimal 44 × 44 px lewat `.tap-target`, melebihi syarat 24 px. |
 | **O - 2.5.5 Target Size (Enhanced)** | ⚠️ Sebagian | Berlaku untuk tombol aksi; beberapa kontrol seperti pemilih periode belum diukur. |
 | **U - 3.3.1 Error Identification** | ✅ | Pesan error berbentuk teks, dengan `role="alert"`. |
-| **U - 3.3.2 Labels** | ✅ | Setiap kolom punya `<label htmlFor>` atau `aria-label`, tanpa placeholder. |
-| **R - 4.1.2 Name, Role, Value** | ⚠️ Sebagian | `aria-label`, `aria-pressed`, `aria-current`, dan `aria-expanded` sudah dipasang; belum diverifikasi dengan *screen reader*. |
+| **U - 3.3.2 Labels** | ✅ | Setiap kolom punya `<label htmlFor>` atau `aria-label`, tanpa placeholder yang mengecoh. |
+| **R - 4.1.2 Name, Role, Value** | ⚠️ Sebagian | `aria-label`, `aria-pressed`, `aria-current`, `aria-selected`, dan `aria-expanded` sudah dipasang; belum diverifikasi dengan *screen reader*. |
 
 #### Recognition over Recall `[Kode]`
-* **Kategori:** chip Makanan, Transport, Belanja, dan lainnya, sehingga user memilih alih-alih mengingat atau mengetik.
+* **Kategori Dinamis:** chip kategori menyesuaikan konteks secara otomatis (`Makan`, `Transportasi`, `Uang Kos`, dll. saat Pengeluaran; `Gaji`, `Kiriman`, `Beasiswa`, dll. saat Pemasukan) sehingga user memilih alih-alih mengingat atau mengetik.
 * **Dompet:** pilihan menampilkan nama dan saldo, misalnya "BCA (Rp 2.450.000)".
-* **Navigasi:** menu aktif ditandai warna dan `aria-current`, dan nama menu sama dengan judul halaman: Transaksi, Dompet, Laporan.
+* **Navigasi:** menu aktif ditandai kapsul indigo dan `aria-current`, dilengkapi tombol `<BackButton />` kontekstual di setiap halaman selain Home.
 
 ---
 
@@ -176,7 +210,7 @@ Rasio kontras dihitung dari token warna. Pengujian manual dengan *screen reader*
 | P3 | Banyak rekening dan e-wallet; catatan sering selisih karena top-up. |
 | P4 | Penghasilan tidak tetap; butuh gambaran cepat dana aman. |
 | P5 | Pragmatis; hanya mau mencatat jika sangat cepat. |
-| P6 | Memisahkan uang pribadi dan uang kelompok. |
+| P6 | Memisahkan uang pribadi dan uang kelompok / unit organisasi. |
 
 #### Opportunity Solution Tree
 ```mermaid
@@ -187,12 +221,12 @@ graph TD
     O2["O2: Saldo catatan selisih karena pindah dana"]
     O3["O3: Laporan terasa rumit dan menghakimi"]
 
-    S11["S1.1: Satu form dengan chip kategori"]
+    S11["S1.1: Satu form dengan chip kategori dinamis"]
     S12["S1.2: Alur bertahap (wizard)"]
     S21["S2.1: Mode transfer khusus"]
     S22["S2.2: Kategori 'pindah dana' pada form biasa"]
     S31["S3.1: Insight dengan alasan dan angka"]
-    S32["S3.2: Struk PDF ala nota kasir"]
+    S32["S3.2: Struk PDF ala nota kasir lengkap"]
 
     E1["E1: Uji waktu pengisian S1.1 vs S1.2"]
     E2["E2: Tree test mode transfer"]
@@ -247,7 +281,7 @@ Target angka outcome: `[PLACEHOLDER - isi dari data riset asli]`
 * **Informed consent:** tertulis, menjelaskan tujuan, rekaman, dan pemakaian data.
 * **Anonimisasi:** kode P1-Pn, tanpa nama asli. Nominal dan nama bank disamarkan atau dibulatkan.
 * **Hak mundur:** partisipan boleh berhenti kapan saja dan meminta datanya dihapus.
-* **Privacy by Design `[Kode]`:** setiap permintaan data diverifikasi dengan token sesi, kata sandi disimpan sebagai hash bcrypt, akun dan seluruh datanya dapat dihapus oleh pemiliknya.
+* **Privacy by Design `[Kode]`:** setiap permintaan data diverifikasi dengan token sesi, kata sandi disimpan sebagai hash bcrypt, akun dan seluruh datanya dapat diekspor/direset/dihapus oleh pemiliknya, serta Admin Pengawas FOSII dibatasi secara ketat hanya dapat melihat maksimal 3 akun unit FOSII dalam mode *Read-Only*.
 * **Dokumen consent:** `[PLACEHOLDER - isi dari data riset asli]`
 
 ---
@@ -262,10 +296,10 @@ graph LR
     I --> P[Prototype]
     P --> T[Test]
     T -.->|Loop 1: placeholder disangka data| I
-    T -.->|Loop 2: bentuk laporan| P
-    D -.->|Loop 3: kebutuhan transfer| E
+    T -.->|Loop 2: bentuk laporan & struk lengkap| P
+    D -.->|Loop 3: kebutuhan transfer & kategori dinamis| E
 ```
-Loop di atas adalah keputusan yang terlihat pada kode saat ini: form tanpa placeholder, struk nota kasir, dan mode transfer. Sesi yang memicu tiap loop: `[PLACEHOLDER - isi dari data riset asli]`
+Loop di atas adalah keputusan yang terlihat pada kode saat ini: form tanpa placeholder yang mengecoh, chip kategori dinamis Pengeluaran vs Pemasukan, struk nota kasir termal berlogo yang menampilkan seluruh transaksi, dan mode transfer. Sesi yang memicu tiap loop: `[PLACEHOLDER - isi dari data riset asli]`
 
 #### Empathy Map: Dimas `[Hipotesis]`
 | Says | Thinks |
@@ -282,8 +316,8 @@ Loop di atas adalah keputusan yang terlihat pada kode saat ini: form tanpa place
 | Fase | User Actions | Emosi | Opportunities |
 | :--- | :--- | :---: | :--- |
 | **1. Pemicu** | Selesai membayar QRIS, ingin mencatat sebelum lupa. | 😐 | Akses cepat dari layar utama. |
-| **2. Membuka app** | Membuka FinanceFlow di ponsel. | 🙂 | Muat cepat dan navigasi jelas. |
-| **3. Mencatat** | Mengisi nominal, memilih chip kategori dan dompet. | 🙁 | Kolom sesedikit mungkin; chip kategori. |
+| **2. Membuka app** | Membuka FinanceFlow di ponsel. | 🙂 | Muat cepat dan navigasi 120Hz jelas. |
+| **3. Mencatat** | Mengisi nominal, memilih chip kategori dinamis dan dompet. | 🙁 | Kolom sesedikit mungkin; chip kategori sesuai jenis transaksi. |
 | **4. Memeriksa** | Melihat pratinjau saldo dan dashboard. | 😊 | Saldo terkini tanpa menghitung. |
 | **5. Merefleksi** | Membaca insight. | 😃 / 😟 | Bahasa yang menjelaskan, tidak menghakimi. |
 
@@ -296,19 +330,20 @@ Loop di atas adalah keputusan yang terlihat pada kode saat ini: form tanpa place
 | **High Risk & Unknown (Prioritas)** | A2. User percaya insight dan tidak merasa dihakimi. | Wizard of Oz. |
 | **High Risk & Unknown (Prioritas)** | A3. User bersedia menyimpan data keuangan di aplikasi web. | Wawancara dan kuesioner. |
 | **High Risk & Known** | A4. Transfer harus dipisah dari pengeluaran agar laporan benar. | Sudah dibuat sebagai fitur inti. |
-| **Low Risk & Unknown** | A5. User butuh ekspor CSV untuk analisis lanjutan. | Pantau pemakaian. |
+| **Low Risk & Unknown** | A5. User butuh ekspor CSV / JSON untuk analisis dan pindah akun. | Pantau pemakaian. |
 | **Low Risk & Unknown** | A6. Struk nota kasir terasa lebih akrab daripada tabel. | Fake-door dan preference test. |
-| **Low Risk & Known** | A7. Tema gelap diterima untuk aplikasi ini. | Pertahankan dan jaga kontras. |
+| **Low Risk & Known** | A7. Tema gelap Titanium Deep Navy diterima untuk aplikasi ini. | Pertahankan dan jaga kontras. |
 
 Semua asumsi berstatus `[Hipotesis]` sampai ada data.
 
 #### User Story Map `[Kode]`
-**Backbone:** Daftar akun → Atur dompet → Catat transaksi → Pantau dashboard → Evaluasi laporan
+**Backbone:** Daftar akun → Atur dompet → Catat transaksi → Pantau dashboard → Evaluasi & kelola laporan
 
 | Slice | Isi |
 | :--- | :--- |
-| **MVP** | Daftar dengan OTP, kelola dompet, catat pemasukan/pengeluaran/transfer, kartu ringkasan, grafik saldo. |
-| **Release 2** | Insight berbasis aturan, struk PDF dan CSV, anggaran, target tabungan, hapus akun, urungkan hapus. |
+| **MVP** | Daftar dengan OTP, kelola dompet, catat pemasukan/pengeluaran/transfer dengan chip kategori dinamis, kartu ringkasan, grafik arus kas & saldo. |
+| **Release 2** | Insight berbasis aturan real-time, struk PDF berlogo (tanpa batas item) dan CSV, anggaran bulanan, target tabungan, kalkulator finansial, urungkan hapus, hapus akun. |
+| **Release 3** | *Export/Import Data (`.json`)* & *Reset Semua Data ke 0* untuk pengguna reguler, serta *Portal Admin Pengawas FOSII (Read-Only)* dengan fitur pemilihan maksimal 3 akun unit (*Pesma Pusat*, *Pesma Cabang*, *Pesmi*). |
 
 #### Ideate
 **HMW:**
@@ -381,7 +416,7 @@ Dua contoh di bawah menunjukkan cara bertanya. Jawabannya ilustrasi, bukan data 
 | **Environments** | Kasir, antrean, kantin; distraksi tinggi. |
 | **Interactions** | Satu tangan, ketukan cepat, sering berpindah aplikasi. |
 | **Objects** | Ponsel, struk kertas, Notes, spreadsheet, chat ke diri sendiri. |
-| **Users** | Mahasiswa dan pekerja awal yang memakai banyak dompet digital. |
+| **Users** | Mahasiswa, pengurus organisasi (seperti unit FOSII), dan pekerja awal yang memakai banyak dompet digital. |
 | **Unspoken behavior & workaround** | Mencatat "pindah dana" di chat pribadi sebagai pengganti aplikasi. |
 
 **Catatan observasi asli:** `[PLACEHOLDER - isi dari data riset asli]`
@@ -397,7 +432,7 @@ Pola yang dicari: user mengaku rutin mencatat, sementara riwayat catatannya menu
 | **Push:** saldo sering selisih, rekap manual melelahkan. | **Anxiety:** takut data keuangan bocor, takut salah catat. |
 | **Pull:** tahu saldo semua dompet di satu tempat, pencatatan cepat. | **Habit:** sudah terbiasa dengan Notes atau chat, malas membuka aplikasi lain. |
 
-**Kesimpulan sementara:** (Push + Pull) > (Anxiety + Habit) belum bisa dipastikan tanpa data. Desain mengurangi Anxiety lewat kontrol privasi dan hapus akun, serta mengurangi Habit lewat form yang cepat. Validasi: `[PLACEHOLDER - isi dari data riset asli]`
+**Kesimpulan sementara:** (Push + Pull) > (Anxiety + Habit) belum bisa dipastikan tanpa data. Desain mengurangi Anxiety lewat kontrol privasi, ekspor/reset data, dan hapus akun, serta mengurangi Habit lewat form yang cepat dengan chip kategori dinamis. Validasi: `[PLACEHOLDER - isi dari data riset asli]`
 
 #### Affinity Diagram & Key Insights `[Hipotesis]`
 | Tema | Insight Note | Sumber |
@@ -436,7 +471,7 @@ Seluruh bagian ini berstatus **proto-persona** `[Hipotesis]`. Posisi P1-P6 harus
 
 **Aturan:** 1 klaster signifikan = 1 persona.
 * **Klaster A (P1, P3, P5, cenderung P4):** transaksi sering, banyak dompet, awam akuntansi → **Primary Persona**.
-* **Klaster B (P2, P6):** lebih teratur dan butuh laporan → **Secondary Persona**.
+* **Klaster B (P2, P6):** lebih teratur dan butuh laporan / pengawasan organisasi → **Secondary Persona**.
 
 #### Behavioral Persona Set
 
@@ -456,12 +491,12 @@ Seluruh bagian ini berstatus **proto-persona** `[Hipotesis]`. Posisi P1-P6 harus
 ##### Secondary Persona: Sarah
 | Elemen | Isi |
 | :--- | :--- |
-| **Header** | Sarah, mahasiswa dan pengurus organisasi. *"Uang pribadi jangan sampai kecampur sama uang kas acara."* |
-| **Behavioral Profile** | Mencatat lebih teratur; memisahkan beberapa pos uang; rutin merekap setiap bulan. |
-| **Core Goals** | **Behavioral:** memisahkan uang pribadi dan uang kegiatan. **Behavioral:** mendapat rekap yang rapi. **Reflective:** merasa dapat dipercaya mengelola uang. |
-| **Pain Points** | Ekspor CSV mentah sulit dibaca di ponsel; uang tercampur. |
-| **Environment** | Ponsel dan laptop, di rumah atau kampus, distraction level sedang. |
-| **Key Scenarios** | Di akhir bulan, memilih rentang tanggal lalu mengunduh struk PDF sebagai arsip. |
+| **Header** | Sarah, mahasiswa dan bendahara/pengawas unit organisasi (seperti FOSII). *"Uang pribadi jangan sampai kecampur sama uang kas unit, dan rekapnya harus transparan."* |
+| **Behavioral Profile** | Mencatat lebih teratur; memisahkan beberapa pos uang; rutin merekap dan memantau laporan setiap bulan. |
+| **Core Goals** | **Behavioral:** memisahkan uang pribadi dan uang kegiatan/unit. **Behavioral:** mendapat rekap PDF utuh yang rapi serta dapat memantau arus kas unit tanpa takut tidak sengaja mengubah data. **Reflective:** merasa dapat dipercaya mengelola dan mengawasi uang. |
+| **Pain Points** | Ekspor CSV mentah sulit dibaca di ponsel; struk PDF yang terpotong jika transaksi banyak; uang tercampur. |
+| **Environment** | Ponsel dan laptop, di rumah atau kampus/pesma, distraction level sedang. |
+| **Key Scenarios** | Di akhir bulan, memilih rentang tanggal lalu mengunduh struk PDF utuh berlogo sebagai arsip, atau memantau kinerja kas Pesma Pusat, Pesma Cabang, dan Pesmi melalui Portal Admin FOSII (*Read-Only*). |
 | **Sumber bukti** | `[PLACEHOLDER - isi dari data riset asli]` |
 
 ##### Anti-Persona: Pak Bambang
@@ -469,27 +504,27 @@ Seluruh bagian ini berstatus **proto-persona** `[Hipotesis]`. Posisi P1-P6 harus
 | :--- | :--- |
 | **Header** | Pak Bambang, pemilik usaha grosir. *"Saya butuh pembukuan double-entry dan faktur pajak."* |
 | **Kebutuhan** | Jurnal akuntansi, faktur pajak, piutang, depresiasi aset. |
-| **Alasan eksklusi** | FinanceFlow hanya mencatat dan tidak memproses pembayaran, jadi bukan alat bayar atau dompet digital. FinanceFlow untuk keuangan pribadi. Memenuhi kebutuhan ini akan membuat form dan istilahnya membebani user utama, sehingga dijadikan batas cakupan untuk mencegah *scope creep*. |
+| **Alasan eksklusi** | FinanceFlow hanya mencatat dan tidak memproses pembayaran, jadi bukan alat bayar atau dompet digital. FinanceFlow untuk keuangan pribadi dan kas unit sederhana. Memenuhi kebutuhan pembukuan korporat ini akan membuat form dan istilahnya membebani user utama, sehingga dijadikan batas cakupan untuk mencegah *scope creep*. |
 
 #### Hierarki Tujuan Norman
 | Level | Dimas | Sarah |
 | :--- | :--- | :--- |
 | **Visceral** | "Saya ingin aplikasinya terlihat rapi dan tidak mengintimidasi." | "Saya ingin tampilannya enak dilihat setiap kali dibuka." |
-| **Behavioral** | "Saya ingin mencatat es kopi dalam beberapa ketukan." | "Saya ingin rekap bulanan keluar tanpa saya susun manual." |
-| **Reflective** | "Saya ingin merasa bertanggung jawab atas uang saya sendiri." | "Saya ingin merasa bisa dipercaya memegang uang." |
+| **Behavioral** | "Saya ingin mencatat es kopi dalam beberapa ketukan." | "Saya ingin rekap bulanan keluar utuh tanpa saya susun manual." |
+| **Reflective** | "Saya ingin merasa bertanggung jawab atas uang saya sendiri." | "Saya ingin merasa bisa dipercaya memegang dan mengawasi uang." |
 
 #### Mental Model Diagram (Indi Young)
 **Bagian atas: tower of behaviors dan motivasi** `[Hipotesis]`
 
 | Memilah Uang | Bertransaksi | Mengecek | Mengevaluasi | Merencanakan |
 | :--- | :--- | :--- | :--- | :--- |
-| Membayangkan uang di kantong terpisah | Menganggap pindah saldo sebagai "geser uang" | Ingin tahu aman atau tidak | Ingin bukti ringkas | Khawatir pengeluaran sekarang mengganggu rencana |
+| Membayangkan uang di kantong terpisah | Menganggap pindah saldo sebagai "geser uang" | Ingin tahu aman atau tidak | Ingin bukti ringkas & utuh | Khawatir pengeluaran sekarang mengganggu rencana |
 
 **Bagian bawah: fitur FinanceFlow yang mendukung** `[Kode]`
 
 | Memilah Uang | Bertransaksi | Mengecek | Mengevaluasi | Merencanakan |
 | :--- | :--- | :--- | :--- | :--- |
-| Kartu dompet | Form Reguler dan Transfer, chip kategori | Kartu ringkasan, insight | Laporan, struk PDF, CSV | Anggaran, target tabungan |
+| Kartu multi-dompet, pemisahan akun & Switcher 3 Unit FOSII | Form Reguler dan Transfer, chip kategori dinamis (Pengeluaran vs Pemasukan) | Kartu ringkasan, AI Insight & lonceng notifikasi real-time | Laporan grafik 6 bulan, struk PDF berlogo (tanpa batas item), CSV, Export/Import JSON | Anggaran bulanan, target tabungan, kalkulator finansial |
 
 **Gap Analysis:**
 * **Unsupported Mental Model (peluang inovasi):** mengetahui "aman jajan berapa hari ini" dan proyeksi saldo akhir bulan. Saat ini user harus menyimpulkan sendiri.
@@ -500,11 +535,12 @@ Seluruh bagian ini berstatus **proto-persona** `[Hipotesis]`. Posisi P1-P6 harus
 | :--- | :--- | :--- |
 | Istilah **"dompet"** mencakup rekening bank, sementara user mungkin memisahkan "rekening" dan "e-wallet". | User ragu rekening bank boleh dimasukkan. | Label form "Nama Dompet / Bank". |
 | Sistem mencatat transfer sebagai **dua baris** (keluar dan masuk), sementara user melihatnya sebagai **satu tindakan**. | Menghapus satu baris bisa merusak saldo. | Antarmuka memakai "Dari Dompet" dan "Ke Dompet"; menghapus transfer menghapus kedua barisnya. |
+| Pengawas organisasi ingin **melihat laporan** beberapa unit tanpa sengaja **mengubah/menghapus** transaksi bendahara. | Salah pencet tombol hapus saat memantau laporan. | Portal Admin Pengawas FOSII berjalan dalam mode *Strict Read-Only* (seluruh tombol tambah/ubah/hapus disembunyikan dan diblokir di server). |
 
 #### Persona sebagai Lensa Keputusan
-1. **Pertanyaan skenario:** "Apakah Dimas akan mengisi sub-kategori 3 level saat berdiri di kasir?" → Tidak; kategori cukup satu tingkat.
-2. **Prioritas fitur:** "Apakah pembuatan faktur membantu Dimas atau Sarah?" → Tidak; itu kebutuhan anti-persona, sehingga ditolak.
-3. **Design critique:** "Apakah contoh abu-abu di kolom membantu Sarah atau malah mengecoh Dimas?" → Placeholder dihapus, label tetap dipasang di luar kolom.
+1. **Pertanyaan skenario:** "Apakah Dimas akan mengisi sub-kategori 3 level saat berdiri di kasir?" → Tidak; kategori cukup satu tingkat dengan chip yang otomatis menyesuaikan Pengeluaran vs Pemasukan.
+2. **Prioritas fitur:** "Apakah pembuatan faktur pajak membantu Dimas atau Sarah?" → Tidak; itu kebutuhan anti-persona, sehingga ditolak.
+3. **Design critique:** "Apakah contoh abu-abu di kolom membantu Sarah atau malah mengecoh Dimas?" → Placeholder yang mengecoh dihapus, label tetap dipasang di luar kolom.
 
 ---
 
@@ -515,14 +551,15 @@ Kolom fitur dapat diperiksa di kode. Kolom temuan dan hasil test menunggu data a
 | Temuan Riset | Insight | Persona / Goal | HMW | Fitur `[Kode]` | Hasil Test |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `[PLACEHOLDER]` Saldo selisih karena pindah dana | Pindah dana bukan belanja | Dimas / saldo benar | HMW pindah dana tercatat benar | Mode Transfer, kategori transfer dikecualikan dari laporan | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Transaksi kecil tidak dicatat | Mencatat harus sepadan | Dimas / mencatat di kasir | HMW mencatat sebelum meninggalkan kasir | Form satu layar, chip kategori | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Placeholder disangka data | Contoh isian mengecoh | Dimas, Sarah / mengisi tanpa salah | HMW mencegah contoh disangka data | Label tetap, tanpa placeholder | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Laporan kaku dihindari | Bentuk akrab lebih diterima | Sarah / rekap rapi | HMW ringkasan yang senang disimpan | Struk PDF | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Perlu olah data sendiri | Sebagian user ingin data mentah | Sarah / arsip | HMW memberi kontrol atas data | Ekspor CSV | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Kaget saldo habis | Sinyal awal mencegah kaget | Dimas / tahu kondisi uang | HMW menyampaikan kondisi tanpa panik | AI Insight berbasis aturan, grafik 6 bulan, anggaran | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Transaksi kecil tidak dicatat | Mencatat harus sepadan | Dimas / mencatat di kasir | HMW mencatat sebelum meninggalkan kasir | Form satu layar, chip kategori dinamis (Pengeluaran vs Pemasukan) | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Placeholder disangka data | Contoh isian mengecoh | Dimas, Sarah / mengisi tanpa salah | HMW mencegah contoh disangka data | Label tetap, tanpa placeholder yang mengecoh | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Laporan kaku dihindari & struk terpotong | Bentuk akrab & utuh lebih diterima | Sarah / rekap rapi | HMW ringkasan yang senang disimpan | Struk PDF berlogo (`/favicon.png`) yang mencetak seluruh transaksi tanpa batas item | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Perlu olah/pindah data sendiri | Sebagian user ingin kendali penuh atas data | Sarah / arsip & migrasi | HMW memberi kontrol atas data | Ekspor CSV, Export/Import Data (`.json`), & Reset Semua Data ke 0 | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Pengawas butuh pantau kas unit tanpa mengubah data | Pemantauan harus aman dari salah pencet | Sarah / transparansi kas organisasi | HMW memantau multi-unit secara aman | Portal Admin Pengawas FOSII (*Read-Only*) dengan pemilihan maks. 3 akun unit (*Pesma Pusat*, *Pesma Cabang*, *Pesmi*) | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Kaget saldo habis | Sinyal awal mencegah kaget | Dimas / tahu kondisi uang | HMW menyampaikan kondisi tanpa panik | AI Insight berbasis aturan real-time, grafik 6 bulan, anggaran | `[PLACEHOLDER]` |
 | `[PLACEHOLDER]` Uang tersebar di banyak tempat | Total uang sulit diketahui | Dimas / lihat total | HMW melihat semua uang di satu tempat | Multi-dompet, Total Kekayaan | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Takut data bocor | Kepercayaan syarat adopsi | Dimas, Sarah / merasa aman | HMW mengurangi kecemasan soal data | OTP email, token sesi, hapus akun | `[PLACEHOLDER]` |
-| `[PLACEHOLDER]` Ingin tampilan tidak mengintimidasi | Tampilan memengaruhi kemauan membuka | Sarah / enak dilihat | HMW membuat keuangan tidak menakutkan | Tema gelap Titanium | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Takut data bocor | Kepercayaan syarat adopsi | Dimas, Sarah / merasa aman | HMW mengurangi kecemasan soal data | OTP email, token sesi HTTP-only, batasan privasi 3 unit FOSII, hapus akun | `[PLACEHOLDER]` |
+| `[PLACEHOLDER]` Ingin tampilan tidak mengintimidasi | Tampilan memengaruhi kemauan membuka | Sarah / enak dilihat | HMW membuat keuangan tidak menakutkan | Tema gelap Titanium Deep Navy & Indigo 120Hz | `[PLACEHOLDER]` |
 
 ---
 
@@ -593,5 +630,3 @@ Kolom fitur dapat diperiksa di kode. Kolom temuan dan hasil test menunggu data a
 - [ ] Peran AI pada transkripsi dan clustering
 
 ---
-
-
