@@ -41,6 +41,7 @@ export default function TransactionsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [undoItems, setUndoItems] = useState<any[] | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('ALL');
@@ -49,6 +50,10 @@ export default function TransactionsPage() {
   const [transferData, setTransferData] = useState({ fromWalletId: '', toWalletId: '', amount: '', description: 'Transfer antar dompet' });
 
   useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      setIsAdmin(Boolean(u?.isAdmin));
+    } catch {}
     fetchData();
   }, []);
 
@@ -190,9 +195,11 @@ export default function TransactionsPage() {
             <p className="text-sm text-muted mt-1">Pantau semua arus kas masuk, keluar, dan mutasi dompet</p>
           </div>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setError(''); }} className="btn-primary tap-target">
-          {showForm ? 'Batal' : '+ Catat Transaksi'}
-        </button>
+        {!isAdmin && (
+          <button onClick={() => { setShowForm(!showForm); setError(''); }} className="btn-primary tap-target">
+            {showForm ? 'Batal' : '+ Catat Transaksi'}
+          </button>
+        )}
       </header>
 
       {/* Toast Urungkan (Safe Exploration W01) */}
@@ -456,18 +463,20 @@ export default function TransactionsPage() {
                     <div className="font-extrabold" style={{ fontSize: '0.95rem', color: isIncome ? 'var(--color-success)' : 'var(--color-text)' }}>
                       {isIncome ? '+' : '-'}{rupiah(tx.amount)}
                     </div>
-                    <button onClick={() => handleDelete(tx)} aria-label={`Hapus ${tx.description || tx.category}`} className="tap-target" style={{
-                      background: 'rgba(244, 63, 94, 0.1)',
-                      border: 'none',
-                      color: 'var(--color-danger)',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      padding: '4px 10px',
-                      borderRadius: '8px'
-                    }}>
-                      Hapus
-                    </button>
+                    {!isAdmin && (
+                      <button onClick={() => handleDelete(tx)} aria-label={`Hapus ${tx.description || tx.category}`} className="tap-target" style={{
+                        background: 'rgba(244, 63, 94, 0.1)',
+                        border: 'none',
+                        color: 'var(--color-danger)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        padding: '4px 10px',
+                        borderRadius: '8px'
+                      }}>
+                        Hapus
+                      </button>
+                    )}
                   </div>
                 </div>
               );

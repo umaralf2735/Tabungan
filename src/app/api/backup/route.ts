@@ -194,3 +194,26 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const userId = getAuthUserId(request);
+    if (!userId) return unauthorized();
+
+    await prisma.$transaction([
+      prisma.transaction.deleteMany({ where: { userId } }),
+      prisma.budget.deleteMany({ where: { userId } }),
+      prisma.goal.deleteMany({ where: { userId } }),
+      prisma.wallet.deleteMany({ where: { userId } }),
+    ]);
+
+    return NextResponse.json({
+      message: 'Seluruh data dompet, transaksi, anggaran, dan target tabungan berhasil dihapus bersih.',
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || 'Gagal menghapus seluruh data' },
+      { status: 500 }
+    );
+  }
+}

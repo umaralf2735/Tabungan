@@ -1,10 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+
+  // Di domain fosii.financeflowpro.my.id khusus Admin, tidak ada reset OTP
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname.toLowerCase().startsWith('fosii.')) {
+      router.replace('/auth/login');
+    }
+  }, [router]);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');

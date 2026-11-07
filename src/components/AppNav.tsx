@@ -45,27 +45,30 @@ export function TopNav() {
     visible: false,
   });
 
-  const [isFosiiMode, setIsFosiiMode] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [activeUnit, setActiveUnit] = useState('pusat');
+  const [monitoredLabel, setMonitoredLabel] = useState('');
   const [switchingUnit, setSwitchingUnit] = useState(false);
 
   const activeIdx = NAV_ITEMS.findIndex(item => item.href === pathname);
 
   useEffect(() => {
-    const checkFosiiStatus = () => {
+    const syncAdminState = () => {
       if (typeof window === 'undefined') return;
-      const host = window.location.hostname.toLowerCase();
-      const isFosiiDomain = host.startsWith('fosii.') || host.includes('fosii');
-      const manualFosii = localStorage.getItem('fosiiMode') === 'true';
-      setIsFosiiMode(isFosiiDomain || manualFosii);
-
-      const savedUnit = localStorage.getItem('fosiiUnit') || 'pusat';
-      setActiveUnit(savedUnit);
+      try {
+        const rawUser = localStorage.getItem('user');
+        const parsedUser = rawUser ? JSON.parse(rawUser) : null;
+        setIsAdmin(Boolean(parsedUser?.isAdmin));
+        setActiveUnit(localStorage.getItem('fosiiUnit') || parsedUser?.unit || 'pusat');
+        setMonitoredLabel(parsedUser?.name || '');
+      } catch {
+        setIsAdmin(false);
+      }
     };
 
-    checkFosiiStatus();
-    window.addEventListener('financeflow:fosii-mode-changed', checkFosiiStatus);
-    return () => window.removeEventListener('financeflow:fosii-mode-changed', checkFosiiStatus);
+    syncAdminState();
+    window.addEventListener('financeflow:unit-changed', syncAdminState);
+    return () => window.removeEventListener('financeflow:unit-changed', syncAdminState);
   }, [pathname]);
 
   useEffect(() => {
@@ -89,7 +92,7 @@ export function TopNav() {
   }, [activeIdx, pathname]);
 
   const handleSwitchUnit = async (unitId: string) => {
-    if (unitId === activeUnit || switchingUnit) return;
+    if (switchingUnit) return;
     if (!localStorage.getItem('token')) return;
 
     setSwitchingUnit(true);
@@ -104,6 +107,7 @@ export function TopNav() {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('fosiiUnit', unitId);
         setActiveUnit(unitId);
+        setMonitoredLabel(data.user?.name || '');
         window.dispatchEvent(new Event('financeflow:data-updated'));
         window.dispatchEvent(new Event('financeflow:unit-changed'));
       }
@@ -142,9 +146,9 @@ export function TopNav() {
             <img src="/favicon.png" alt="" width={26} height={26} style={{ objectFit: 'contain' }} />
             <span>FinanceFlow</span>
           </Link>
-          {isFosiiMode && (
-            <span className="ledger-badge-pill" style={{ fontSize: '0.68rem', padding: '3px 9px', letterSpacing: '0.04em' }}>
-              FOSII
+          {isAdmin && (
+            <span className="ledger-badge-pill" style={{ fontSize: '0.66rem', padding: '3px 9px', letterSpacing: '0.03em' }}>
+              ADMIN FOSII • PANTAU
             </span>
           )}
         </div>
@@ -181,29 +185,29 @@ export function TopNav() {
         </div>
       </nav>
 
-      {/* SWITCHER 3 UNIT KEUANGAN FOSII (Pesma Pusat | Pesma Cabang | Pesmi) */}
-      {isFosiiMode && (
+      {/* BAR KHUSUS ADMIN PENGAWAS FOSII: SWITCHER 3 AKUN UNIT (Pesma Pusat | Pesma Cabang | Pesmi) */}
+      {isAdmin && (
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
-            padding: '10px 16px 0 16px',
+            padding: '12px 16px 0 16px',
             position: 'relative',
             zIndex: 40,
           }}
         >
           <div
             role="group"
-            aria-label="Pilih Unit Keuangan FOSII"
+            aria-label="Pantau Unit Keuangan FOSII"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '5px 7px',
+              padding: '6px 10px',
               borderRadius: '999px',
-              background: 'rgba(12, 19, 36, 0.9)',
-              border: '1px solid rgba(165, 180, 252, 0.2)',
-              boxShadow: '0 12px 28px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+              background: 'rgba(12, 19, 36, 0.92)',
+              border: '1px solid rgba(165, 180, 252, 0.24)',
+              boxShadow: '0 12px 28px -8px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14)',
               backdropFilter: 'blur(16px)',
               flexWrap: 'wrap',
               justifyContent: 'center',
@@ -214,14 +218,14 @@ export function TopNav() {
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 color: '#A5B4FC',
-                padding: '0 8px 0 6px',
+                padding: '0 6px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
               }}
             >
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399', boxShadow: '0 0 8px #34D399' }} />
-              Unit FOSII:
+              Pantau Kinerja:
             </span>
             {FOSII_UNITS.map(u => {
               const isSelected = activeUnit === u.id;
@@ -236,9 +240,9 @@ export function TopNav() {
                   style={{
                     padding: '6px 14px',
                     borderRadius: '999px',
-                    border: isSelected ? '1px solid rgba(165, 180, 252, 0.45)' : '1px solid transparent',
+                    border: isSelected ? '1px solid rgba(165, 180, 252, 0.48)' : '1px solid transparent',
                     background: isSelected
-                      ? 'radial-gradient(120% 120% at 50% 100%, rgba(79, 70, 229, 0.65) 0%, rgba(17, 28, 49, 0.95) 100%)'
+                      ? 'radial-gradient(120% 120% at 50% 100%, rgba(79, 70, 229, 0.68) 0%, rgba(17, 28, 49, 0.95) 100%)'
                       : 'transparent',
                     color: isSelected ? '#FFFFFF' : 'var(--color-text-muted)',
                     fontSize: '0.78rem',
@@ -252,6 +256,22 @@ export function TopNav() {
                 </button>
               );
             })}
+            <Link
+              href="/menu"
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                color: '#E0E7FF',
+                padding: '5px 11px',
+                borderRadius: '999px',
+                background: 'rgba(99, 102, 241, 0.16)',
+                border: '1px solid rgba(165, 180, 252, 0.25)',
+                marginLeft: '4px',
+              }}
+              title="Pilih 3 akun database untuk Pesma Pusat, Pesma Cabang, dan Pesmi"
+            >
+              ⚙ Pilih 3 Akun ({monitoredLabel ? monitoredLabel.split(' (')[0] : 'Atur'})
+            </Link>
           </div>
         </div>
       )}

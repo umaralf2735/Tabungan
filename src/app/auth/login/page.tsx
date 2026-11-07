@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -8,6 +8,16 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isFosiiPortal, setIsFosiiPortal] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname.toLowerCase();
+      if (host.startsWith('fosii.')) {
+        setIsFosiiPortal(true);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +36,11 @@ export default function LoginPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.user?.isAdmin) {
+        localStorage.setItem('fosiiUnit', data.user.unit || 'pusat');
+      } else {
+        localStorage.removeItem('fosiiUnit');
+      }
       router.push('/');
     } catch (err: any) {
       setError(err.message);
@@ -103,7 +118,7 @@ export default function LoginPage() {
                 FinanceFlow
               </span>
               <span className="ledger-badge-pill" style={{ marginLeft: 'auto' }}>
-                Personal Ledger
+                {isFosiiPortal ? 'FOSII Admin' : 'Personal Ledger'}
               </span>
             </div>
 
@@ -116,7 +131,7 @@ export default function LoginPage() {
                 color: '#FFFFFF',
               }}
             >
-              Selamat datang{' '}
+              {isFosiiPortal ? 'Portal Pengawas ' : 'Selamat datang '}
               <span
                 style={{
                   background: 'linear-gradient(90deg, #E0E7FF 0%, #818CF8 100%)',
@@ -124,11 +139,13 @@ export default function LoginPage() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                kembali.
+                {isFosiiPortal ? 'FOSII.' : 'kembali.'}
               </span>
             </h1>
             <p className="text-muted text-sm" style={{ marginTop: '6px' }}>
-              Masuk untuk mengelola arus kas, dompet, dan laporan Anda.
+              {isFosiiPortal
+                ? 'Masuk dengan akun Admin untuk memantau kinerja arus kas Pesma Pusat, Pesma Cabang, dan Pesmi.'
+                : 'Masuk untuk mengelola arus kas, dompet, dan laporan Anda.'}
             </p>
           </div>
 
@@ -171,12 +188,14 @@ export default function LoginPage() {
                 <label htmlFor="login-password" className="text-xs text-muted block" style={{ fontWeight: 600 }}>
                   Kata Sandi
                 </label>
-                <Link
-                  href="/auth/forgot-password"
-                  style={{ fontSize: '0.75rem', color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}
-                >
-                  Lupa sandi?
-                </Link>
+                {!isFosiiPortal && (
+                  <Link
+                    href="/auth/forgot-password"
+                    style={{ fontSize: '0.75rem', color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}
+                  >
+                    Lupa sandi?
+                  </Link>
+                )}
               </div>
               <input
                 id="login-password"
@@ -195,25 +214,27 @@ export default function LoginPage() {
               disabled={loading}
               style={{ width: '100%', padding: '14px', marginTop: '0.5rem', fontSize: '0.92rem' }}
             >
-              {loading ? 'Memproses...' : 'Masuk ke Akun'}
+              {loading ? 'Memproses...' : isFosiiPortal ? 'Masuk sebagai Admin FOSII' : 'Masuk ke Akun'}
             </button>
           </form>
 
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: '1.75rem',
-              paddingTop: '1.25rem',
-              borderTop: '1px solid rgba(255, 255, 255, 0.07)',
-            }}
-          >
-            <p className="text-sm text-muted">
-              Belum punya akun?{' '}
-              <Link href="/auth/register" style={{ color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}>
-                Daftar sekarang
-              </Link>
-            </p>
-          </div>
+          {!isFosiiPortal && (
+            <div
+              style={{
+                textAlign: 'center',
+                marginTop: '1.75rem',
+                paddingTop: '1.25rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.07)',
+              }}
+            >
+              <p className="text-sm text-muted">
+                Belum punya akun?{' '}
+                <Link href="/auth/register" style={{ color: 'var(--color-primary-text)', fontWeight: 600, textDecoration: 'none' }}>
+                  Daftar sekarang
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

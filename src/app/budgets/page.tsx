@@ -21,6 +21,7 @@ export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1); // 1-12
@@ -30,6 +31,10 @@ export default function BudgetsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      setIsAdmin(Boolean(u?.isAdmin));
+    } catch {}
     fetchBudgets();
   }, [selectedMonth, selectedYear]);
 
@@ -108,9 +113,11 @@ export default function BudgetsPage() {
             <p className="text-sm text-muted mt-1">Tetapkan dan pantau batas pengeluaran per kategori</p>
           </div>
         </div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary tap-target">
-          {showForm ? 'Batal' : '+ Buat Budget'}
-        </button>
+        {!isAdmin && (
+          <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: '', amount: '', month: selectedMonth, year: selectedYear }); }} className="btn-primary tap-target">
+            {showForm ? 'Batal' : '+ Buat Budget'}
+          </button>
+        )}
       </div>
 
       {/* Filter Compact */}
@@ -185,10 +192,12 @@ export default function BudgetsPage() {
                   </div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>{b.category}</h3>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => handleEdit(b)} aria-label={`Edit anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-primary-text)', fontSize: '0.8rem', cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => handleDelete(b.id)} aria-label={`Hapus anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer' }}>Hapus</button>
-                </div>
+                {!isAdmin && (
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => handleEdit(b)} aria-label={`Edit anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-primary-text)', fontSize: '0.8rem', cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => handleDelete(b.id)} aria-label={`Hapus anggaran ${b.category}`} className="tap-target" style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer' }}>Hapus</button>
+                  </div>
+                )}
               </div>
               
               <div>
